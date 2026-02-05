@@ -1,10 +1,10 @@
 import React from 'react'
 import Navbar from './Navbar'
 
-export default function Home() {
+export default function Home({darkmode,setDarkmode}) {
   return (
     <div>
-      <Navbar/>
+      <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
       Home
     </div>
   )

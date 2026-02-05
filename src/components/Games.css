@@ -1,0 +1,36 @@
+.filter{
+    padding: 10px;
+    width: 15vw;
+    height: 92vh;
+    border: 1px solid;
+    border-top: none;
+    display: flex; flex-direction: column; gap: 10px;
+}
+.games .searchDiv{
+    display: flex;
+    gap: 5px;
+}
+.cardlist{
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    border: 1px solid peachpuff;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 30px;
+}
+.hbox{
+    display: flex;
+}
+.card{
+    height: 40vh;
+    width: 15vw;
+    border: 1px solid;
+}
+
+.games .genres{
+    display: flex;
+    gap: 5px;
+}
