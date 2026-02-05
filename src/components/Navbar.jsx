@@ -30,7 +30,7 @@ export default function Navbar({darkmode,setDarkmode}) {
 
 
   return (
-    <navbar className='navbar'>
+    <navbar className={'navbar'}>
       <div className="left">
         <div className="page" onClick={()=>toHome()}>Home</div>
         <div className="page" onClick={()=>toGames()}>Games</div>

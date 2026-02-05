@@ -4,8 +4,8 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .app{
-    min-width: 100vw;
-    min-width: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
     
 }
 

@@ -3,9 +3,11 @@ import Navbar from './Navbar'
 
 export default function Profile() {
   return (
-    <div>
+    <div className='profile'>
       <Navbar/>
-      Profil
+      <div profileDiv>
+        
+      </div>
     </div>
   )
 }

@@ -18,6 +18,12 @@
     height: 30px;
 }
 
+.signupForm input, .signupGoogle{
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid white;
+}
+
 .signupEmail{
     width: 175px;
 }
@@ -33,4 +39,14 @@
     gap: 5px;
     height: 30px;
     width: 250px;
+}
+
+.signup .logB{
+    color: white;
+    text-decoration: underline;
+}
+
+.signup .logB:hover{
+    color: red;
+    cursor: pointer;
 }

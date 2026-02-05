@@ -29,7 +29,7 @@ function App() {
   ])
 
   return (
-    <div className={'app'+darkmode ? "dark": ""}>
+    <div className={'app'+darkmode ? " dark": ""}>
       <RouterProvider router={router} />
     </div>
   )

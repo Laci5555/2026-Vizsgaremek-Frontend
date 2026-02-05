@@ -6,5 +6,47 @@
 
 .loginForm{
     display: flex; flex-direction: column; gap: 10px;
+    align-items: center;
+    padding: 10px;
+    background-color: #222831;
+    border: 1px solid white; border-radius: 10px;
+}
 
+.loginForm input{
+    width: 250px;
+    height: 30px;
+}
+
+.loginForm input, .loginGoogle{
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid white;
+}
+
+
+.loginEmail{
+    width: 175px;
+}
+
+.separator{
+    margin: 10px 0px;
+    height: 2px; color: white;
+    width: 60%;
+}
+
+.loginGoogle{
+    display: flex; align-items: center; justify-content: center;
+    gap: 5px;
+    height: 30px;
+    width: 250px;
+}
+
+.login .signupB{
+    color: white;
+    text-decoration: underline;
+}
+
+.login .signupB:hover{
+    color: red;
+    cursor: pointer;
 }

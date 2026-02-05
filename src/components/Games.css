@@ -9,6 +9,7 @@
 .games .searchDiv{
     display: flex;
     gap: 5px;
+    width: 100%;
 }
 .cardlist{
     width: 100%;
@@ -16,8 +17,9 @@
     overflow-y: scroll;
     scrollbar-width: thin;
     border: 1px solid peachpuff;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    /* display: grid; grid-template-columns: repeat(5, 1fr); */
+    justify-content: center; align-items: center;
+    display: flex; flex-wrap: wrap; 
     gap: 20px;
     padding: 30px;
 }
@@ -25,12 +27,33 @@
     display: flex;
 }
 .card{
-    height: 40vh;
-    width: 15vw;
+    height: 230px;
+    width: 230px;
     border: 1px solid;
 }
 
 .games .genres{
     display: flex;
     gap: 5px;
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1520px) {
+    /* .cardlist{
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        justify-content: center; align-items: center;
+    } */
+}
+
+@media screen and (min-width: 900px) and (max-width: 1200px) {
+    /* .cardlist{
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        justify-content: space-between; align-items: center;
+    } */
+}
+
+@media screen and (min-width: 600px) and (max-width: 900px) {
+    /* .cardlist{
+        display: grid; grid-template-columns: repeat(2, 1fr);
+        justify-content: center; align-items: center;
+    } */
 }
