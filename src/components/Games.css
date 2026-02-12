@@ -14,6 +14,21 @@
     border-radius: 5px;
 }
 
+.filterIcon{
+    display: none;
+    width: 50px; height: 50px;
+    margin: 5px;
+}
+
+.close{
+    display: none;
+}
+
+.close:hover{
+    color: red;
+    cursor: pointer;
+}
+
 .searchDiv .searchBar{
     border: none;
     padding: 5px;
@@ -37,6 +52,7 @@
 }
 .hbox{
     display: flex;
+    position: relative;
 }
 .card{
     height: 230px;
@@ -49,12 +65,34 @@
     gap: 5px;
 }
 
-@media screen and (min-width: 1200px) and (max-width: 1520px) {
-    /* .cardlist{
-        display: grid; grid-template-columns: repeat(4, 1fr);
-        justify-content: center; align-items: center;
-    } */
+@media screen and (max-width: 1010px) {
+    .filter{
+        display: none;
+        left: -100%;
+        position: absolute;
+        padding: 10px;
+        width: 250px;
+        height: 92vh;
+        border: 1px solid;
+        border-top: none;
+        display: flex; flex-direction: column; gap: 10px;
+        z-index: 1000;
+        background-color: grey;
+        transition: left 0.8s ease-in-out;
+    }
+    .filterIcon{
+        display: inline;
+        background-color: white;
+        
+    }
+    .filter.show {
+        left: 0;
+    }
+    .close{
+        display: inline;
+    }
 }
+
 
 @media screen and (min-width: 900px) and (max-width: 1200px) {
     /* .cardlist{

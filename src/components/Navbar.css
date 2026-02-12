@@ -27,6 +27,9 @@
     margin-right: 10px;
 }
 
+.navbar .ikon{
+    font-size: 25px;
+}
 .navbar .mode .ikon:hover{
     cursor: pointer;
 }
@@ -43,4 +46,48 @@
 
 .navbar .profPicture:hover{
     cursor: pointer;
+}
+
+@media screen and (min-width:601px) and (max-width: 900px) {
+    .navbar .page{
+        font-size: 23px;
+    }
+    .navbar .ikon{
+        font-size: 22px;
+    }
+    .navbar .profName{
+        font-size: 19px;
+    }
+}
+
+@media screen and (min-width:401px) and (max-width: 600px) {
+    .navbar .page{
+        font-size: 20px;
+    }
+    .navbar .ikon{
+        font-size: 19px;
+    }
+    .navbar .profName{
+        font-size: 17px;
+    }
+    .navbar .profPicture{
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media screen and (min-width:0px) and (max-width: 401px) {
+    .navbar .page{
+        font-size: 15px;
+    }
+    .navbar .ikon{
+        font-size: 14px;
+    }
+    .navbar .profName{
+        font-size: 12px;
+    }
+    .navbar .profPicture{
+        width: 30px;
+        height: 30px;
+    }
 }
