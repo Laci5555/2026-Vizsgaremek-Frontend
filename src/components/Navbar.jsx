@@ -13,16 +13,16 @@ export default function Navbar({darkmode,setDarkmode}) {
   const navigate = useNavigate()
 
   function toHome() {
-      navigate("/")
+    navigate("/")
   }
   function toGames() {
-      navigate("/games")
+    navigate("/games")
   }
   function toDiscussion() {
-      navigate("/discussion")
+    navigate("/discussion")
   }
   function toFinder() {
-      navigate("/finder")
+    navigate("/finder")
   }
   function toProfile() {
     navigate("/profile")
@@ -30,7 +30,7 @@ export default function Navbar({darkmode,setDarkmode}) {
 
 
   return (
-    <navbar className={'navbar'}>
+    <div className='navbar'>
       <div className="left">
         <div className="page" onClick={()=>toHome()}>Home</div>
         <div className="page" onClick={()=>toGames()}>Games</div>
@@ -39,13 +39,13 @@ export default function Navbar({darkmode,setDarkmode}) {
       </div>
       <div className="right">
         <div className="mode" onClick={()=>setDarkmode(!darkmode)}>
-          {darkmode ? <FaRegMoon size={25} className='ikon'/> : <MdOutlineLightMode size={25} className='ikon'/>}
+          {darkmode ? <FaRegMoon className='ikon'/> : <MdOutlineLightMode size={25} className='ikon'/>}
         </div>
         <div className='profName'>{name}</div>
         <div onClick={()=>toProfile()}>
           <img className='profPicture' src="https://sm.ign.com/ign_pk/cover/a/avatar-gen/avatar-generations_rpge.jpg" alt="" />
         </div>
       </div>
-    </navbar>
+    </div>
   )
 }

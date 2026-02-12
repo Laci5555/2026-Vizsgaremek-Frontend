@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import {useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import "./Games.css";
 import { IoSearchOutline } from 'react-icons/io5';
+import { TfiFilter } from 'react-icons/tfi';
+import { IoMdClose } from 'react-icons/io';
 
 export default function Games({darkmode,setDarkmode}) {
 
@@ -14,14 +16,13 @@ export default function Games({darkmode,setDarkmode}) {
   const [games,setGames]=useState([...jatekok]);
 
   const [refresh,setRefresh]=useState(false);
-
-  
+  const [showFilter,setShowFilter]=useState(false);
 
   useEffect(()=>{
     async function getGames() {
       // setGames([...jatekok])
       console.log(games);
-      
+      setShowFilter(false);
     }
     getGames();
   },[refresh]);
@@ -38,11 +39,17 @@ export default function Games({darkmode,setDarkmode}) {
     setRefresh(!refresh);
   }
 
+  function showingFilter() {
+    setShowFilter(!showFilter);
+  }
+
   return (
     <div className='games'>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
       <div className="hbox">
-        <div className="filter">
+        <button className='filterIcon' onClick={showingFilter}><TfiFilter  /></button>
+        <div className={`filter ${showFilter ? "show" : ""}`}>
+          <IoMdClose className='close' onClick={showingFilter}/>
           <div className='searchDiv'>
             <IoSearchOutline style={{color:"grey"}}/>
             <input type="text" className='searchBar' value={game} onChange={e=>setGame(e.target.value)}/>
