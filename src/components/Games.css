@@ -1,16 +1,29 @@
 .filter{
     padding: 10px;
-    width: 15vw;
+    width: 250px;
     height: 92vh;
     border: 1px solid;
     border-top: none;
     display: flex; flex-direction: column; gap: 10px;
 }
 .games .searchDiv{
-    display: flex;
-    gap: 5px;
+    display: flex; gap: 5px; align-items: center;
     width: 100%;
+    background-color: white;
+    padding: 5px;
+    border-radius: 5px;
 }
+
+.searchDiv .searchBar{
+    border: none;
+    padding: 5px;
+}
+
+.searchDiv .searchBtn{
+    border: 1px solid grey; border-radius: 5px; padding: 5px;
+    background-color: rgb(30, 79, 126); color: white;
+}
+
 .cardlist{
     width: 100%;
     max-height: 92vh;
@@ -18,10 +31,9 @@
     scrollbar-width: thin;
     border: 1px solid peachpuff;
     /* display: grid; grid-template-columns: repeat(5, 1fr); */
-    justify-content: center; align-items: center;
-    display: flex; flex-wrap: wrap; 
+    display: flex; flex-wrap: wrap; justify-content: center;
     gap: 20px;
-    padding: 30px;
+    padding: 30px 5px;
 }
 .hbox{
     display: flex;

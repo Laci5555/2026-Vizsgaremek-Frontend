@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import "./Games.css";
+import { IoSearchOutline } from 'react-icons/io5';
 
 export default function Games({darkmode,setDarkmode}) {
 
@@ -43,10 +44,10 @@ export default function Games({darkmode,setDarkmode}) {
       <div className="hbox">
         <div className="filter">
           <div className='searchDiv'>
+            <IoSearchOutline style={{color:"grey"}}/>
             <input type="text" className='searchBar' value={game} onChange={e=>setGame(e.target.value)}/>
-            <input type="button" value="Search" onClick={getGame}/>
+            <input className='searchBtn' type="button" value="Search" onClick={getGame}/>
           </div>
-          
           <div className='checkboxs'>
             {genres.map(x=><div className='genres' key={x}>
                 <input type="checkbox" name="" id={x} />
