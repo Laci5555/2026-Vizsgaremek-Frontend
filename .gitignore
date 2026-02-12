@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 pnpm-lock.yaml
+firebaseConfig.js
 
 # Editor directories and files
 .vscode/*
