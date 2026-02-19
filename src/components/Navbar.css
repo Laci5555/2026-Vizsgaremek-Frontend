@@ -61,6 +61,9 @@
 }
 
 @media screen and (min-width:401px) and (max-width: 600px) {
+    .navbar{
+        justify-content: center;
+    }
     .navbar .page{
         font-size: 20px;
     }
@@ -70,6 +73,10 @@
     .navbar .profName{
         font-size: 17px;
     }
+    .navbar .mode{
+        margin-right: 0px;
+        margin-left: 10px;
+    }
     .navbar .profPicture{
         width: 40px;
         height: 40px;
@@ -77,6 +84,10 @@
 }
 
 @media screen and (min-width:0px) and (max-width: 401px) {
+    .navbar{
+        padding: 10px;
+        gap: 5px;
+    }
     .navbar .page{
         font-size: 15px;
     }
@@ -86,8 +97,12 @@
     .navbar .profName{
         font-size: 12px;
     }
+    .navbar .mode{
+        margin-right: 0px;
+        margin-left: 10px;
+    }
     .navbar .profPicture{
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
     }
 }
