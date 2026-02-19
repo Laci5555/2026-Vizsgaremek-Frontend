@@ -8,6 +8,16 @@
     background-color: darkslategrey;
 }
 
+.navbar .menuIkon{
+    display: none;
+    color: white;
+    font-size: 30px;
+}
+
+.navbar:hover{
+    cursor: pointer;
+}
+
 .navbar .left, .right{
    display: flex;
     gap: 10px;
@@ -60,30 +70,32 @@
     }
 }
 
-@media screen and (min-width:401px) and (max-width: 600px) {
+@media screen and (min-width:001px) and (max-width: 600px) {
     .navbar{
-        justify-content: center;
+        padding-left: 15px;
     }
-    .navbar .page{
-        font-size: 20px;
+    .navbar .menuIkon{
+        display: block;
     }
-    .navbar .ikon{
-        font-size: 19px;
+    .navbar .left{
+        position: absolute;
+        top: 8vh;
+        left: -100%;
+        padding: 20px;
+        width: 250px;
+        height: 92vh;
+        display: flex; flex-direction: column; gap: 10px;
+        align-items: flex-start;
+        z-index: 1000;
+        background-color: white; color: black;
+        transition: left 0.8s ease-in-out;
     }
-    .navbar .profName{
-        font-size: 17px;
-    }
-    .navbar .mode{
-        margin-right: 0px;
-        margin-left: 10px;
-    }
-    .navbar .profPicture{
-        width: 40px;
-        height: 40px;
+    .left.show{
+        left: 0;
     }
 }
 
-@media screen and (min-width:0px) and (max-width: 401px) {
+/*@media screen and (min-width:0px) and (max-width: 401px) {
     .navbar{
         padding: 10px;
         gap: 5px;
@@ -105,4 +117,4 @@
         width: 28px;
         height: 28px;
     }
-}
+}*/
