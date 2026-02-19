@@ -3,3 +3,11 @@
     height: 100vh;
 }
 
+.profileDiv{
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 10px;
+}
+
+.username,.profPicture{
+    display: flex; gap: 10px;
+}
