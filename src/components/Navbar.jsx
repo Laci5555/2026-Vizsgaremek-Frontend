@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import { MdOutlineLightMode } from "react-icons/md";
 import { FaRegMoon } from "react-icons/fa";
 import './Navbar.css';
+import { IoMdMenu } from 'react-icons/io';
+import { log } from 'firebase/firestore/pipelines';
 
 export default function Navbar({darkmode,setDarkmode}) {
 
   const [name,setName]=useState("Aang");
+  const [showMenu,setShowMenu]=useState(false);
   
 
   const navigate = useNavigate()
@@ -28,10 +31,15 @@ export default function Navbar({darkmode,setDarkmode}) {
     navigate("/profile")
   }
 
+  function showMenus() {
+    setShowMenu(!showMenu);
+  }
+
 
   return (
     <div className='navbar'>
-      <div className="left">
+      <IoMdMenu className='menuIkon' onClick={showMenus}/>
+      <div className={`left ${showMenu ? "show" : ""}`}>
         <div className="page" onClick={()=>toHome()}>Home</div>
         <div className="page" onClick={()=>toGames()}>Games</div>
         <div className="page" onClick={()=>toDiscussion()}>Discussion</div>

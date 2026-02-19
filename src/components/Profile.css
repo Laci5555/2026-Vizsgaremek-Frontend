@@ -1,0 +1,101 @@
+.profile {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #151515;
+}
+
+.profileContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+}
+
+.profileCard {
+    background: #222831;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+
+.avatarPreview{
+    margin-top: 10px;
+    width: 120px;
+    height: 120px;
+    margin: 0px auto;
+}
+
+.avatarPreview img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid darkslategrey;
+    margin-bottom: 10px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 5px;
+}
+
+.inputGroup label {
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+}
+
+.inputGroup input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.saveBtn {
+    background-color: darkslategrey;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.3s;
+}
+
+.saveBtn:hover {
+    background-color: #1a3030;
+}
+
+.saveBtn:disabled {
+    background-color: gray;
+}
+
+.logoutBtn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+}
+
+.logoutBtn:hover {
+    background-color: #c0392b;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 10px 0;
+}
