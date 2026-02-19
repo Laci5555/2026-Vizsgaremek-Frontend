@@ -5,7 +5,6 @@ export default function Home({darkmode,setDarkmode}) {
   return (
     <div>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
-      Home
     </div>
   )
 }

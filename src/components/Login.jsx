@@ -54,7 +54,7 @@ export default function Login({auth, userDataCollection}) {
             <input type="button" value="Login" className='loginEmail' onClick={()=>LoginWithEmail()}/>
             <span style={{display:"flex",gap:"5px"}}><p>Don't have an account? <span className='signupB' onClick={()=>toSignup()}>Sign up</span></p></span>
             <hr className='separator'/>
-            <button className='loginGoogle' onClick={()=>LoginInWithGoogle()}><FaGoogle /> <p>Login with Google!</p></button>
+            <button className='loginGoogle' onClick={()=>LoginInWithGoogle()}><FaGoogle /> <p>Continue with Google!</p></button>
         </div>
         
     </div>
