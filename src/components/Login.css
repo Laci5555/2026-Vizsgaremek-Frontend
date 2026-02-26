@@ -1,52 +1,157 @@
-.login{
-    display: flex; align-items: center; justify-content: center;
-    width: 100vw; height: 100vh;
-    flex-direction: column;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg:           #0f0f0f;
+  --surface:      #1a1a1a;
+  --border:       #2e2e2e;
+  --border-focus: #555;
+  --text:         #ececec;
+  --muted:        #6b6b6b;
+  --danger:       #ef4444;
 }
 
-.loginForm{
-    display: flex; flex-direction: column; gap: 10px;
-    align-items: center;
-    padding: 10px;
-    background-color: #222831;
-    border: 1px solid white; border-radius: 10px;
+/* ── Page ── */
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
 }
 
-.loginForm input{
-    width: 250px;
-    height: 30px;
+/* ── Card ── */
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+  width: 400px;
+  padding: 48px 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.loginForm input, .loginGoogle{
-    border-radius: 5px;
-    padding: 5px;
-    border: 1px solid white;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-
-.loginEmail{
-    width: 175px;
+/* ── Title ── */
+.loginForm h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 8px;
+  letter-spacing: -0.4px;
 }
 
-.separator{
-    margin: 10px 0px;
-    height: 2px; color: white;
-    width: 60%;
+/* ── Inputs ── */
+.loginForm input[type="email"],
+.loginForm input[type="password"] {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
 }
 
-.loginGoogle{
-    display: flex; align-items: center; justify-content: center;
-    gap: 5px;
-    height: 30px;
-    width: 250px;
+.loginForm input[type="email"]:focus,
+.loginForm input[type="password"]:focus {
+  border-color: var(--border-focus);
 }
 
-.login .signupB{
-    color: white;
-    text-decoration: underline;
+.loginForm input::placeholder {
+  color: #6b6b6b;
 }
 
-.login .signupB:hover{
-    color: red;
-    cursor: pointer;
+/* ── Login button ── */
+.loginEmail {
+  width: 100%;
+  height: 46px;
+  margin-top: 4px;
+  background: var(--text);
+  border: none;
+  border-radius: 8px;
+  color: #0f0f0f;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.loginEmail:hover  { opacity: 0.85; }
+.loginEmail:active { opacity: 1; }
+
+/* ── Signup text ── */
+.login span > p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.login .signupB {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.login .signupB:hover { color: var(--danger); }
+
+/* ── Divider ── */
+.login .separator {
+    display: block;
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px 0;
+    width: 100%;
+}
+
+/* ── Google button ── */
+.loginGoogle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 46px;
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  padding: 0;
+}
+
+.loginGoogle p { margin: 0; }
+
+.loginGoogle:hover {
+  border-color: var(--border-focus);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 400px) {
+  .loginForm {
+    width: 100%;
+    padding: 48px 28px;
+    justify-content: center;
+  }
 }

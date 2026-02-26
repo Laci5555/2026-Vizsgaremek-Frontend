@@ -60,7 +60,7 @@ export default function Signup({auth, userDataCollection}) {
             <input type="password" placeholder='Password' value={pass} onChange={e=>setPass(e.target.value)} required/>
             <input type="password" placeholder='Password again' value={spass} onChange={e=>setSpass(e.target.value)} required/>
             <input type="button" value="Sign up" className='signupEmail' onClick={()=>SignUpWithEmailandPass()}/>
-            <span style={{display:"flex",gap:"5px"}}><p>Already have an account <span className='logB' onClick={()=>toLogin()}>Login</span></p></span>
+            <span style={{display:"flex",justifyContent:"center",gap:"5px"}}><p>Already have an account <span className='logB' onClick={()=>toLogin()}>Login</span></p></span>
             <hr className='separator'/>
             <button className='signupGoogle' onClick={()=>LoginInWithGoogle()}><FaGoogle /> <p>Continue with Google!</p></button>
         </div>
