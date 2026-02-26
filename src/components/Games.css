@@ -39,7 +39,7 @@
     background-color: rgb(30, 79, 126); color: white;
 }
 
-.cardlist{
+.games .cardlist{
     width: 100%;
     max-height: 92vh;
     overflow-y: scroll;
@@ -54,7 +54,7 @@
     display: flex;
     position: relative;
 }
-.card{
+.games .card{
     height: 230px;
     width: 230px;
     border: 1px solid;
@@ -66,6 +66,9 @@
 }
 
 @media screen and (max-width: 1010px) {
+    .hbox{
+        height: 92vh;
+    }
     .filter{
         display: none;
         left: -100%;
@@ -83,13 +86,16 @@
     .filterIcon{
         display: inline;
         background-color: white;
-        
     }
     .filter.show {
         left: 0;
     }
     .close{
         display: inline;
+        /*position: absolute;
+        top: 5px;
+        right: 5px;
+        margin-bottom: 10px;*/
     }
 }
 

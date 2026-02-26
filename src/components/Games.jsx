@@ -72,7 +72,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
       <div className="hbox">
         <button className='filterIcon' onClick={showingFilter}><TfiFilter  /></button>
         <div className={`filter ${showFilter ? "show" : ""}`}>
-          <IoMdClose className='close' onClick={showingFilter}/>
+          <div style={{display:"flex",justifyContent:"flex-end"}}><IoMdClose className='close' onClick={showingFilter}/></div>
           <div className='searchDiv'>
             <IoSearchOutline style={{color:"grey"}}/>
             <input type="text" className='searchBar' value={game} onChange={e=>setGame(e.target.value)}/>

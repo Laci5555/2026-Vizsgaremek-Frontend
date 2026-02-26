@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
 import { signOut, updateProfile } from "firebase/auth";
 import "./Profile.css";
-import { useState } from 'react';
 
 export default function Profile({auth,darkmode,setDarkmode }) {
   const [username, setUsername] = useState("");

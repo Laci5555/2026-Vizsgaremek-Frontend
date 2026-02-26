@@ -1,0 +1,31 @@
+.discussion{
+    
+}
+
+.discussion .cardlist{
+    padding: 20px;
+    height: 92vh; width: 100%;
+    display: flex; gap: 20px; flex-wrap: wrap;
+    overflow-y: scroll; 
+    scrollbar-width: thin;
+}
+
+.discussion .card{
+    width: 300px;
+    height: 230px;
+    border: 1px solid;
+    padding: 5px;
+}
+
+.card .person{
+    display: flex; gap: 10px; padding: 5px;
+}
+
+.person .kep{
+    width: 20px; height: 20px;
+}
+
+.card .text{
+    padding: 5px;
+    text-align: justify;
+}
