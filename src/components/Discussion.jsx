@@ -8,6 +8,8 @@ export default function Discussion() {
   const [discussion,setDiscussion] =useState([
     {id:1, profile: "Aang", pfp:"https://sm.ign.com/ign_pk/cover/a/avatar-gen/avatar-generations_rpge.jpg", szoveg:"Ez az első üzenet!"},
     {id:2, profile: "Aang", pfp:"https://sm.ign.com/ign_pk/cover/a/avatar-gen/avatar-generations_rpge.jpg", szoveg:"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim natus in facilis quis vel. Corporis, hic, explicabo consequatur, nostrum molestias possimus voluptate id inventore error at obcaecati similique perferendis fuga?"},
+    {id:3, profile: "Aang", pfp:"https://sm.ign.com/ign_pk/cover/a/avatar-gen/avatar-generations_rpge.jpg", szoveg:"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim natus in facilis quis vel. Corporis, hic, explicabo consequatur, nostrum molestias possimus voluptate id inventore error at obcaecati similique perferendis fuga?"},
+    {id:4, profile: "Aang", pfp:"https://sm.ign.com/ign_pk/cover/a/avatar-gen/avatar-generations_rpge.jpg", szoveg:"Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim natus in facilis quis vel. Corporis, hic, explicabo consequatur, nostrum molestias possimus voluptate id inventore error at obcaecati similique perferendis fuga?"}
   ]);
 
   

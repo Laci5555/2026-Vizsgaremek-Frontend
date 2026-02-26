@@ -1,17 +1,20 @@
 .discussion{
-    
+    width: 100%;
+    min-height: 100vh;
+    background-color: #151515;
 }
 
 .discussion .cardlist{
     padding: 20px;
     height: 92vh; width: 100%;
-    display: flex; gap: 20px; flex-wrap: wrap;
+    display: flex;
+    gap: 20px; flex-wrap: wrap; align-content: flex-start; justify-content: center;
     overflow-y: scroll; 
     scrollbar-width: thin;
 }
 
 .discussion .card{
-    width: 300px;
+    width: 280px;
     height: 230px;
     border: 1px solid;
     padding: 5px;
@@ -23,6 +26,7 @@
 
 .person .kep{
     width: 20px; height: 20px;
+    border-radius: 50%;
 }
 
 .card .text{
