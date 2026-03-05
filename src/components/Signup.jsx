@@ -53,6 +53,8 @@ export default function Signup({auth, userDataCollection}) {
 
   return (
     <div className='signup'>
+        <h1 className="title">Welcome to Gamminity!</h1>
+        <div className="motto">Your best platform for communication about gaming!</div>
         <div className='signupForm'>
             <h1>Sign up</h1>
             <input type="text" placeholder='Username' value={name} onChange={e=>setName(e.target.value)} required/>
@@ -64,7 +66,6 @@ export default function Signup({auth, userDataCollection}) {
             <hr className='separator'/>
             <button className='signupGoogle' onClick={()=>LoginInWithGoogle()}><FaGoogle /> <p>Continue with Google!</p></button>
         </div>
-        
     </div>
   )
 }
