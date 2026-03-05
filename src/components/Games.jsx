@@ -5,6 +5,8 @@ import { IoSearchOutline } from 'react-icons/io5';
 import { TfiFilter } from 'react-icons/tfi';
 import { IoMdClose } from 'react-icons/io';
 import { collection, getDocs } from 'firebase/firestore';
+import { FaPlus } from 'react-icons/fa';
+import { GoPlus } from "react-icons/go";
 
 export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCollection}) {
 
@@ -23,6 +25,9 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
 
   const [refresh,setRefresh]=useState(false);
   const [showFilter,setShowFilter]=useState(false);
+
+
+  const[newGameName,setNewGameName]=useState("");
 
   useEffect(()=>{
     async function getGames() {
@@ -66,6 +71,12 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
     setShowFilter(!showFilter);
   }
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) setIsOpen(false);
+  };
+
   return (
     <div className='games'>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
@@ -88,6 +99,23 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
         <div className="cardlist">
           {/* x.img, x.likes, x.dislikes, x.genre[] */}
           {gamesMain.length>0 ? (games.length>0 ? games.map(x => <div className='card' key={x.id}>{x.name}</div>) : <div>Sajnos ilyen nevű játék nincs...</div>) : <div>Betöltés...</div>}
+          <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
+        </div>
+      </div>
+      <div className={`backdrop ${isOpen ? "visible" : ""}`} onClick={handleBackdropClick}>
+        <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-top-bar" />
+          <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+          <div className="newgame">
+            <h2>Kérj fel egy játékot hogy felkerüljön!</h2>
+            <div>
+              <label>Játék neve</label>
+              <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)}/>
+            </div>
+            <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => {setIsOpen(false); }}>
+              Kérés elküldése
+            </button>
+          </div>
         </div>
       </div>
     </div>
