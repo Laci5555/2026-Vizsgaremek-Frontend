@@ -4,9 +4,10 @@ import "./Games.css";
 import { IoSearchOutline } from 'react-icons/io5';
 import { TfiFilter } from 'react-icons/tfi';
 import { IoMdClose } from 'react-icons/io';
-import { collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { FaPlus } from 'react-icons/fa';
 import { GoPlus } from "react-icons/go";
+import { db } from '../../firebaseApp';
 
 export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCollection}) {
 
@@ -77,6 +78,15 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
     if (e.target === e.currentTarget) setIsOpen(false);
   };
 
+  async function SubmitRequest() {
+    setIsOpen(false)
+    try {
+      await addDoc(collection(db, "game-requests"), {name:newGameName});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <div className='games'>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
@@ -102,7 +112,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
           <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
         </div>
       </div>
-      <div className={`backdrop ${isOpen ? "visible" : ""}`} onClick={handleBackdropClick}>
+      <div className={`backdrop ${isOpen ? "visible" : ""}`} onMouseDownCapture={handleBackdropClick}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-top-bar" />
           <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
@@ -112,7 +122,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
               <label>Játék neve</label>
               <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)}/>
             </div>
-            <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => {setIsOpen(false); }}>
+            <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => SubmitRequest()}>
               Kérés elküldése
             </button>
           </div>
