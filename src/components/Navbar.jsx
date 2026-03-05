@@ -6,11 +6,19 @@ import { FaRegMoon } from "react-icons/fa";
 import './Navbar.css';
 import { IoMdMenu } from 'react-icons/io';
 import { log } from 'firebase/firestore/pipelines';
+import { useEffect } from 'react';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../firebaseApp';
 
-export default function Navbar({darkmode,setDarkmode}) {
+export default function Navbar({darkmode,setDarkmode,user}) {
 
-  const [name,setName]=useState("Aang");
+  const [name,setName] = useState("");
+  const [pfp, setPfp] = useState("")
+
+
   const [showMenu,setShowMenu]=useState(false);
+
+  const userDataCollection = collection(db, 'user-data');
   
 
   const navigate = useNavigate()
@@ -35,6 +43,17 @@ export default function Navbar({darkmode,setDarkmode}) {
     setShowMenu(!showMenu);
   }
 
+  useEffect(()=>{
+    async function getUserData() {
+      const snap = await getDocs(query(userDataCollection, where("email", "==", user.email)))
+      const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
+      setName(lst[0]?.username)
+      setPfp(lst[0]?.picture)
+    }
+    getUserData()
+  },[user])
+
+  
 
   return (
     <div className='navbar'>
@@ -51,7 +70,7 @@ export default function Navbar({darkmode,setDarkmode}) {
         </div>
         <div className='profName'>{name}</div>
         <div onClick={()=>toProfile()}>
-          <img className='profPicture' src="https://sm.ign.com/ign_pk/cover/a/avatar-gen/avatar-generations_rpge.jpg" alt="" />
+          <img className='profPicture' src={pfp} alt="" />
         </div>
       </div>
     </div>

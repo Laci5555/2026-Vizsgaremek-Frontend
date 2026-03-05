@@ -20,7 +20,7 @@ function App() {
   const [darkmode,setDarkmode]=useState(true);
 
   
-  const userDataCollection = collection(db, 'user-data');
+  
 
   const gamesDataCollection = collection(db, 'games');
   const genreCollection = collection(db, 'genres');
@@ -33,16 +33,16 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
     return unsubscribe
   },[])
-  
 
-  console.log(user);
+  
+  
   
 
 
   const router = createBrowserRouter([
-    {path:"/", element:<Home darkmode={darkmode} setDarkmode={setDarkmode}/>},
-    {path:"/login", element:<Login auth={auth} userDataCollection={userDataCollection}/>},
-    {path:"/signup", element:<Signup auth={auth} userDataCollection={userDataCollection}/>},
+    {path:"/", element:<Home darkmode={darkmode} setDarkmode={setDarkmode} user={user}/>},
+    {path:"/login", element:<Login auth={auth} />},
+    {path:"/signup", element:<Signup auth={auth}/>},
     {path:"/games", element:<Games darkmode={darkmode} setDarkmode={setDarkmode} gamesDataCollection={gamesDataCollection} genreCollection={genreCollection}/>},
     {path:"/discussion", element:<Discussion/>},
     {path:"/finder", element:<Finder/>},

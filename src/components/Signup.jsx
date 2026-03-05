@@ -4,15 +4,17 @@ import { FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { addDoc, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../firebaseApp';
 
-export default function Signup({auth, userDataCollection}) {
+export default function Signup({auth}) {
 
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [pass, setPass] = useState("")
     const [spass, setSpass] = useState("")
 
+    const userDataCollection = collection(db, 'user-data');
 
 
     const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function Signup({auth, userDataCollection}) {
         try {
           await createUserWithEmailAndPassword(auth, email, pass)
           navigate("/")
-          await addDoc(userDataCollection, {'email':email, 'username':name, 'picture':'https://www.google.com/search?q=base+user+pictur&sca_esv=bab5da91c7c319fb&rlz=1C1CHBD_huHU1039HU1190&udm=2&biw=1920&bih=953&sxsrf=ANbL-n7NiG9a4jdnsejVPnGXbwvcd7L2iw%3A1770886417350&ei=EZWNabKKFZ7i7_UP0reJyQk&ved=0ahUKEwjy1t_-ydOSAxUe8bsIHdJbIpkQ4dUDCBQ&uact=5&oq=base+user+pictur&gs_lp=Egtnd3Mtd2l6LWltZyIQYmFzZSB1c2VyIHBpY3R1ckjLJlCzD1i4JXACeACQAQCYAcEBoAHXC6oBAzcuN7gBA8gBAPgBAZgCCqAC0gnCAgcQABiABBgTwgIGEAAYExgewgIIEAAYExgFGB7CAgoQABgTGAgYChgewgIIEAAYExgIGB7CAggQABiABBixA8ICBRAAGIAEwgIHEAAYgAQYCsICBBAAGB7CAgYQABgFGB7CAgYQABgIGB6YAwCIBgGSBwUxLjguMaAH2TuyBwUxLjguMbgH0gnCBwUyLTEuOcgHc4AIAA&sclient=gws-wiz-img#sv=CAMSVhoyKhBlLUFMLUY5S3VuckhPRG5NMg5BTC1GOUt1bnJIT0RuTToOUnBtckdESkVBWmpmWE0gBCocCgZtb3NhaWMSEGUtQUwtRjlLdW5ySE9Ebk0YADABGAcgxPOLiAEwAkoIEAIYAiACKAI'});
+          await addDoc(userDataCollection, {'email':email, 'username':name, 'picture':'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg'});
         } catch (err) {
           console.log(err);
         } 
