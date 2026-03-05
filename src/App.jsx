@@ -44,7 +44,7 @@ function App() {
     {path:"/login", element:<Login auth={auth} />},
     {path:"/signup", element:<Signup auth={auth}/>},
     {path:"/games", element:<Games darkmode={darkmode} setDarkmode={setDarkmode} gamesDataCollection={gamesDataCollection} genreCollection={genreCollection}/>},
-    {path:"/discussion", element:<Discussion/>},
+    {path:"/discussion", element:<Discussion user={user}/>},
     {path:"/finder", element:<Finder/>},
     {path:"/profile", element:<Profile auth={auth} user={user}/>},
     {path:"*", element:<NotFound/>},
