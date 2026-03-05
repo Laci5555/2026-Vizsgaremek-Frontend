@@ -1,75 +1,110 @@
-.filter{
+.filter {
     padding: 10px;
     width: 250px;
     height: 92vh;
     border: 1px solid;
     border-top: none;
-    display: flex; flex-direction: column; gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-.games .searchDiv{
-    display: flex; gap: 5px; align-items: center;
+
+.games .searchDiv {
+    display: flex;
+    gap: 5px;
+    align-items: center;
     width: 100%;
     background-color: white;
     padding: 5px;
     border-radius: 5px;
 }
 
-.filterIcon{
+.filterIcon {
     display: none;
-    width: 50px; height: 50px;
+    width: 50px;
+    height: 50px;
     margin: 5px;
 }
 
-.close{
+.close {
     display: none;
 }
 
-.close:hover{
+.close:hover {
     color: red;
     cursor: pointer;
 }
 
-.searchDiv .searchBar{
+.searchDiv .searchBar {
     border: none;
     padding: 5px;
 }
 
-.searchDiv .searchBtn{
-    border: 1px solid grey; border-radius: 5px; padding: 5px;
-    background-color: rgb(30, 79, 126); color: white;
+.searchDiv .searchBtn {
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: rgb(30, 79, 126);
+    color: white;
 }
 
-.games .cardlist{
+.games .cardlist {
     width: 100%;
     max-height: 92vh;
     overflow-y: scroll;
     scrollbar-width: thin;
     border: 1px solid peachpuff;
     /* display: grid; grid-template-columns: repeat(5, 1fr); */
-    display: flex; flex-wrap: wrap; justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
     padding: 30px 5px;
+    position: relative;
 }
-.hbox{
+
+.hbox {
     display: flex;
     position: relative;
 }
-.games .card{
+
+.games .card {
     height: 230px;
     width: 230px;
     border: 1px solid;
 }
 
-.games .genres{
+.games .genres {
     display: flex;
     gap: 5px;
 }
 
+.games .requestGame {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    background-color: purple;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25pt;
+    font-weight: bold;
+}
+
+.games .requestGame:hover {
+    filter: drop-shadow(2px 2px 10px rgb(155, 5, 155));
+    cursor: pointer;
+}
+
 @media screen and (max-width: 1010px) {
-    .hbox{
+    .hbox {
         height: 92vh;
     }
-    .filter{
+
+    .filter {
         display: none;
         left: -100%;
         position: absolute;
@@ -78,19 +113,24 @@
         height: 92vh;
         border: 1px solid;
         border-top: none;
-        display: flex; flex-direction: column; gap: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         z-index: 1000;
         background-color: grey;
         transition: left 0.8s ease-in-out;
     }
-    .filterIcon{
+
+    .filterIcon {
         display: inline;
         background-color: white;
     }
+
     .filter.show {
         left: 0;
     }
-    .close{
+
+    .close {
         display: inline;
         /*position: absolute;
         top: 5px;
@@ -112,4 +152,122 @@
         display: grid; grid-template-columns: repeat(2, 1fr);
         justify-content: center; align-items: center;
     } */
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease, opacity 0.3s ease;
+}
+
+.backdrop.visible {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    pointer-events: all;
+    opacity: 1;
+}
+
+.modal {
+    background: #12121a;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90vw;
+    padding: 32px;
+    position: relative;
+    transform: translateY(16px);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.backdrop.visible .modal {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.close-btn:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.newgame {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.newgame h2 {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+    padding-right: 24px;
+}
+
+.newgame input[type="text"] {
+    margin-top: 5px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 10px 5px;
+    font-size: 14px;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.newgame input[type="text"]:focus {
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+}
+
+.newgame input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.submit-btn {
+    align-self: flex-end;
+    padding: 9px 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.submit-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
 }

@@ -47,6 +47,8 @@ export default function Login({auth, userDataCollection}) {
 
   return (
     <div className='login'>
+        <h1 className="title">Welcome to Gamminity!</h1>
+        <div className="motto">Your best platform for communication about gaming!</div>
         <div className='loginForm'>
             <h1>Login</h1>
             <input type="email" placeholder='Email' value={email} onChange={e=>setEmail(e.target.value)} required/>
