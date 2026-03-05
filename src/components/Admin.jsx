@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 export default function Admin() {
 
+    const [admin,setAdmin]=useState(true);
     //let genres=["Action","Adventure","Fighting","FPS","Gacha","Horror","MOBA","Puzzle","Racing","RPG","Strategy","Survival","Shooter","Simulation","Sports"];
     let [gameName,setGameName]=useState("");
     let [genres,setGenres]=useState(["Action","Adventure","Fighting","FPS","Gacha","Horror","MOBA","Puzzle","Racing","RPG","Strategy","Survival","Shooter","Simulation","Sports"]);
