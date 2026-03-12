@@ -13,11 +13,19 @@ export default function Admin() {
     let [genre,setGenre]=useState("");
     let [gamePicture,setGamePicture]=useState("");
     const [url,setUrl]=useState(true);
+    const [requests,setRequests]=useState(["Elden Ring","Resident Evil: Requiem"]);
 
     function addGameGenres(item) {
         let gameGenres2=[...gameGenres];
-        gameGenres2.push(item);
-        setGameGenres(gameGenres2);
+        if(!gameGenres2.includes(item) && item.trim().length!=0){
+            gameGenres2.push(item);
+        } else{
+            let i=gameGenres2.findIndex(x=>x==item);
+            gameGenres2.splice(i,1);
+        }
+        setGameGenres(gameGenres2.sort());
+        console.log(gameGenres2);
+        
     }
 
     function addGame() {
@@ -28,7 +36,12 @@ export default function Admin() {
 
     function addGenre() {
         let genres2=[...genres];
-        genres2.push(genre);
+        let i=genres2.findIndex(x=>x.toLocaleLowerCase().trim()==genre.toLocaleLowerCase().trim());
+        if(i==-1 && genre.trim().length!=0){
+            genres2.push(genre);
+            console.log("Nágy sikeer!");
+            
+        }
         setGenres(genres2);
     }
 
@@ -44,7 +57,7 @@ export default function Admin() {
                 </div>
                 <div>
                     <span>Genres:</span>
-                    <div>{genres.map(x=><div key={x}><input  type="checkbox" name="" id="chk" onChange={()=>addGameGenres(x)}/><label htmlFor='chk'> {x}</label></div>)}</div>
+                    <div>{genres.map(x=><div key={x} onClick={() => addGameGenres(x)}><input type="checkbox" defaultChecked={false} checked={gameGenres.includes(x)} name="" id={`chk-${x}`} /><label htmlFor={`chk-${x}`}>{x}</label></div>)}</div>
                 </div>
                 <div className='pictureType'>
                     <h2>Picture upload method</h2>
@@ -65,23 +78,30 @@ export default function Admin() {
                 </div>
                 <div className='addPicture'>
                     {url ? 
-                        <div>
+                        <div className='picture'>
                             <label htmlFor='gamePicture'>Game picture: </label>
                             <input id='gamePicture' type="text" value={gamePicture} onChange={(e) => setGamePicture(e.target.value)}/>
                         </div> : 
-                        <div>
-                            <label for="myfile">Select files: </label>
-                            <input type="file" id="myfile" name="myfile" multiple value={gamePicture} onChange={(e) => setGamePicture(e.target.value)}/>
+                        <div className='file'>
+                            <label htmlFor="myfile">Select files: </label>
+                            <input style={{display:"none"}} type="file" id="myfile" name="myfile" multiple value={gamePicture} onChange={(e) => setGamePicture(e.target.value)}/>
+                            <label className='fileChooser' htmlFor="myfile">File choosing</label>
                         </div>
                     }
                 </div>
-                <input style={{width:"200px"}} type="button" value="Add new game" onClick={addGame}/>
+                <input className='addGameButton' style={{width:"200px"}} type="button" value="Add new game" onClick={addGame}/>
             </div>
-            <div className="addGenre">
-                <label htmlFor='genre'>Genre:</label>
-                <input id='genre' type="text" value={genre} onChange={(e) => setGenre(e.target.value)}/>
-                <input type="button" value="Add genre" onClick={addGenre}/>
+            <div className='oldalso'>
+                <div className="addGenre">
+                    <label htmlFor='genre'>Genre:</label>
+                    <input id='genre' type="text" value={genre} onChange={(e) => setGenre(e.target.value)}/>
+                    <input className='addGenreButton' type="button" value="Add genre" onClick={addGenre}/>
+                </div>
+                <div className='gameRequests'>
+                    {requests.map(x=><div>{x}</div>)}
+                </div>
             </div>
+            
         </div>
         
     </div>
