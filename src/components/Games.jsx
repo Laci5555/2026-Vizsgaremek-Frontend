@@ -8,6 +8,7 @@ import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { FaPlus } from 'react-icons/fa';
 import { GoPlus } from "react-icons/go";
 import { db } from '../../firebaseApp';
+import Message from './Message';
 
 export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCollection}) {
 
@@ -90,6 +91,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
   return (
     <div className='games'>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
+      <Message/>
       <div className="hbox">
         <button className='filterIcon' onClick={showingFilter}><TfiFilter  /></button>
         <div className={`filter ${showFilter ? "show" : ""}`}>
