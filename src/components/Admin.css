@@ -1,0 +1,343 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --bg: #13131a;
+    --surface: #1c1c26;
+    --surface2: #24242f;
+    --border: #32323f;
+    --accent: #6c63ff;
+    --text: #f0eeff;
+    --text-muted: #8888aa;
+}
+
+.admin {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+}
+
+/* LAYOUT */
+.admin .adds {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 32px;
+    align-items: flex-start;
+}
+
+/* PANELS */
+.admin .addNewGame,
+.admin .addGenre,
+.admin .gameRequests {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.admin .addNewGame { flex: 2; }
+.admin .addGenre   { flex: 1; }
+
+/* LABELS */
+.admin label,
+.admin span {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+/* TEXT INPUTS */
+.admin input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+/* GENRE GRID */
+.admin .addNewGame > div:nth-child(2) > div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.admin .addNewGame > div:nth-child(2) > div > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.admin .addNewGame > div:nth-child(2) > div > div:hover {
+    border-color: var(--accent);
+    background: #2a2a3a;
+}
+
+.admin input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.admin .addNewGame > div:nth-child(2) > div > div label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text);
+    cursor: pointer;
+    margin: 0;
+}
+
+/* PICTURE TYPE */
+.admin .pictureType {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin .pictureType h2 {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* TOGGLE */
+.pictureType .toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin .genreCheck{
+    display: flex; gap: 5px; align-items: center;
+}
+
+.admin .genreDiv{
+    display: flex; justify-content: space-between;
+}
+
+.label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.25s;
+    user-select: none;
+}
+
+.label.active {
+    color: var(--text);
+}
+
+.toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    cursor: pointer;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.track {
+    position: absolute;
+    inset: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: background 0.25s, border-color 0.25s;
+}
+
+.toggle input:checked ~ .track {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.toggle input:checked ~ .track .thumb {
+    transform: translateX(22px);
+}
+
+/* ADD PICTURE */
+.admin .addPicture {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin .addPicture label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+/* FILE CHOOSER */
+.fileChooser {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 18px;
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.fileChooser:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+/* BUTTONS */
+.addGameButton,
+.addGenreButton {
+    width: 100% !important;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.addGameButton {
+    background: var(--accent);
+    color: white;
+}
+
+.addGameButton:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+.addGenreButton {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.addGenreButton:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.admin .oldalso{
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.oldalso .gameRequests{
+    gap: 10px;
+}
+
+.admin .request{
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; padding: 5px; border-radius: 10px;
+}
+
+.admin .request:hover{
+    border: 1px dashed var(--accent);
+}
+
+@media (min-width: 951px) {
+    .admin .addNewGame { flex: 2; }
+    .admin .oldalso { flex: 1; }
+}
+
+@media (min-width: 501px) and (max-width: 950px) {
+    .admin .adds {
+        flex-direction: column;
+    }
+    .admin .addNewGame {
+        width: 100%;
+    }
+    .admin .oldalso {
+        flex-direction: row;
+        width: 100%;
+    }
+    .admin .oldalso .addGenre {
+        flex: 1;
+    }
+    .admin .oldalso .gameRequests {
+        flex: 1;
+    }
+}
+
+@media (max-width: 500px) {
+    .admin .adds {
+        flex-direction: column;
+        padding: 16px;
+    }
+    .admin .addNewGame,
+    .admin .addGenre,
+    .admin .gameRequests {
+        width: 100%;
+        padding: 18px;
+    }
+    .admin .oldalso {
+        flex-direction: column;
+        width: 100%;
+    }
+    .admin .addNewGame > div:nth-child(2) > div {
+        grid-template-columns: 1fr 1fr;
+    }
+    .addGameButton {
+        width: 100% !important;
+    }
+}

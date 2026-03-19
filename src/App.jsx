@@ -13,6 +13,7 @@ import { collection, getFirestore } from "firebase/firestore";
 import { onAuthStateChanged } from 'firebase/auth'
 import { useEffect } from 'react'
 import { auth, db } from '../firebaseApp'
+import Admin from './components/Admin'
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
     {path:"/games", element:<Games darkmode={darkmode} setDarkmode={setDarkmode} gamesDataCollection={gamesDataCollection} genreCollection={genreCollection}/>},
     {path:"/discussion", element:<Discussion user={user}/>},
     {path:"/finder", element:<Finder/>},
+    {path:"/admin", element:<Admin/>},
     {path:"/profile", element:<Profile auth={auth} user={user}/>},
     {path:"*", element:<NotFound/>},
   ])
