@@ -3,19 +3,32 @@ import { useState } from 'react';
 import Navbar from './Navbar';
 import "./Admin.css";
 import { IoMdClose } from 'react-icons/io';
+import { useEffect } from 'react';
+import { db } from '../../firebaseApp';
 
 export default function Admin() {
 
     const [admin, setAdmin] = useState(true);
     //let genres=["Action","Adventure","Fighting","FPS","Gacha","Horror","MOBA","Puzzle","Racing","RPG","Strategy","Survival","Shooter","Simulation","Sports"];
     let [gameName, setGameName] = useState("");
-    let [genres, setGenres] = useState(["Action", "Adventure", "Fighting", "FPS", "Gacha", "Horror", "MOBA", "Puzzle", "Racing", "RPG", "Strategy", "Survival", "Shooter", "Simulation", "Sports"]);
+    let [genres, setGenres] = useState([]);
     let [gameGenres, setGameGenres] = useState([]);
     let [genre, setGenre] = useState("");
     let [gamePicture, setGamePicture] = useState("");
     const [url, setUrl] = useState(true);
     const [requests, setRequests] = useState(["Elden Ring", "Resident Evil: Requiem"]);
     const [fileNames, setFileNames] = useState([]);
+
+    
+
+
+    useEffect(()=>{
+        async function fetchGenres() {
+            const snap = await getDocs(collection(db, "genres"));
+            const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
+            setGenres(lst)
+        }
+    },[])
 
     function addGameGenres(item) {
         let gameGenres2 = [...gameGenres];
@@ -27,7 +40,6 @@ export default function Admin() {
         }
         setGameGenres(gameGenres2.sort());
         console.log(gameGenres2);
-
     }
 
     function addGame() {
@@ -79,7 +91,7 @@ export default function Admin() {
                     </div>
                     <div>
                         <span>Genres:</span>
-                        <div >{genres.map(x => <div key={x} className='genreDiv' onClick={() => addGameGenres(x)}><div className='genreCheck' ><input type="checkbox" defaultChecked={false} checked={gameGenres.includes(x)} name="" id={`chk-${x}`} /><label htmlFor={`chk-${x}`}>{x}</label></div><IoMdClose onClick={() => delGenre(x)} /></div>)}</div>
+                        <div >{genres.map(x => <div key={x.id} className='genreDiv' onClick={() => addGameGenres(x.name)}><div className='genreCheck' ><input type="checkbox" defaultChecked={false} checked={gameGenres.includes(x.name)} name="" id={`chk-${x.name}`} /><label htmlFor={`chk-${x.name}`}>{x.name}</label></div><IoMdClose onClick={() => delGenre(x.id)} /></div>)}</div>
                     </div>
                     <div className='pictureType'>
                         <h2>Picture upload method</h2>
@@ -106,7 +118,7 @@ export default function Admin() {
                             </div> :
                             <div className='file'>
                                 <label htmlFor="myfile">Select files: </label>
-                                <input style={{ display: "none" }} type="file" id="myfile" name="myfile" multiple
+                                <input style={{ display: "none" }} type="file" id="myfile" name="myfile" 
                                     onChange={(e) => { /*const files = Array.from(e.target.files); setFileNames(files.map(f => f.name));*/ setGamePicture(e.target.value);
                                     }}
                                 />
