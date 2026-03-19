@@ -31,7 +31,8 @@
 
 /* PANELS */
 .admin .addNewGame,
-.admin .addGenre {
+.admin .addGenre,
+.admin .gameRequests {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -139,6 +140,14 @@
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.admin .genreCheck{
+    display: flex; gap: 5px; align-items: center;
+}
+
+.admin .genreDiv{
+    display: flex; justify-content: space-between;
 }
 
 .label {
@@ -273,15 +282,62 @@
     display: flex; flex-direction: column; gap: 10px;
 }
 
-@media (min-width:501px) and (max-width:950px) {
-    .admin .adds{
+.oldalso .gameRequests{
+    gap: 10px;
+}
+
+.admin .request{
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; padding: 5px; border-radius: 10px;
+}
+
+.admin .request:hover{
+    border: 1px dashed var(--accent);
+}
+
+@media (min-width: 951px) {
+    .admin .addNewGame { flex: 2; }
+    .admin .oldalso { flex: 1; }
+}
+
+@media (min-width: 501px) and (max-width: 950px) {
+    .admin .adds {
         flex-direction: column;
     }
-    .adds .addNewGame{
+    .admin .addNewGame {
         width: 100%;
     }
-    .adds .oldalso{
+    .admin .oldalso {
         flex-direction: row;
+        width: 100%;
     }
+    .admin .oldalso .addGenre {
+        flex: 1;
+    }
+    .admin .oldalso .gameRequests {
+        flex: 1;
+    }
+}
 
+@media (max-width: 500px) {
+    .admin .adds {
+        flex-direction: column;
+        padding: 16px;
+    }
+    .admin .addNewGame,
+    .admin .addGenre,
+    .admin .gameRequests {
+        width: 100%;
+        padding: 18px;
+    }
+    .admin .oldalso {
+        flex-direction: column;
+        width: 100%;
+    }
+    .admin .addNewGame > div:nth-child(2) > div {
+        grid-template-columns: 1fr 1fr;
+    }
+    .addGameButton {
+        width: 100% !important;
+    }
 }
