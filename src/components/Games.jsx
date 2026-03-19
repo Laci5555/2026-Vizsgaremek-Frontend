@@ -24,6 +24,8 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
 
   const [genres, setGenres] = useState([])
 
+  const [Genrefilters, setGenreFilters] = useState([])
+
 
   const [refresh,setRefresh]=useState(false);
   const [showFilter,setShowFilter]=useState(false);
@@ -56,13 +58,19 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
     FetchGenres()
   },[])
 
+
+
   async function getGame() {
     let modGames=[];
-    if(game==""){
+    if(game=="" && Genrefilters.length == 0){
       setGames([...gamesMain])
-    } else {
-      // modGames=jatekok.filter(x=>x.toLowerCase().includes(game.toLowerCase()));
+    }else if(Genrefilters.length == 0 && game!=""){
       modGames = gamesMain.filter(x => x.name.toLowerCase().includes(game.toLowerCase()));
+      setGames(modGames);
+    }
+    else {
+      // modGames=jatekok.filter(x=>x.toLowerCase().includes(game.toLowerCase()));
+      modGames = gamesMain.filter(x => x.name.toLowerCase().includes(game.toLowerCase()) && x.genre.some(x => Genrefilters.includes(x)));
       // console.log(modGames);
       setGames(modGames);
     }
@@ -88,6 +96,22 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
     }
   }
 
+  function HandleFilterGenre(name) {
+    let i = Genrefilters.findIndex(x => x == name)
+    event.stopPropagation()
+    // console.log(event.target);
+    
+    if(i == -1){
+      Genrefilters.push(name)
+    }
+    else if(i != -1){
+      Genrefilters.splice(i, 1)
+    }
+    setGenreFilters([...Genrefilters])
+  }
+
+  console.log(Genrefilters);
+
   return (
     <div className='games'>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
@@ -102,9 +126,9 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
             <input className='searchBtn' type="button" value="Search" onClick={getGame}/>
           </div>
           <div className='checkboxs'>
-            {genres.map(x=><div className='genres' key={x.id}>
-                <input type="checkbox" name="" id={x.name} />
-                <label htmlFor={x.name}>{x.name}</label>
+            {genres.map(x=><div className='genres' key={x.id} onClick={()=>HandleFilterGenre(x.name)}>
+                <input type="checkbox" name="" id={x.name} checked={Genrefilters.includes(x.name)}/>
+                <label>{x.name}</label>
             </div>)}
           </div>
         </div>
