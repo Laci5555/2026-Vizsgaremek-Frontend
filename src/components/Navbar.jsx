@@ -29,8 +29,8 @@ export default function Navbar({darkmode,setDarkmode,user}) {
   function toGames() {
     navigate("/games")
   }
-  function toDiscussion() {
-    navigate("/discussion")
+  function toDiscussions() {
+    navigate("/discussions")
   }
   function toFinder() {
     navigate("/finder")
@@ -61,7 +61,7 @@ export default function Navbar({darkmode,setDarkmode,user}) {
       <div className={`left ${showMenu ? "show" : ""}`}>
         <div className="page" onClick={()=>toHome()}>Home</div>
         <div className="page" onClick={()=>toGames()}>Games</div>
-        <div className="page" onClick={()=>toDiscussion()}>Discussion</div>
+        <div className="page" onClick={()=>toDiscussions()}>Discussions</div>
         <div className="page" onClick={()=>toFinder()}>Finder</div>
       </div>
       <div className="right">

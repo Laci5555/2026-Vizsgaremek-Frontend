@@ -1,74 +1,141 @@
-import React from 'react'
-import Navbar from './Navbar'
-import { useState } from 'react'
-import "./Discussion.css";
-import { useEffect } from 'react';
-import { addDoc, collection, doc, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom';
+import './Discussion.css';
+import { IoArrowBack } from 'react-icons/io5';
+import { addDoc, collection, getDocs, orderBy, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebaseApp';
+import Navbar from './Navbar';
 
-export default function Discussion({user}) {
+export default function Discussion({ user }) {
 
-  const [discussions,setDiscussions] =useState([]);
+  const { id, title } = useParams();
+  const navigate = useNavigate();
 
+  const [currentchat, setCurrentchat] = useState([]);
   const [users, setUsers] = useState([]);
-
-  const [currentchat, setCurrentchat] = useState([])
-
+  const [discussion, setDiscussion] = useState(null);
   const [message, setMessage] = useState("");
+  const [refresh, setRefresh] = useState(true);
 
-  useEffect(()=>{
-    async function getDiscussions() {
-      const snap = await getDocs(collection(db, "discussions"))
-      const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
-      setDiscussions(lst)
+  useEffect(() => {
+    async function getData() {
+      const usersSnap = await getDocs(collection(db, "user-data"));
+      setUsers(usersSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }))); 
     }
-    async function getUsers() {
-      const snap = await getDocs(collection(db, "user-data"))
-      const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
-      setUsers(lst)
+    async function getDiscussion() {
+      const discSnap = await getDocs(collection(db, "discussions"));
+      const all = discSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      setDiscussion(all.find(x => x.id === id) || null);
+      console.log(discussion);
+      
     }
-    getDiscussions()
-    getUsers()
-  },[])
+    getData();
+    getDiscussion();
+  }, [id]);
 
-  function getUser(email){
-    let i = users.findIndex(x => x.email == email)
-    return users[i]
+  useEffect(() => {
+    async function getCurrentChat() {
+      const snap = await getDocs(
+        query(collection(db, "discussion-messages"), where("discussionID", "==", id), orderBy("time", "asc"))
+      );
+      setCurrentchat(snap.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+    }
+    getCurrentChat();
+  }, [refresh]);
+
+  function getUser(email) {
+    return users.find(x => x.email === email);
   }
 
-  function OpenChat(id){
-    setCurrentchat(id)
-  }
-
-  async function sendMessage(){
+  async function sendMessage() {
+    if (message.trim() === "") return;
     try {
-      if(message!=""){
-        await addDoc(collection(db, "discussion-messages"), {comment:message, discussionID:currentchat, email:user.email, time:Timestamp.now()});
-      }
+      await addDoc(collection(db, "discussion-messages"), { comment: message, discussionID: id, email: user.email, time: Timestamp.now()});
+      setMessage("");
+      setRefresh(!refresh);
     } catch (err) {
       console.log(err);
     }
   }
 
-  
+  function toDiscussions() {
+    navigate("/discussions")
+  }
+
+  if (!discussion || users.length === 0) toDiscussions();
+
+  const creator = getUser(discussion.creatoremail);
+
   return (
     <div className='discussion'>
-      <Navbar/>
-      <div className="cardlist">
-        {discussions.map(x=><div className='card' key={x.id} onClick={()=>OpenChat(x.id)}>
-          <div className='person'>
-            <img src={getUser(x.creatoremail).picture} alt="" className='kep'/>
-            <span>{getUser(x.creatoremail).username}</span>
-          </div>
-          <div className='text'>
-            <p>{x.title}</p>
-            <p>{x.description}</p>
-            {/* --Modal ba-- <input type="text" value={message} onChange={e => setMessage(e.target.value)} />
-            <input type="button" value="Send"  onClick={sendMessage}/> */}
-          </div>
-        </div>)}
+      <div className='discussion-back' onClick={()=>toDiscussions()}>
+        <IoArrowBack />
       </div>
-      
+      <div className="discussion-modal" onClick={e => e.stopPropagation()}>
+        <div className='person'>
+          <img src={creator?.picture} alt="" className='picture' />
+          <span>{creator?.username}</span>
+        </div>
+        <div className='discussion-text'>
+          <p>{discussion.title}</p>
+          <p>{discussion.description}</p>
+        </div>
+        <div className='discussion-chats'>
+          {currentchat.map(x => (
+            <div key={x.id}>
+              <div className='chatUser'>
+                <img className='chatUserPfp' src={getUser(x.email).picture} alt="" />
+                <span>{getUser(x.email).username}</span>
+              </div>
+              <div><p>{x.comment}</p></div>
+            </div>
+          ))}
+        </div>
+        <div>
+          <input type="text" value={message} onChange={e => setMessage(e.target.value)} onKeyDown={e => e.key === "Enter" && sendMessage()} />
+          <input type="button" value="Send" onClick={sendMessage} />
+        </div>
+      </div>
     </div>
   )
 }
+
+
+/*import React from 'react'
+import { useParams } from 'react-router-dom';
+import './Discussion.css';
+import { IoArrowBack } from 'react-icons/io5';
+
+export default function Discussion() {
+
+  const params = useParams();
+  let { id, title } = req.params;
+
+  const [users, setUsers] = useState([]);
+
+
+  async function getCurrentChat() {
+    const snap = await getDocs(query(collection(db, "discussion-messages"), where("discussionID", "==", id)), orderBy("time","asc"));
+    const lst = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    setCurrentchat(lst);
+  }
+
+
+  useEffect(() => {
+    if (discussionId !== null) {
+      getCurrentChat(discussions[discussionId].id);
+    }
+  }, [refresh, discussionId]);
+
+  async function sendMessage() {
+    try {
+      if (message != "") {
+        await addDoc(collection(db, "discussion-messages"), { comment: message, discussionID: discussions[discussionId].id, email: user.email, time: Timestamp.now() });
+        setRefresh(!refresh);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }*/
+
+  

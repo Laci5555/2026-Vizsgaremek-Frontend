@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import Home from './components/Home'
 import Games from './components/Games'
+import Discussions from './components/Discussions'
 import Discussion from './components/Discussion'
 import Finder from './components/Finder'
 import NotFound from './components/NotFound'
@@ -14,6 +15,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { useEffect } from 'react'
 import { auth, db } from '../firebaseApp'
 import Admin from './components/Admin'
+
 
 
 function App() {
@@ -45,7 +47,8 @@ function App() {
     {path:"/login", element:<Login auth={auth} />},
     {path:"/signup", element:<Signup auth={auth}/>},
     {path:"/games", element:<Games darkmode={darkmode} setDarkmode={setDarkmode} gamesDataCollection={gamesDataCollection} genreCollection={genreCollection}/>},
-    {path:"/discussion", element:<Discussion user={user}/>},
+    {path:"/discussions", element:<Discussions user={user}/>},
+    {path:"/discussion/:id/:title", element:<Discussion user={user}/>},
     {path:"/finder", element:<Finder/>},
     {path:"/admin", element:<Admin/>},
     {path:"/profile", element:<Profile auth={auth} user={user}/>},
