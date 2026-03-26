@@ -4,9 +4,11 @@ import "./Games.css";
 import { IoSearchOutline } from 'react-icons/io5';
 import { TfiFilter } from 'react-icons/tfi';
 import { IoMdClose } from 'react-icons/io';
-import { collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { FaPlus } from 'react-icons/fa';
 import { GoPlus } from "react-icons/go";
+import { db } from '../../firebaseApp';
+import Message from './Message';
 
 export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCollection}) {
 
@@ -21,6 +23,8 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
   const [gamesMain, setGamesmain] = useState([])
 
   const [genres, setGenres] = useState([])
+
+  const [Genrefilters, setGenreFilters] = useState([])
 
 
   const [refresh,setRefresh]=useState(false);
@@ -54,13 +58,19 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
     FetchGenres()
   },[])
 
+
+
   async function getGame() {
     let modGames=[];
-    if(game==""){
+    if(game=="" && Genrefilters.length == 0){
       setGames([...gamesMain])
-    } else {
-      // modGames=jatekok.filter(x=>x.toLowerCase().includes(game.toLowerCase()));
+    }else if(Genrefilters.length == 0 && game!=""){
       modGames = gamesMain.filter(x => x.name.toLowerCase().includes(game.toLowerCase()));
+      setGames(modGames);
+    }
+    else {
+      // modGames=jatekok.filter(x=>x.toLowerCase().includes(game.toLowerCase()));
+      modGames = gamesMain.filter(x => x.name.toLowerCase().includes(game.toLowerCase()) && x.genre.some(x => Genrefilters.includes(x)));
       // console.log(modGames);
       setGames(modGames);
     }
@@ -77,9 +87,35 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
     if (e.target === e.currentTarget) setIsOpen(false);
   };
 
+  async function SubmitRequest() {
+    setIsOpen(false)
+    try {
+      await addDoc(collection(db, "game-requests"), {name:newGameName});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  function HandleFilterGenre(name) {
+    let i = Genrefilters.findIndex(x => x == name)
+    event.stopPropagation()
+    // console.log(event.target);
+    
+    if(i == -1){
+      Genrefilters.push(name)
+    }
+    else if(i != -1){
+      Genrefilters.splice(i, 1)
+    }
+    setGenreFilters([...Genrefilters])
+  }
+
+  console.log(Genrefilters);
+
   return (
     <div className='games'>
       <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
+      <Message/>
       <div className="hbox">
         <button className='filterIcon' onClick={showingFilter}><TfiFilter  /></button>
         <div className={`filter ${showFilter ? "show" : ""}`}>
@@ -90,9 +126,9 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
             <input className='searchBtn' type="button" value="Search" onClick={getGame}/>
           </div>
           <div className='checkboxs'>
-            {genres.map(x=><div className='genres' key={x.id}>
-                <input type="checkbox" name="" id={x.name} />
-                <label htmlFor={x.name}>{x.name}</label>
+            {genres.map(x=><div className='genres' key={x.id} onClick={()=>HandleFilterGenre(x.name)}>
+                <input type="checkbox" name="" id={x.name} checked={Genrefilters.includes(x.name)}/>
+                <label>{x.name}</label>
             </div>)}
           </div>
         </div>
@@ -102,7 +138,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
           <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
         </div>
       </div>
-      <div className={`backdrop ${isOpen ? "visible" : ""}`} onClick={handleBackdropClick}>
+      <div className={`backdrop ${isOpen ? "visible" : ""}`} onMouseDownCapture={handleBackdropClick}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-top-bar" />
           <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
@@ -112,7 +148,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
               <label>Játék neve</label>
               <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)}/>
             </div>
-            <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => {setIsOpen(false); }}>
+            <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => SubmitRequest()}>
               Kérés elküldése
             </button>
           </div>

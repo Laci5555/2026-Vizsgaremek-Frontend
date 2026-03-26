@@ -3,19 +3,40 @@ import { useState } from 'react';
 import Navbar from './Navbar';
 import "./Admin.css";
 import { IoMdClose } from 'react-icons/io';
+import { useEffect } from 'react';
+import { db } from '../../firebaseApp';
+import { addDoc, collection, deleteDoc, doc, getDocs, or, orderBy, query, setDoc, Timestamp, updateDoc, where } from 'firebase/firestore';
 
 export default function Admin() {
 
     const [admin, setAdmin] = useState(true);
     //let genres=["Action","Adventure","Fighting","FPS","Gacha","Horror","MOBA","Puzzle","Racing","RPG","Strategy","Survival","Shooter","Simulation","Sports"];
     let [gameName, setGameName] = useState("");
-    let [genres, setGenres] = useState(["Action", "Adventure", "Fighting", "FPS", "Gacha", "Horror", "MOBA", "Puzzle", "Racing", "RPG", "Strategy", "Survival", "Shooter", "Simulation", "Sports"]);
+    let [genres, setGenres] = useState([]);
     let [gameGenres, setGameGenres] = useState([]);
     let [genre, setGenre] = useState("");
     let [gamePicture, setGamePicture] = useState("");
     const [url, setUrl] = useState(true);
-    const [requests, setRequests] = useState(["Elden Ring", "Resident Evil: Requiem"]);
+    const [requests, setRequests] = useState([]);
     const [fileNames, setFileNames] = useState([]);
+
+    const [r, refresh] = useState(false)
+
+
+    useEffect(()=>{
+        async function fetchGenres() {
+            const snap = await getDocs(collection(db, "genres"));
+            const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
+            setGenres(lst)
+        }
+        fetchGenres()
+        async function fetchRequests() {
+            const snap = await getDocs(collection(db, "game-requests"));
+            const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
+            setRequests(lst)
+        }
+        fetchRequests()
+    },[r])
 
     function addGameGenres(item) {
         let gameGenres2 = [...gameGenres];
@@ -27,44 +48,64 @@ export default function Admin() {
         }
         setGameGenres(gameGenres2.sort());
         console.log(gameGenres2);
-
     }
 
-    function addGame() {
+    async function addGame() {
         console.log(gameName);
         console.log(gamePicture);
         console.log(gameGenres);
+        const snap = await getDocs(query(collection(db, "games")));
+        const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id}));
+        let i = lst.findIndex(x => x.name.toLocaleLowerCase().trim().split(" ").join("") == gameName.toLocaleLowerCase().trim().split(" ").join(""))
+        // console.log(i);
+        if(i == -1 && gameName.trim().length != 0){
+            await addDoc(collection(db, "games"), {name:gameName, img:gamePicture, likes:0, dislikes:0, genre:gameGenres});
+            const snap = await getDocs(query(collection(db, "game-requests")));
+            const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id}));
+            let i = lst.findIndex(x => x.name.toLocaleLowerCase().trim().split(" ").join("") == gameName.toLocaleLowerCase().trim().split(" ").join(""))
+            delGameRequest(lst[i].id)
+            setGameName("")
+            setGameGenres([])
+        }else if(i != -1 && gameName.trim().length != 0){
+            await updateDoc(doc(db, "games", lst[i].id), {genre:gameGenres, img:gamePicture});
+            const snap = await getDocs(query(collection(db, "game-requests")));
+            const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id}));
+            let i = lst.findIndex(x => x.name.toLocaleLowerCase().trim().split(" ").join("") == gameName.toLocaleLowerCase().trim().split(" ").join(""))
+            delGameRequest(lst[i].id)
+            setGameName("")
+            setGameGenres([])
+        }
     }
 
-    function addGenre() {
-        let genres2 = [...genres];
-        let i = genres2.findIndex(x => x.toLocaleLowerCase().trim() == genre.toLocaleLowerCase().trim());
-        if (i == -1 && genre.trim().length != 0) {
-            genres2.push(genre);
-            console.log("Nágy sikeer!");
-
+    async function addGenre() {
+        const snap = await getDocs(query(collection(db, "genres")));
+        const lst = snap.docs.map(doc => ({ ...doc.data()}));
+        let i = lst.findIndex(x => x.name.toLocaleLowerCase().trim() == genre.toLocaleLowerCase().trim())
+        if(genre.trim().length != 0 && i == -1){
+            await addDoc(collection(db, "genres"), {name:genre});
+            refresh(!r)
+            setGenre("")
+        }else{
+          console.log("A genre már létezik!");
         }
-        setGenres(genres2);
     }
 
-    function delGenre(nev) {
-        let genres2 = [...genres];
-        let i = genres2.findIndex(x => x == nev);
-        if (i != -1) {
-            genres2.splice(i, 1);
+    async function delGenre(id) {
+        try {
+            await deleteDoc(doc(db, "genres", id));
+            refresh(!r)
+        } catch (err) {
+            console.log("Törlés során hiba!");
         }
-        setGenres(genres2);
     }
 
-    function delGameRequest(nev) {
-        let requests2 = [...requests];
-        let i = requests2.findIndex(x => x == nev);
-        if (i != -1) {
-            requests2.splice(i, 1);
+    async function delGameRequest(id) {
+        try {
+            await deleteDoc(doc(db, "game-requests", id));
+            refresh(!r)
+        } catch (err) {
+            console.log("Törlés során hiba!");
         }
-        setRequests(requests2);
-        console.log(requests);
-        
     }
 
 
@@ -79,7 +120,7 @@ export default function Admin() {
                     </div>
                     <div>
                         <span>Genres:</span>
-                        <div >{genres.map(x => <div key={x} className='genreDiv' onClick={() => addGameGenres(x)}><div className='genreCheck' ><input type="checkbox" defaultChecked={false} checked={gameGenres.includes(x)} name="" id={`chk-${x}`} /><label htmlFor={`chk-${x}`}>{x}</label></div><IoMdClose onClick={() => delGenre(x)} /></div>)}</div>
+                        <div >{genres.map(x => <div key={x.id} className='genreDiv' onClick={() => addGameGenres(x.name)}><div className='genreCheck' ><input type="checkbox" defaultChecked={false} checked={gameGenres.includes(x.name)} name="" id={`chk-${x.name}`} /><label htmlFor={`chk-${x.name}`}>{x.name}</label></div><IoMdClose onClick={() => delGenre(x.id)} /></div>)}</div>
                     </div>
                     <div className='pictureType'>
                         <h2>Picture upload method</h2>
@@ -106,7 +147,7 @@ export default function Admin() {
                             </div> :
                             <div className='file'>
                                 <label htmlFor="myfile">Select files: </label>
-                                <input style={{ display: "none" }} type="file" id="myfile" name="myfile" multiple
+                                <input style={{ display: "none" }} type="file" id="myfile" name="myfile" 
                                     onChange={(e) => { /*const files = Array.from(e.target.files); setFileNames(files.map(f => f.name));*/ setGamePicture(e.target.value);
                                     }}
                                 />
@@ -129,7 +170,7 @@ export default function Admin() {
                     </div>
                     <div className='gameRequests'>
                         <span>Game requests:</span>
-                        {requests.map(x => <div className='request' onClick={()=>setGameName(x)}>{x} <IoMdClose onClick={() => delGameRequest(x)} /></div>)}
+                        {requests.map(x => <div className='request' onClick={()=>setGameName(x.name)}>{x.name} <IoMdClose onClick={() => delGameRequest(x.id)} /></div>)}
                     </div>
                 </div>
             </div>
