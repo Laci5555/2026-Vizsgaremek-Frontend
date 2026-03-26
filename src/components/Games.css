@@ -74,6 +74,11 @@
     border: 1px solid;
 }
 
+.games .card:hover{
+    cursor: pointer;
+    box-shadow: 0px 5px 5px white;
+}
+
 .games .genres {
     display: flex;
     gap: 5px;

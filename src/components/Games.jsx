@@ -1,4 +1,4 @@
-import {useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import "./Games.css";
 import { IoSearchOutline } from 'react-icons/io5';
@@ -10,15 +10,15 @@ import { GoPlus } from "react-icons/go";
 import { db } from '../../firebaseApp';
 import Message from './Message';
 
-export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCollection}) {
+export default function Games({ darkmode, setDarkmode, gamesDataCollection, genreCollection }) {
 
   // const jatekok = ["Cyberpunk 2077", "Devil may cry 5", "Fortnite", "Valorant", "Counter Strike 2", "League of Legends", "Clair Obscure: Expedition 33", "Hollow knight: Silksong", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game", "Example game"]
 
   // const genres=["Action","Adventure","Fighting","FPS","Gacha","Horror","MOBA","Puzzle","Racing","RPG","Strategy","Survival","Shooter","Simulation","Sports"];
 
-  const [game,setGame]=useState("");
+  const [game, setGame] = useState("");
 
-  const [games,setGames]=useState([]);
+  const [games, setGames] = useState([]);
 
   const [gamesMain, setGamesmain] = useState([])
 
@@ -27,44 +27,45 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
   const [Genrefilters, setGenreFilters] = useState([])
 
 
-  const [refresh,setRefresh]=useState(false);
-  const [showFilter,setShowFilter]=useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
 
+  const [selectedGame,setSelectedGame]=useState(null);
 
-  const[newGameName,setNewGameName]=useState("");
+  const [newGameName, setNewGameName] = useState("");
 
-  useEffect(()=>{
+  useEffect(() => {
     async function getGames() {
       // setGames([...jatekok])
       // console.log(games);
       setShowFilter(false);
     }
     getGames();
-  },[refresh]);
+  }, [refresh]);
 
-  useEffect(()=>{
+  useEffect(() => {
     async function FetchGames() {
       const snap = await getDocs(gamesDataCollection);
-      const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
+      const lst = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       setGamesmain(lst)
       setGames(lst)
     }
     async function FetchGenres() {
       const snap = await getDocs(genreCollection);
-      const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id }));
+      const lst = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       setGenres(lst)
     }
     FetchGames()
     FetchGenres()
-  },[])
+  }, [])
 
 
 
   async function getGame() {
-    let modGames=[];
-    if(game=="" && Genrefilters.length == 0){
+    let modGames = [];
+    if (game == "" && Genrefilters.length == 0) {
       setGames([...gamesMain])
-    }else if(Genrefilters.length == 0 && game!=""){
+    } else if (Genrefilters.length == 0 && game != "") {
       modGames = gamesMain.filter(x => x.name.toLowerCase().includes(game.toLowerCase()));
       setGames(modGames);
     }
@@ -90,21 +91,25 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
   async function SubmitRequest() {
     setIsOpen(false)
     try {
-      await addDoc(collection(db, "game-requests"), {name:newGameName});
+      await addDoc(collection(db, "game-requests"), { name: newGameName });
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async function getGameDiv(obj) {
+    setSelectedGame(obj);
   }
 
   function HandleFilterGenre(name) {
     let i = Genrefilters.findIndex(x => x == name)
     event.stopPropagation()
     // console.log(event.target);
-    
-    if(i == -1){
+
+    if (i == -1) {
       Genrefilters.push(name)
     }
-    else if(i != -1){
+    else if (i != -1) {
       Genrefilters.splice(i, 1)
     }
     setGenreFilters([...Genrefilters])
@@ -114,27 +119,39 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
 
   return (
     <div className='games'>
-      <Navbar darkmode={darkmode} setDarkmode={setDarkmode}/>
-      <Message/>
+      <Navbar darkmode={darkmode} setDarkmode={setDarkmode} />
+      <Message />
       <div className="hbox">
-        <button className='filterIcon' onClick={showingFilter}><TfiFilter  /></button>
+        <button className='filterIcon' onClick={showingFilter}><TfiFilter /></button>
         <div className={`filter ${showFilter ? "show" : ""}`}>
-          <div style={{display:"flex",justifyContent:"flex-end"}}><IoMdClose className='close' onClick={showingFilter}/></div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}><IoMdClose className='close' onClick={showingFilter} /></div>
           <div className='searchDiv'>
-            <IoSearchOutline style={{color:"grey"}}/>
-            <input type="text" className='searchBar' value={game} onChange={e=>setGame(e.target.value)}/>
-            <input className='searchBtn' type="button" value="Search" onClick={getGame}/>
+            <IoSearchOutline style={{ color: "grey" }} />
+            <input type="text" className='searchBar' value={game} onChange={e => setGame(e.target.value)} />
+            <input className='searchBtn' type="button" value="Search" onClick={getGame} />
           </div>
           <div className='checkboxs'>
-            {genres.map(x=><div className='genres' key={x.id} onClick={()=>HandleFilterGenre(x.name)}>
-                <input type="checkbox" name="" id={x.name} checked={Genrefilters.includes(x.name)}/>
-                <label>{x.name}</label>
+            {genres.map(x => <div className='genres' key={x.id} onClick={() => HandleFilterGenre(x.name)}>
+              <input type="checkbox" name="" id={x.name} checked={Genrefilters.includes(x.name)} />
+              <label>{x.name}</label>
             </div>)}
           </div>
         </div>
         <div className="cardlist">
           {/* x.img, x.likes, x.dislikes, x.genre[] */}
-          {gamesMain.length>0 ? (games.length>0 ? games.map(x => <div className='card' key={x.id}>{x.name}</div>) : <div>Sajnos ilyen nevű játék nincs...</div>) : <div>Betöltés...</div>}
+          {gamesMain.length > 0 ? (games.length > 0 ? games.map(x =>
+            <div className='card' key={x.id} onClick={()=>getGameDiv(x)}>
+              <img src={x.img} alt="" />
+              <h3>{x.name}</h3>
+            </div>)
+            :
+            <div>Sajnos ilyen nevű játék nincs...</div>)
+            :
+            <div>Betöltés...</div>}
+          {/* <div className="gameDiv">
+            <img src={selectedGame?.img} alt="" />
+            <h3>{selectedGame?.name}</h3>
+          </div> */}
           <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
         </div>
       </div>
@@ -146,7 +163,7 @@ export default function Games({darkmode,setDarkmode,gamesDataCollection,genreCol
             <h2>Kérj fel egy játékot hogy felkerüljön!</h2>
             <div>
               <label>Játék neve</label>
-              <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)}/>
+              <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)} />
             </div>
             <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => SubmitRequest()}>
               Kérés elküldése
