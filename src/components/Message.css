@@ -1,0 +1,222 @@
+/* === GOMB === */
+.message {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.showChat {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 20px;
+}
+
+.showChat:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.06);
+}
+
+/* === PANEL === */
+.messages {
+    position: fixed;
+    right: 28px;
+    bottom: 88px;
+    width: 340px;
+    height: 480px;
+    background: #12121a;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: panelIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes panelIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* === FEJLÉC === */
+.messages-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.messages-header span {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0.01em;
+}
+
+.closeChat {
+    cursor: pointer;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.25);
+    transition: color 0.15s ease;
+    display: flex;
+}
+
+.closeChat:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* === TABOK === */
+.messages-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: rgba(255, 255, 255, 0.25);
+    transition: color 0.15s ease;
+    border-bottom: 1px solid transparent;
+    margin-bottom: -1px;
+}
+
+.tab-btn.active {
+    color: rgba(255, 255, 255, 0.75);
+    border-bottom-color: rgba(255, 255, 255, 0.4);
+}
+
+.tab-btn:hover:not(.active) {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* === ÚJ CHAT === */
+.new-chat {
+    position: relative;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.new-chat select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 8px 4px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    transition: border-color 0.2s ease;
+}
+
+.new-chat select option {
+    background: #1e1e2e;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+
+.new-chat select:focus {
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* === LISTA === */
+.conversations-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.conversations-list::-webkit-scrollbar {
+    display: none;
+}
+
+.section-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.2);
+    padding: 12px 20px 6px;
+    margin: 0;
+}
+
+.no-messages {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+    padding: 32px 0;
+    margin: 0;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.conversation-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.conv-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.conv-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 2px;
+}
+
+.conv-email {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conv-last-msg {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.25);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
