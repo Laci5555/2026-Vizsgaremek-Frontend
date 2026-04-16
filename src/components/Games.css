@@ -510,7 +510,7 @@
     .games .filterIcon {
         display: flex;
         position: absolute;
-        top: 12px;
+        top: 6px;
         left: 12px;
         z-index: 10;
     }
@@ -556,6 +556,9 @@
         width: 100%;
         min-height: 200px;
         border-radius: 16px 16px 0 0;
+    }
+    .cardlist{
+        justify-content: center;
     }
 
     .games .card {
