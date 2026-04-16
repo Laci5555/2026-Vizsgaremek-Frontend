@@ -19,6 +19,8 @@ export default function Admin() {
     const [url, setUrl] = useState(true);
     const [requests, setRequests] = useState([]);
     const [fileNames, setFileNames] = useState([]);
+    const [description, setDescription] = useState("");
+    const MAX_DESC = 500;
 
     const [r, refresh] = useState(false)
 
@@ -159,6 +161,21 @@ export default function Admin() {
                                 )}
                             </div>
                         }
+                    </div>
+                    <div className='addDescription'>
+                        <label htmlFor='gameDescription'>Description</label>
+                        <textarea
+                            id='gameDescription'
+                            className='description'
+                            placeholder='Write a short description of the game...'
+                            rows={5}
+                            maxLength={MAX_DESC}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        ></textarea>
+                        <span className={`charCount${description.length > 450 ? description.length >= MAX_DESC ? ' over' : ' near' : ''}`}>
+                            {description.length} / {MAX_DESC}
+                        </span>
                     </div>
                     <input className='addGameButton' style={{ width: "200px" }} type="button" value="Add new game" onClick={addGame} disabled={gameName.trim().length==0 || gameGenres.length==0 ||gamePicture.trim().length==0}/>
                 </div>
