@@ -9,6 +9,7 @@ import { FaPlus } from 'react-icons/fa';
 import { GoPlus } from "react-icons/go";
 import { db } from '../../firebaseApp';
 import Message from './Message';
+import { AiFillDislike, AiFillLike } from 'react-icons/ai';
 
 export default function Games({ darkmode, setDarkmode, gamesDataCollection, genreCollection }) {
 
@@ -30,9 +31,11 @@ export default function Games({ darkmode, setDarkmode, gamesDataCollection, genr
   const [refresh, setRefresh] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
 
-  const [selectedGame,setSelectedGame]=useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   const [newGameName, setNewGameName] = useState("");
+
+  const [showGame, setShowGame] = useState(false);
 
   useEffect(() => {
     async function getGames() {
@@ -99,6 +102,7 @@ export default function Games({ darkmode, setDarkmode, gamesDataCollection, genr
 
   async function getGameDiv(obj) {
     setSelectedGame(obj);
+    setShowGame(true);
   }
 
   function HandleFilterGenre(name) {
@@ -140,7 +144,7 @@ export default function Games({ darkmode, setDarkmode, gamesDataCollection, genr
         <div className="cardlist">
           {/* x.img, x.likes, x.dislikes, x.genre[] */}
           {gamesMain.length > 0 ? (games.length > 0 ? games.map(x =>
-            <div className='card' key={x.id} onClick={()=>getGameDiv(x)}>
+            <div className='card' key={x.id} onClick={() => getGameDiv(x)}>
               <img src={x.img} alt="" />
               <h3>{x.name}</h3>
             </div>)
@@ -148,11 +152,21 @@ export default function Games({ darkmode, setDarkmode, gamesDataCollection, genr
             <div>Sajnos ilyen nevű játék nincs...</div>)
             :
             <div>Betöltés...</div>}
-          {/* <div className="gameDiv">
-            <img src={selectedGame?.img} alt="" />
-            <h3>{selectedGame?.name}</h3>
-          </div> */}
           <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
+          <div className={`backdrop ${showGame ? "visible" : ""}`} onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setShowGame(false); }}>
+            <div className="gameDiv" onClick={(e) => e.stopPropagation()}>
+              <button className="close-btn" onClick={() => setShowGame(false)}>✕</button>
+              <img src={selectedGame?.img} alt={selectedGame?.name} />
+              <div className='gameInfos'>
+                <h3>{selectedGame?.name}</h3>
+                <p>{selectedGame?.description}</p>
+                <div className='likeRatios'>
+                  <div className='like'><AiFillLike /><span>{selectedGame?.likes}</span></div>
+                  <div className='dislike'><AiFillDislike /><span>{selectedGame?.dislikes}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div className={`backdrop ${isOpen ? "visible" : ""}`} onMouseDownCapture={handleBackdropClick}>

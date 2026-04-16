@@ -1,164 +1,245 @@
-.filter {
-    padding: 10px;
-    width: 250px;
-    height: 92vh;
-    border: 1px solid;
-    border-top: none;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --bg: #13131a;
+    --surface: #1c1c26;
+    --surface2: #24242f;
+    --border: #32323f;
+    --accent: #6c63ff;
+    --text: #f0eeff;
+    --text-muted: #8888aa;
+}
+
+/* ── BASE ── */
+.games {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── LAYOUT ── */
+.games .hbox {
+    display: flex;
+    position: relative;
+    height: calc(100vh - 60px);
+    overflow-y: hidden;
+}
+
+/* ── SIDEBAR / FILTER ── */
+.games .filter {
+    width: 240px;
+    flex-shrink: 0;
+    height: 100%;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 16px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.games .filter > div:first-child {
+    display: none !important;
 }
 
 .games .searchDiv {
     display: flex;
-    gap: 5px;
     align-items: center;
-    width: 100%;
-    background-color: white;
-    padding: 5px;
-    border-radius: 5px;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: border-color 0.2s;
 }
 
-.filterIcon {
-    display: none;
-    width: 50px;
-    height: 50px;
-    margin: 5px;
+.games .searchDiv:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
 }
 
-.close {
-    display: none;
+.games .searchDiv svg {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    font-size: 15px;
 }
 
-.close:hover {
-    color: red;
-    cursor: pointer;
-}
-
-.searchDiv .searchBar {
+.games .searchDiv .searchBar {
     border: none;
-    padding: 5px;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    flex: 1;
+    min-width: 0;
 }
 
-.searchDiv .searchBtn {
-    border: 1px solid grey;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: rgb(30, 79, 126);
+.games .searchDiv .searchBar::placeholder {
+    color: var(--text-muted);
+}
+
+.games .searchDiv .searchBtn {
+    border: none;
+    background: var(--accent);
     color: white;
-}
-
-.games .cardlist {
-    width: 100%;
-    max-height: 92vh;
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    border: 1px solid peachpuff;
-    /* display: grid; grid-template-columns: repeat(5, 1fr); */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 30px 5px;
-    position: relative;
-}
-
-.hbox {
-    display: flex;
-    position: relative;
-}
-
-.games .card {
-    height: 230px;
-    width: 230px;
-    border: 1px solid;
-}
-
-.games .card:hover{
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    box-shadow: 0px 5px 5px white;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.games .searchDiv .searchBtn:hover {
+    opacity: 0.85;
+}
+
+/* Genre filter label */
+.games .filter > span,
+.games .filter > p {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.games .checkboxs {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .games .genres {
     display: flex;
-    gap: 5px;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
 }
 
+.games .genres:hover {
+    background: var(--surface2);
+    border-color: var(--border);
+}
+
+.games .genres input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.games .genres label {
+    font-size: 0.88rem;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ── CARD LIST ── */
+.games .cardlist {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 20px;
+    padding: 28px;
+    position: relative;
+}
+
+/* ── GAME CARD ── */
+.games .card {
+    width: 200px;
+    height: 280px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.games .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(108, 99, 255, 0.18);
+}
+
+.games .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    background: var(--surface2);
+}
+
+.games .card h3 {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── EMPTY / LOADING STATE ── */
+.games .cardlist > div:not(.card):not(.gameDiv):not(.requestGame) {
+    width: 100%;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    padding: 60px 0;
+}
+
+/* ── REQUEST BUTTON ── */
 .games .requestGame {
     position: absolute;
-    left: 30px;
-    bottom: 30px;
+    left: 32px;
+    bottom: 32px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    background-color: purple;
+    background: var(--accent);
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 25pt;
-    font-weight: bold;
+    justify-content: center;
+    font-size: 22px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(108, 99, 255, 0.35);
+    z-index: 50;
 }
 
 .games .requestGame:hover {
-    filter: drop-shadow(2px 2px 10px rgb(155, 5, 155));
-    cursor: pointer;
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(108, 99, 255, 0.5);
 }
 
-@media screen and (max-width: 1010px) {
-    .hbox {
-        height: 92vh;
-    }
-
-    .filter {
-        display: none;
-        left: -100%;
-        position: absolute;
-        padding: 10px;
-        width: 250px;
-        height: 92vh;
-        border: 1px solid;
-        border-top: none;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 1000;
-        background-color: grey;
-        transition: left 0.8s ease-in-out;
-    }
-
-    .filterIcon {
-        display: inline;
-        background-color: white;
-    }
-
-    .filter.show {
-        left: 0;
-    }
-
-    .close {
-        display: inline;
-        /*position: absolute;
-        top: 5px;
-        right: 5px;
-        margin-bottom: 10px;*/
-    }
-}
-
-
-@media screen and (min-width: 900px) and (max-width: 1200px) {
-    /* .cardlist{
-        display: grid; grid-template-columns: repeat(3, 1fr);
-        justify-content: space-between; align-items: center;
-    } */
-}
-
-@media screen and (min-width: 600px) and (max-width: 900px) {
-    /* .cardlist{
-        display: grid; grid-template-columns: repeat(2, 1fr);
-        justify-content: center; align-items: center;
-    } */
-}
-
+/* ── BACKDROP ── */
 .backdrop {
     position: fixed;
     inset: 0;
@@ -174,16 +255,17 @@
 }
 
 .backdrop.visible {
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
     pointer-events: all;
     opacity: 1;
 }
 
+/* ── REQUEST MODAL ── */
 .modal {
-    background: #12121a;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
     width: 400px;
     max-width: 90vw;
     padding: 32px;
@@ -198,81 +280,290 @@
     opacity: 1;
 }
 
+.modal-top-bar {
+    display: none;
+}
+
 .close-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 14px;
+    right: 14px;
     width: 28px;
     height: 28px;
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.25);
-    font-size: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.15s ease;
+    transition: color 0.15s, border-color 0.15s;
 }
 
 .close-btn:hover {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text);
+    border-color: var(--accent);
 }
 
 .newgame {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
 }
 
 .newgame h2 {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--text);
     line-height: 1.5;
     padding-right: 24px;
+    margin: 0;
+}
+
+.newgame label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
 }
 
 .newgame input[type="text"] {
-    margin-top: 5px;
     width: 100%;
-    background: rgba(255, 255, 255, 0.04);
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 10px 5px;
-    font-size: 14px;
-    color: #fff;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
     outline: none;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
 }
 
 .newgame input[type="text"]:focus {
-    border-bottom-color: rgba(255, 255, 255, 0.5);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
 }
 
 .newgame input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+    opacity: 0.6;
 }
 
 .submit-btn {
     align-self: flex-end;
-    padding: 9px 24px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 13px;
+    padding: 9px 22px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s, transform 0.15s;
 }
 
 .submit-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.2);
+    opacity: 0.88;
+    transform: translateY(-1px);
 }
 
 .submit-btn:disabled {
-    opacity: 0.25;
+    opacity: 0.3;
     cursor: not-allowed;
+    transform: none;
+}
+
+/* ── GAME DETAIL MODAL ── */
+.gameDiv {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 700px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.backdrop.visible .gameDiv {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.gameDiv img {
+    width: 260px;
+    min-height: 340px;
+    object-fit: cover;
+    border-radius: 16px 0 0 16px;
+    flex-shrink: 0;
+    background: var(--surface2);
+}
+
+.gameDiv .gameInfos {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.gameDiv .gameInfos h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    padding-right: 32px;
+}
+
+.gameDiv .gameInfos p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin: 0;
+    flex: 1;
+}
+
+.gameDiv .likeRatios {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.gameDiv .like,
+.gameDiv .dislike {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 8px;
+}
+
+.gameDiv .like {
+    background: rgba(74, 222, 128, 0.08);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.gameDiv .dislike {
+    background: rgba(248, 113, 113, 0.08);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+/* ── FILTER ICON (mobile) ── */
+.games .filterIcon {
+    display: none;
+    width: 40px;
+    height: 40px;
+    margin: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+}
+
+.games .filterIcon:hover {
+    border-color: var(--accent);
+}
+
+.games .close {
+    display: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.15s;
+}
+
+.games .close:hover {
+    color: #f87171;
+}
+
+/* ── RESPONSIVE ── */
+@media screen and (max-width: 1010px) {
+    .games .hbox {
+        height: calc(100vh - 60px);
+    }
+
+    .games .filterIcon {
+        display: flex;
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 10;
+    }
+
+    .games .filter {
+        display: flex;
+        position: absolute;
+        left: -260px;
+        top: 0;
+        width: 240px;
+        height: 100%;
+        z-index: 200;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        transition: left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .games .filter.show {
+        left: 0;
+    }
+
+    .games .filter > div:first-child {
+        display: flex !important;
+        justify-content: flex-end;
+    }
+
+    .games .close {
+        display: inline;
+    }
+
+    .games .cardlist {
+        padding-top: 64px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .gameDiv {
+        flex-direction: column;
+        width: 95vw;
+    }
+
+    .gameDiv img {
+        width: 100%;
+        min-height: 200px;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .games .card {
+        width: 160px;
+        height: 230px;
+    }
+
+    .games .card img {
+        height: 160px;
+    }
 }
