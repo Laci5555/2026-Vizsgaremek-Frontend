@@ -151,19 +151,27 @@ export default function Games({ darkmode, setDarkmode, gamesDataCollection, genr
             :
             <div>Sajnos ilyen nevű játék nincs...</div>)
             :
-            <div>Betöltés...</div>}
+            <div>Loading...</div>}
           <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
           <div className={`backdrop ${showGame ? "visible" : ""}`} onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setShowGame(false); }}>
             <div className="gameDiv" onClick={(e) => e.stopPropagation()}>
-              <button className="close-btn" onClick={() => setShowGame(false)}>✕</button>
+              <button className="close-btn gameClose" onClick={() => setShowGame(false)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg></button>
               <img src={selectedGame?.img} alt={selectedGame?.name} />
               <div className='gameInfos'>
-                <h3>{selectedGame?.name}</h3>
-                <p>{selectedGame?.description}</p>
-                <div className='likeRatios'>
-                  <div className='like'><AiFillLike /><span>{selectedGame?.likes}</span></div>
-                  <div className='dislike'><AiFillDislike /><span>{selectedGame?.dislikes}</span></div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+                  <h3 className='title'>{selectedGame?.name}</h3>
+                  <div className='likeRatios'>
+                    <div className='like'><AiFillLike /><span>{selectedGame?.likes}</span></div>
+                    <div className='dislike'><AiFillDislike /><span>{selectedGame?.dislikes}</span></div>
+                  </div>
                 </div>
+                <div className='gameGenres'>
+                  {selectedGame?.genre.map((x,i)=><div className='gameGenre' key={i}>{x}</div>)}
+                </div>
+                <div className='gameDescription'>{selectedGame?.description}</div>
               </div>
             </div>
           </div>
@@ -172,15 +180,18 @@ export default function Games({ darkmode, setDarkmode, gamesDataCollection, genr
       <div className={`backdrop ${isOpen ? "visible" : ""}`} onMouseDownCapture={handleBackdropClick}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-top-bar" />
-          <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+          <button className="close-btn" onClick={() => setIsOpen(false)}><svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg></button>
           <div className="newgame">
-            <h2>Kérj fel egy játékot hogy felkerüljön!</h2>
+            <h2>Submit a game to be added!</h2>
             <div>
-              <label>Játék neve</label>
+              <label>Game's name</label>
               <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)} />
             </div>
             <button className="submit-btn" disabled={!newGameName.trim()} onClick={() => SubmitRequest()}>
-              Kérés elküldése
+              Submit request
             </button>
           </div>
         </div>

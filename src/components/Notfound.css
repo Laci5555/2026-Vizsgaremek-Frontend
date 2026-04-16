@@ -1,0 +1,70 @@
+.notFound {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 0;
+}
+
+.notFound__icon { margin-bottom: 2rem; }
+
+.notFound__code {
+  font-size: 72px;
+  font-weight: 600;
+  letter-spacing: -3px;
+  line-height: 1;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.notFound__title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+}
+
+.notFound__sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+.notFound__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.notFound__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.notFound__btn span{
+    display: flex; gap: 10px;
+    align-items: center;
+}
+
+.notFound__btn--primary {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.notFound__btn--secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
