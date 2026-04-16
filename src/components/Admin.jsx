@@ -61,7 +61,7 @@ export default function Admin() {
         let i = lst.findIndex(x => x.name.toLocaleLowerCase().trim().split(" ").join("") == gameName.toLocaleLowerCase().trim().split(" ").join(""))
         // console.log(i);
         if(i == -1 && gameName.trim().length != 0){
-            await addDoc(collection(db, "games"), {name:gameName, img:gamePicture, likes:0, dislikes:0, genre:gameGenres});
+            await addDoc(collection(db, "games"), {name:gameName, img:gamePicture, likes:0, dislikes:0, genre:gameGenres, description:description});
             const snap = await getDocs(query(collection(db, "game-requests")));
             const lst = snap.docs.map(doc => ({ ...doc.data(), id:doc.id}));
             let i = lst.findIndex(x => x.name.toLocaleLowerCase().trim().split(" ").join("") == gameName.toLocaleLowerCase().trim().split(" ").join(""))
