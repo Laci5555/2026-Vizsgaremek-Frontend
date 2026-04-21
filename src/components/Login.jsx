@@ -1,64 +1,63 @@
-import React from 'react';
-import "./Login.css";
+import React, { useState } from 'react';
+import './Login.css';
 import { FaGoogle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { addDoc, getDocs, query, where } from 'firebase/firestore';
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../firebaseApp';
 
-export default function Login({auth, userDataCollection}) {
+const userDataCollection = collection(db, 'user-data');
 
-    const [email, setEmail] = useState("")
-    const [pass, setPass] = useState("")
+export default function Login({ auth }) {
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+  const [error, setError] = useState('');
 
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-
-    function toSignup() {
-        navigate("/signup");
+  async function loginWithEmail() {
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
     }
+  }
 
-    async function LoginWithEmail() {
-      try {
-          await signInWithEmailAndPassword(auth, email, pass);
-          navigate("/")
-      } catch (err) {
-          console.log(err);
+  async function loginWithGoogle() {
+    try {
+      const result = await signInWithPopup(auth, new GoogleAuthProvider());
+      const { email: gEmail, displayName, photoURL } = result.user;
+      const snap = await getDocs(query(userDataCollection, where('email', '==', gEmail)));
+      if (snap.docs.length === 0) {
+        await addDoc(userDataCollection, { email: gEmail, username: displayName, picture: photoURL });
       }
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
     }
-
-    async function LoginInWithGoogle() {
-      let result = (await signInWithPopup(auth, new GoogleAuthProvider()));
-      let check = result.user.email;
-      let displayName = result.user.displayName
-      console.log(result);
-      navigate("/")
-      try {
-          const adatSnapshot = await getDocs(query(userDataCollection, where("email", "==", check)));
-          if(adatSnapshot.docs.length == 0){
-              await addDoc(userDataCollection, {'email':check, 'username':displayName, 'picture':result.user.photoURL});
-          }
-      } catch (err) {
-          console.log(err);
-      }
-    }
-
-    
+  }
 
   return (
-    <div className='login'>
-        <h1 className="title">Welcome to Gamminity!</h1>
-        <div className="motto">Your best platform for communication about gaming!</div>
-        <div className='loginForm'>
-            <h1>Login</h1>
-            <input type="email" placeholder='Email' value={email} onChange={e=>setEmail(e.target.value)} required/>
-            <input type="password" placeholder='Password' value={pass} onChange={e=>setPass(e.target.value)} required/>
-            <input type="button" value="Login" className='loginEmail' onClick={()=>LoginWithEmail()}/>
-            <span style={{display:"flex",justifyContent:"center",gap:"5px"}}><p>Don't have an account? <span className='signupB' onClick={()=>toSignup()}>Sign up</span></p></span>
-            <hr className='separator'/>
-            <button className='loginGoogle' onClick={()=>LoginInWithGoogle()}><FaGoogle /> <p>Continue with Google!</p></button>
-        </div>
-        
+    <div className="login">
+      <h1 className="title">Welcome to Gamminity!</h1>
+      <div className="motto">Your best platform for communication about gaming!</div>
+      <div className="loginForm">
+        <h1>Login</h1>
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={pass} onChange={(e) => setPass(e.target.value)} required />
+        {error && <p className="error">{error}</p>}
+        <input type="button" value="Login" className="loginEmail" onClick={loginWithEmail} />
+        <span style={{ display: 'flex', justifyContent: 'center', gap: '5px' }}>
+          <p>Don't have an account? <span className="signupB" onClick={() => navigate('/signup')}>Sign up</span></p>
+        </span>
+        <hr className="separator" />
+        <button className="loginGoogle" onClick={loginWithGoogle}>
+          <FaGoogle /> <p>Continue with Google!</p>
+        </button>
+      </div>
     </div>
-  )
+  );
 }

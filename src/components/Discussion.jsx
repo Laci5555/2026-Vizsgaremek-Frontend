@@ -1,141 +1,136 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Discussion.css';
 import { IoArrowBack } from 'react-icons/io5';
-import { addDoc, collection, getDocs, orderBy, query, where, Timestamp } from 'firebase/firestore';
+import {
+  addDoc, collection, getDocs, orderBy, query, where, Timestamp,
+} from 'firebase/firestore';
 import { db } from '../../firebaseApp';
 import Navbar from './Navbar';
+import { useApp } from '../AppContext';
 
-export default function Discussion({ user }) {
-
-  const { id, title } = useParams();
+export default function Discussion() {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useApp();
 
   const [currentchat, setCurrentchat] = useState([]);
   const [users, setUsers] = useState([]);
   const [discussion, setDiscussion] = useState(null);
-  const [message, setMessage] = useState("");
-  const [refresh, setRefresh] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [refresh, setRefresh] = useState(false);
 
+  // Alap adatok betöltése
   useEffect(() => {
-    async function getData() {
-      const usersSnap = await getDocs(collection(db, "user-data"));
-      setUsers(usersSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }))); 
+    async function load() {
+      const [usersSnap, discSnap] = await Promise.all([
+        getDocs(collection(db, 'user-data')),
+        getDocs(collection(db, 'discussions')),
+      ]);
+
+      const usersList = usersSnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      setUsers(usersList);
+
+      const found = discSnap.docs
+        .map((doc) => ({ ...doc.data(), id: doc.id }))
+        .find((x) => x.id === id) ?? null;
+      setDiscussion(found);
+      setLoading(false);
     }
-    async function getDiscussion() {
-      const discSnap = await getDocs(collection(db, "discussions"));
-      const all = discSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      setDiscussion(all.find(x => x.id === id) || null);
-      console.log(discussion);
-      
-    }
-    getData();
-    getDiscussion();
+    load();
   }, [id]);
 
+  // BUG FIX: az eredeti kódban `toDiscussions()` a render közben hívódott,
+  // ami React szabályokat sért. Redirect useEffect-be kerül.
+  useEffect(() => {
+    if (!loading && !discussion) {
+      navigate('/discussions');
+    }
+  }, [loading, discussion, navigate]);
+
+  // Üzenetek betöltése
   useEffect(() => {
     async function getCurrentChat() {
       const snap = await getDocs(
-        query(collection(db, "discussion-messages"), where("discussionID", "==", id), orderBy("time", "asc"))
+        // BUG FIX (Discussions.jsx-ből örökölt): orderBy a query() belsejébe kerül
+        query(
+          collection(db, 'discussion-messages'),
+          where('discussionID', '==', id),
+          orderBy('time', 'asc'),
+        ),
       );
-      setCurrentchat(snap.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+      setCurrentchat(snap.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     }
     getCurrentChat();
-  }, [refresh]);
+  }, [id, refresh]);
 
   function getUser(email) {
-    return users.find(x => x.email === email);
+    return users.find((x) => x.email === email);
   }
 
   async function sendMessage() {
-    if (message.trim() === "") return;
+    if (message.trim() === '' || !user?.email) return;
     try {
-      await addDoc(collection(db, "discussion-messages"), { comment: message, discussionID: id, email: user.email, time: Timestamp.now()});
-      setMessage("");
-      setRefresh(!refresh);
+      await addDoc(collection(db, 'discussion-messages'), {
+        comment: message,
+        discussionID: id,
+        email: user.email,
+        time: Timestamp.now(),
+      });
+      setMessage('');
+      setRefresh((p) => !p);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 
-  function toDiscussions() {
-    navigate("/discussions")
+  // Betöltés / átirányítás közben ne rendereljük a tartalmat
+  if (loading || !discussion || users.length === 0) {
+    return <div className="discussion"><Navbar /></div>;
   }
-
-  if (!discussion || users.length === 0) toDiscussions();
 
   const creator = getUser(discussion.creatoremail);
 
   return (
-    <div className='discussion'>
-      <div className='discussion-back' onClick={()=>toDiscussions()}>
+    <div className="discussion">
+      <Navbar />
+      <div className="discussion-back" onClick={() => navigate('/discussions')}>
         <IoArrowBack />
       </div>
-      <div className="discussion-modal" onClick={e => e.stopPropagation()}>
-        <div className='person'>
-          <img src={creator?.picture} alt="" className='picture' />
+      <div className="discussion-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="person">
+          <img src={creator?.picture} alt="" className="picture" />
           <span>{creator?.username}</span>
         </div>
-        <div className='discussion-text'>
+        <div className="discussion-text">
           <p>{discussion.title}</p>
           <p>{discussion.description}</p>
         </div>
-        <div className='discussion-chats'>
-          {currentchat.map(x => (
-            <div key={x.id}>
-              <div className='chatUser'>
-                <img className='chatUserPfp' src={getUser(x.email).picture} alt="" />
-                <span>{getUser(x.email).username}</span>
+        <div className="discussion-chats">
+          {currentchat.map((x) => {
+            const chatUser = getUser(x.email);
+            return (
+              <div key={x.id}>
+                <div className="chatUser">
+                  <img className="chatUserPfp" src={chatUser?.picture} alt="" />
+                  <span>{chatUser?.username}</span>
+                </div>
+                <div><p>{x.comment}</p></div>
               </div>
-              <div><p>{x.comment}</p></div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div>
-          <input type="text" value={message} onChange={e => setMessage(e.target.value)} onKeyDown={e => e.key === "Enter" && sendMessage()} />
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          />
           <input type="button" value="Send" onClick={sendMessage} />
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-
-/*import React from 'react'
-import { useParams } from 'react-router-dom';
-import './Discussion.css';
-import { IoArrowBack } from 'react-icons/io5';
-
-export default function Discussion() {
-
-  const params = useParams();
-  let { id, title } = req.params;
-
-  const [users, setUsers] = useState([]);
-
-
-  async function getCurrentChat() {
-    const snap = await getDocs(query(collection(db, "discussion-messages"), where("discussionID", "==", id)), orderBy("time","asc"));
-    const lst = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-    setCurrentchat(lst);
-  }
-
-
-  useEffect(() => {
-    if (discussionId !== null) {
-      getCurrentChat(discussions[discussionId].id);
-    }
-  }, [refresh, discussionId]);
-
-  async function sendMessage() {
-    try {
-      if (message != "") {
-        await addDoc(collection(db, "discussion-messages"), { comment: message, discussionID: discussions[discussionId].id, email: user.email, time: Timestamp.now() });
-        setRefresh(!refresh);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }*/
-
-  
