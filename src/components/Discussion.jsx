@@ -21,17 +21,14 @@ export default function Discussion() {
   const [message, setMessage] = useState('');
   const [refresh, setRefresh] = useState(false);
 
-  // Alap adatok betöltése
   useEffect(() => {
     async function load() {
       const [usersSnap, discSnap] = await Promise.all([
         getDocs(collection(db, 'user-data')),
         getDocs(collection(db, 'discussions')),
       ]);
-
       const usersList = usersSnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
       setUsers(usersList);
-
       const found = discSnap.docs
         .map((doc) => ({ ...doc.data(), id: doc.id }))
         .find((x) => x.id === id) ?? null;
@@ -41,19 +38,13 @@ export default function Discussion() {
     load();
   }, [id]);
 
-  // BUG FIX: az eredeti kódban `toDiscussions()` a render közben hívódott,
-  // ami React szabályokat sért. Redirect useEffect-be kerül.
   useEffect(() => {
-    if (!loading && !discussion) {
-      navigate('/discussions');
-    }
+    if (!loading && !discussion) navigate('/discussions');
   }, [loading, discussion, navigate]);
 
-  // Üzenetek betöltése
   useEffect(() => {
     async function getCurrentChat() {
       const snap = await getDocs(
-        // BUG FIX (Discussions.jsx-ből örökölt): orderBy a query() belsejébe kerül
         query(
           collection(db, 'discussion-messages'),
           where('discussionID', '==', id),
@@ -85,7 +76,6 @@ export default function Discussion() {
     }
   }
 
-  // Betöltés / átirányítás közben ne rendereljük a tartalmat
   if (loading || !discussion || users.length === 0) {
     return <div className="discussion"><Navbar /></div>;
   }
@@ -95,18 +85,26 @@ export default function Discussion() {
   return (
     <div className="discussion">
       <Navbar />
+
       <div className="discussion-back" onClick={() => navigate('/discussions')}>
         <IoArrowBack />
       </div>
+
       <div className="discussion-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="person">
-          <img src={creator?.picture} alt="" className="picture" />
-          <span>{creator?.username}</span>
+
+        {/* ── Header ── */}
+        <div className="discussion-header">
+          <div className="person">
+            <img src={creator?.picture} alt="" className="picture" />
+            <span>{creator?.username}</span>
+          </div>
+          <div className="discussion-text">
+            <p>{discussion.title}</p>
+            <p>{discussion.description}</p>
+          </div>
         </div>
-        <div className="discussion-text">
-          <p>{discussion.title}</p>
-          <p>{discussion.description}</p>
-        </div>
+
+        {/* ── Messages ── */}
         <div className="discussion-chats">
           {currentchat.map((x) => {
             const chatUser = getUser(x.email);
@@ -121,15 +119,19 @@ export default function Discussion() {
             );
           })}
         </div>
+
+        {/* ── Input bar ── */}
         <div>
           <input
             type="text"
+            placeholder="Write a message…"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
           />
           <input type="button" value="Send" onClick={sendMessage} />
         </div>
+
       </div>
     </div>
   );
