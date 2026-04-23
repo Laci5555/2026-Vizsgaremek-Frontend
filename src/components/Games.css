@@ -570,10 +570,9 @@
     }
 
     .games .close { display: inline; }
+    .games .requestGame { bottom: 20px; left: 20px; right: auto; }
 
     .games .cardlist { padding-top: 64px; }
-
-    .games .requestGame { bottom: 20px; left: 20px; right: auto; }
 }
 
 @media screen and (max-width: 600px) {
@@ -638,9 +637,276 @@
     .games .message-fab { bottom: 78px; right: 20px; }
 }
 
-@media screen and (max-width: 400px) {
-    .games .card{
-        width: 250px;
-        height: 275px;
-    }
+/* ── GAME EDIT BTN (admin) ── */
+.gameDiv .gameEditBtn {
+    top: 14px;
+    right: auto;
+    left: 14px;
+}
+
+/* ── EDIT MODAL ── */
+.editModal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 680px;
+    max-width: 94vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    position: relative;
+    padding: 32px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.backdrop.visible .editModal {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ── EDIT FIELDS ── */
+.editField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.editField > label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.editField input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    padding: 10px 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editField input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+/* ── GENRE GRID ── */
+.editGenreGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.editGenreItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+}
+
+.editGenreItem:hover {
+    border-color: var(--accent);
+    background: #2a2a3a;
+}
+
+.editGenreItem.checked {
+    border-color: var(--accent);
+    background: rgba(108, 99, 255, 0.08);
+}
+
+.editGenreItem input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.editGenreItem span {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0;
+}
+
+.editGenreItem .genreX {
+    color: var(--text-muted);
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.editGenreItem .genreX:hover { color: #f87171; }
+
+/* ── PICTURE TOGGLE ── */
+.pictureType .toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    user-select: none;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.label.active { color: var(--text); }
+
+.toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.track {
+    position: absolute;
+    inset: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: background 0.25s, border-color 0.25s;
+}
+
+.toggle input:checked ~ .track {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.toggle input:checked ~ .track .thumb { transform: translateX(22px); }
+
+/* ── FILE CHOOSER ── */
+.fileChooser {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 16px;
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.fileChooser:hover { border-color: var(--accent); color: var(--text); }
+
+.fileName {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: block;
+}
+
+/* ── TEXTAREA ── */
+.editTextarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    padding: 12px 14px;
+    outline: none;
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editTextarea::placeholder { color: var(--text-muted); opacity: 0.7; }
+
+.editTextarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+.charCount {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    letter-spacing: 0.03em;
+}
+
+.charCount.near { color: #f0a020; }
+.charCount.over { color: #e24b4a; }
+
+/* ── EDIT GAME BUTTON ── */
+.editGameButton {
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 4px;
+}
+
+.editGameButton:hover { opacity: 0.88; transform: translateY(-1px); }
+.editGameButton:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+/* ── EDIT MODAL RESPONSIVE ── */
+@media (max-width: 600px) {
+    .editModal { padding: 24px 16px 20px; gap: 18px; }
+    .editGenreGrid { grid-template-columns: repeat(2, 1fr); }
+    .gameDiv .gameEditBtn { right: 50px; }
 }
