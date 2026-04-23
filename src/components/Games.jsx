@@ -39,6 +39,8 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
   const cardlistRef = useRef(null);
   const [cardsPerRow, setCardsPerRow] = useState(Infinity);
 
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   useEffect(() => {
     const el = cardlistRef.current;
     if (!el) return;
@@ -113,6 +115,19 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
   async function saveEdit() {
     // TODO: Firestore update hívás ide
     setEditing(false);
+  }
+
+
+
+  function deleteGame() {
+    setConfirmDelete(true);
+  }
+
+  async function confirmDeleteGame() {
+    // TODO: await deleteDoc(doc(db, 'games', selectedGame.id))
+    setConfirmDelete(false);
+    setEditing(false);
+    setShowGame(false);
   }
 
   const XIcon = () => (
@@ -300,9 +315,24 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
             </span>
           </div>
 
-          <button className="editGameButton" onClick={saveEdit} disabled={!editName.trim()}>
-            Edit game
-          </button>
+          <div className="editActions">
+            <button className="deleteGameButton" onClick={deleteGame}>Delete game</button>
+            <button className="editGameButton" onClick={saveEdit} disabled={!editName.trim()}>Edit game</button>
+          </div>
+          {/* ── Confirm delete modal ── */}
+          <div
+            className={`backdrop ${confirmDelete ? 'visible' : ''}`}
+            onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setConfirmDelete(false); }}
+          >
+            <div className="confirmModal" onClick={(e) => e.stopPropagation()}>
+              <p className="confirmTitle">Are you sure you want to delete this game?</p>
+              <p className="confirmSub">This action cannot be undone.</p>
+              <div className="confirmActions">
+                <button className="confirmCancel" onClick={() => setConfirmDelete(false)}>Cancel</button>
+                <button className="confirmDelete" onClick={confirmDeleteGame}>Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

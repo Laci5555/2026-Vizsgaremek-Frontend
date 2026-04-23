@@ -901,8 +901,113 @@
     margin-top: 4px;
 }
 
+.editActions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.editActions .editGameButton {
+    flex: 1;
+    margin-top: 0;
+}
+
+.deleteGameButton {
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    border-radius: 8px;
+    color: #f87171;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.deleteGameButton:hover {
+    background: rgba(248, 113, 113, 0.08);
+    border-color: #f87171;
+}
+
 .editGameButton:hover { opacity: 0.88; transform: translateY(-1px); }
 .editGameButton:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+.confirmModal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 360px;
+    max-width: 90vw;
+    padding: 32px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transform: translateY(16px);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.backdrop.visible .confirmModal {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.confirmTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.confirmSub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+}
+
+.confirmActions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.confirmCancel {
+    padding: 9px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.confirmCancel:hover {
+    border-color: var(--accent);
+}
+
+.confirmDelete {
+    padding: 9px 20px;
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    border-radius: 8px;
+    color: #f87171;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.confirmDelete:hover {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: #f87171;
+}
 
 /* ── EDIT MODAL RESPONSIVE ── */
 @media (max-width: 600px) {

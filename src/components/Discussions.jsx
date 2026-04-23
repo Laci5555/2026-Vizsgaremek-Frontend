@@ -14,19 +14,19 @@ import { IoMdClose } from 'react-icons/io';
 const PLACEHOLDER = 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg';
 
 const MAX_TITLE = 80;
-const MAX_DESC  = 300;
+const MAX_DESC = 300;
 
 export default function Discussions() {
   const [discussions, setDiscussions] = useState([]);
-  const [users, setUsers]             = useState([]);
-  const { user }                      = useApp();
-  const [r, refresh]                  = useState(false);
+  const [users, setUsers] = useState([]);
+  const { user } = useApp();
+  const [r, refresh] = useState(false);
 
   // modal state
-  const [isOpen,    setIsOpen]    = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [discTitle, setDiscTitle] = useState('');
   const [discDescr, setDiscDescr] = useState('');
-  const [error,     setError]     = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function getDiscussions() {
@@ -111,12 +111,7 @@ export default function Discussions() {
       </div>
 
       {/* ── FAB – bottom-left ── */}
-      <div
-        className="requestGame"
-        style={{ left: 28, right: 'auto' }}
-        onClick={openModal}
-        title="New discussion"
-      >
+      <div className="createDiscussion" style={{ left: 28, right: 'auto' }} onClick={openModal} title="New discussion">
         <GoPlus />
       </div>
 
@@ -131,7 +126,7 @@ export default function Discussions() {
           <button className="close-btn" onClick={closeModal}>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="11" y1="1" x2="1"  y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
 
