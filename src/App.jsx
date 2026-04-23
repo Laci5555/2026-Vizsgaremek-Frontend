@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import './App.css';
 import Home from './components/Home';
 import Games from './components/Games';
@@ -12,21 +12,54 @@ import Signup from './components/Signup';
 import Admin from './components/Admin';
 import { collection } from 'firebase/firestore';
 import { auth, db } from '../firebaseApp';
-import { AppProvider } from './AppContext';
+import { AppProvider, useApp } from './AppContext';
 
 const gamesDataCollection = collection(db, 'games');
 const genreCollection = collection(db, 'genres');
 
+// 👇 Védett útvonal komponens
+function ProtectedRoute({ children }) {
+  const { user, loading } = useApp();
+  if (loading) return null; // vagy egy spinner
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
+
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
+  {
+    path: '/',
+    element: <ProtectedRoute><Home /></ProtectedRoute>,
+  },
   { path: '/login', element: <Login auth={auth} /> },
   { path: '/signup', element: <Signup auth={auth} /> },
-  { path: '/games', element: <Games gamesDataCollection={gamesDataCollection} genreCollection={genreCollection} /> },
-  { path: '/discussions', element: <Discussions /> },
-  { path: '/discussion/:id/:title', element: <Discussion /> },
-  { path: '/finder', element: <Finder /> },
-  { path: '/admin', element: <Admin /> },
-  { path: '/profile', element: <Profile auth={auth} /> },
+  {
+    path: '/games',
+    element: (
+      <ProtectedRoute>
+        <Games gamesDataCollection={gamesDataCollection} genreCollection={genreCollection} />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/discussions',
+    element: <ProtectedRoute><Discussions /></ProtectedRoute>,
+  },
+  {
+    path: '/discussion/:id/:title',
+    element: <ProtectedRoute><Discussion /></ProtectedRoute>,
+  },
+  {
+    path: '/finder',
+    element: <ProtectedRoute><Finder /></ProtectedRoute>,
+  },
+  {
+    path: '/admin',
+    element: <ProtectedRoute><Admin /></ProtectedRoute>,
+  },
+  {
+    path: '/profile',
+    element: <ProtectedRoute><Profile auth={auth} /></ProtectedRoute>,
+  },
   { path: '*', element: <NotFound /> },
 ]);
 

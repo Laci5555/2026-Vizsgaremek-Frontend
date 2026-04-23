@@ -6,14 +6,18 @@ const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // 👈
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false); // 👈
+    });
     return unsubscribe;
   }, []);
 
   return (
-    <AppContext.Provider value={{ user }}>
+    <AppContext.Provider value={{ user, loading }}> {/* 👈 */}
       {children}
     </AppContext.Provider>
   );
