@@ -13,6 +13,15 @@
     color: white;
 }
 
+.discussions,
+.discussion,
+.games,
+.finder,
+.profile,
+.home,
+.admin {
+  padding-top: 64px;
+}
 
 
 
