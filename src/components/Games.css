@@ -24,7 +24,7 @@
 .games .hbox {
     display: flex;
     position: relative;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 64px);
     overflow-y: hidden;
 }
 
@@ -99,20 +99,7 @@
     flex-shrink: 0;
 }
 
-.games .searchDiv .searchBtn:hover {
-    opacity: 0.85;
-}
-
-/* Genre filter label */
-.games .filter > span,
-.games .filter > p {
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin: 0;
-}
+.games .searchDiv .searchBtn:hover { opacity: 0.85; }
 
 .games .checkboxs {
     display: flex;
@@ -160,10 +147,18 @@
     scrollbar-color: var(--border) transparent;
     display: flex;
     flex-wrap: wrap;
+    /* alapértelmezett: középre */
     align-content: flex-start;
+    justify-content: center;
     gap: 20px;
     padding: 28px;
     position: relative;
+}
+
+/* keresés közben: felülre igazítás */
+.games .cardlist.is-filtering {
+    align-content: flex-start;
+    justify-content: flex-start;
 }
 
 /* ── GAME CARD ── */
@@ -206,7 +201,7 @@
 }
 
 /* ── EMPTY / LOADING STATE ── */
-.games .cardlist > div:not(.card):not(.gameDiv):not(.requestGame) {
+.games .cardlist > div:not(.card):not(.gameDiv):not(.requestGame):not(.backdrop) {
     width: 100%;
     text-align: center;
     color: var(--text-muted);
@@ -214,27 +209,43 @@
     padding: 60px 0;
 }
 
-/* ── REQUEST BUTTON ── */
-.games .requestGame {
-    position: absolute;
-    left: 32px;
-    bottom: 32px;
-    width: 52px;
-    height: 52px;
+/* ── FAB GOMBOK (requestGame + Message) – jobb alsó sarok, fixed ── */
+.games .requestGame,
+.games .message-fab {
+    position: fixed;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     color: white;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 4px 16px rgba(108, 99, 255, 0.35);
     z-index: 50;
+    border: none;
 }
 
-.games .requestGame:hover {
+.games .requestGame {
+    bottom: 28px;
+    left: 268px;
+}
+
+/* Message komponens FAB – a requestGame fölé */
+.games .message-fab {
+    bottom: 88px;
+    right: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.games .requestGame:hover,
+.games .message-fab:hover {
     transform: scale(1.08);
     box-shadow: 0 6px 24px rgba(108, 99, 255, 0.5);
 }
@@ -280,9 +291,7 @@
     opacity: 1;
 }
 
-.modal-top-bar {
-    display: none;
-}
+.modal-top-bar { display: none; }
 
 .close-btn {
     position: absolute;
@@ -407,15 +416,16 @@
 
 .gameDiv img {
     width: 100%;
-    min-height: 340px;
+    min-height: 300px;
+    max-height: 340px;
     object-fit: cover;
-    border-radius: 16px 0 0 0;
+    border-radius: 16px 16px 0 0;
     flex-shrink: 0;
     background: var(--surface2);
 }
 
 .gameDiv .gameInfos {
-    padding: 28px 24px;
+    padding: 24px 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -423,11 +433,12 @@
 }
 
 .gameDiv .gameInfos .title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--text);
     margin: 0;
     padding-right: 32px;
+    line-height: 1.3;
 }
 
 .gameDiv .gameInfos p {
@@ -439,36 +450,37 @@
 }
 
 .gameDiv .gameGenre {
-  background: rgba(99,102,241,0.15);
-  border: 0.5px solid rgba(99,102,241,0.4);
-  color: #a5b4fc;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 20px;
+    background: rgba(99, 102, 241, 0.15);
+    border: 0.5px solid rgba(99, 102, 241, 0.4);
+    color: #a5b4fc;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
 }
 
 .gameDiv .gameGenres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
 .gameDiv .gameDescription {
-  background: rgba(255,255,255,0.04);
-  border: 0.5px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 14px 16px;
-  font-size: 13.5px;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.7;
+    background: rgba(255, 255, 255, 0.04);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.7;
 }
 
 .gameDiv .likeRatios {
     display: flex;
-    gap: 10px;
-    margin-top: auto;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
 }
 
 .gameDiv .like,
@@ -476,10 +488,11 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    padding: 7px 16px;
+    padding: 6px 14px;
     border-radius: 8px;
+    white-space: nowrap;
 }
 
 .gameDiv .like {
@@ -512,9 +525,7 @@
     transition: border-color 0.2s;
 }
 
-.games .filterIcon:hover {
-    border-color: var(--accent);
-}
+.games .filterIcon:hover { border-color: var(--accent); }
 
 .games .close {
     display: none;
@@ -524,20 +535,16 @@
     transition: color 0.15s;
 }
 
-.games .close:hover {
-    color: #f87171;
-}
+.games .close:hover { color: #f87171; }
 
 /* ── RESPONSIVE ── */
 @media screen and (max-width: 1010px) {
-    .games .hbox {
-        height: calc(100vh - 60px);
-    }
+    .games .hbox { height: calc(100vh - 64px); }
 
     .games .filterIcon {
         display: flex;
         position: absolute;
-        top: 0px;
+        top: 0;
         left: 12px;
         z-index: 10;
     }
@@ -555,45 +562,85 @@
         transition: left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .games .filter.show {
-        left: 0;
-    }
+    .games .filter.show { left: 0; }
 
     .games .filter > div:first-child {
         display: flex !important;
         justify-content: flex-end;
     }
 
-    .games .close {
-        display: inline;
-    }
+    .games .close { display: inline; }
 
-    .games .cardlist {
-        padding-top: 64px;
-    }
+    .games .cardlist { padding-top: 64px; }
+
+    .games .requestGame { bottom: 20px; left: 20px; right: auto; }
 }
 
 @media screen and (max-width: 600px) {
+    /* gameDiv mobilon: kisebb kép, minden adat kiférjen */
     .gameDiv {
-        flex-direction: column;
-        width: 95vw;
+        width: 96vw;
+        max-height: 92vh;
+        border-radius: 14px;
     }
 
     .gameDiv img {
-        width: 100%;
-        min-height: 200px;
-        border-radius: 16px 16px 0 0;
+        min-height: 180px;
+        max-height: 220px;
+        border-radius: 14px 14px 0 0;
     }
-    .cardlist{
+
+    .gameDiv .gameInfos {
+        padding: 16px 14px;
+        gap: 10px;
+    }
+
+    .gameDiv .gameInfos > div:first-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        margin-bottom: 0 !important;
+    }
+
+    .gameDiv .gameInfos .title {
+        font-size: 1.1rem;
+        padding-right: 0;
+    }
+
+    .gameDiv .likeRatios {
+        width: 100%;
+    }
+
+    .gameDiv .like,
+    .gameDiv .dislike {
+        flex: 1;
         justify-content: center;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+
+    .gameDiv .gameDescription {
+        font-size: 12.5px;
+        padding: 10px 12px;
     }
 
     .games .card {
-        width: 160px;
-        height: 230px;
+        width: 155px;
+        height: 225px;
     }
 
-    .games .card img {
-        height: 160px;
+    .games .card img { height: 155px; }
+
+    .games .cardlist { justify-content: center; }
+
+    /* FAB gombok kicsit közelebb a sarokhoz mobilon */
+    .games .requestGame { bottom: 20px; left: 20px; right: auto; }
+    .games .message-fab { bottom: 78px; right: 20px; }
+}
+
+@media screen and (max-width: 400px) {
+    .games .card{
+        width: 250px;
+        height: 275px;
     }
 }

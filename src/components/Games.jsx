@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
 import './Games.css';
 import { IoSearchOutline } from 'react-icons/io5';
@@ -9,6 +9,9 @@ import { GoPlus } from 'react-icons/go';
 import { db } from '../../firebaseApp';
 import Message from './Message';
 import { AiFillDislike, AiFillLike } from 'react-icons/ai';
+
+const CARD_WIDTH = 200;
+const CARD_GAP = 20;
 
 export default function Games({ gamesDataCollection, genreCollection }) {
   const [game, setGame] = useState('');
@@ -21,6 +24,26 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   const [newGameName, setNewGameName] = useState('');
   const [showGame, setShowGame] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const cardlistRef = useRef(null);
+  const [cardsPerRow, setCardsPerRow] = useState(Infinity);
+
+  // Figyeli a cardlist szélességét és kiszámolja hány kártya fér el egy sorban
+  useEffect(() => {
+    const el = cardlistRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      const perRow = Math.floor((width + CARD_GAP) / (CARD_WIDTH + CARD_GAP));
+      setCardsPerRow(Math.max(1, perRow));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Balra igazítás csak akkor, ha: keresés futott ÉS a találatok száma több mint egy sor
+  const isFiltering = searched && games.length < cardsPerRow;
 
   useEffect(() => {
     async function fetchGames() {
@@ -46,6 +69,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
       result = result.filter((x) => x.genre.some((g) => activeFilters.includes(g)));
     }
     setGames(result);
+    setSearched(true);
     setShowFilter(false);
   }
 
@@ -53,6 +77,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     e.stopPropagation();
     setGenreFilters((prev) => {
       const next = prev.includes(name) ? prev.filter((x) => x !== name) : [...prev, name];
+      filterGames(game, next);
       return next;
     });
   }
@@ -71,17 +96,39 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   return (
     <div className="games">
       <Navbar />
-      <Message />
+
       <div className="hbox">
-        <button className="filterIcon" onClick={() => setShowFilter((p) => !p)}><TfiFilter /></button>
+        <button className="filterIcon" onClick={() => setShowFilter((p) => !p)}>
+          <TfiFilter />
+        </button>
+
+        {/* ── Sidebar filter ── */}
         <div className={`filter ${showFilter ? 'show' : ''}`}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <IoMdClose className="close" onClick={() => setShowFilter(false)} />
           </div>
           <div className="searchDiv">
             <IoSearchOutline style={{ color: 'grey' }} />
-            <input type="text" className="searchBar" value={game} onChange={(e) => setGame(e.target.value)} />
-            <input className="searchBtn" type="button" value="Search" onClick={() => filterGames(game, genreFilters)} />
+            <input
+              type="text"
+              className="searchBar"
+              value={game}
+              onChange={(e) => {
+                setGame(e.target.value);
+                // Ha kitörlik a keresőt, visszaáll középre
+                if (e.target.value.trim() === '') {
+                  setGames(gamesMain);
+                  setSearched(false);
+                }
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && filterGames(game, genreFilters)}
+            />
+            <input
+              className="searchBtn"
+              type="button"
+              value="Search"
+              onClick={() => filterGames(game, genreFilters)}
+            />
           </div>
           <div className="checkboxs">
             {genres.map((x) => (
@@ -93,22 +140,26 @@ export default function Games({ gamesDataCollection, genreCollection }) {
           </div>
         </div>
 
-        <div className="cardlist">
+        {/* ── Card list ── */}
+        <div ref={cardlistRef} className={`cardlist ${isFiltering ? 'is-filtering' : ''}`}>
           {gamesMain.length > 0 ? (
             games.length > 0
               ? games.map((x) => (
-                <div className="card" key={x.id} onClick={() => { setSelectedGame(x); setShowGame(true); }}>
+                <div
+                  className="card"
+                  key={x.id}
+                  onClick={() => { setSelectedGame(x); setShowGame(true); }}
+                >
                   <img src={x.img} alt={x.name} />
                   <h3>{x.name}</h3>
                 </div>
               ))
-              : <div>Sajnos ilyen nevű játék nincs...</div>
+              : <div>No games found...</div>
           ) : (
             <div>Loading...</div>
           )}
 
-          <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
-
+          {/* ── Game detail modal ── */}
           <div
             className={`backdrop ${showGame ? 'visible' : ''}`}
             onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setShowGame(false); }}
@@ -139,6 +190,13 @@ export default function Games({ gamesDataCollection, genreCollection }) {
         </div>
       </div>
 
+      {/* ── FAB gombok ── */}
+      <Message />
+      <div className="requestGame" onClick={() => setIsOpen(true)}>
+        <GoPlus />
+      </div>
+
+      {/* ── Request modal ── */}
       <div
         className={`backdrop ${isOpen ? 'visible' : ''}`}
         onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setIsOpen(false); }}
@@ -155,7 +213,12 @@ export default function Games({ gamesDataCollection, genreCollection }) {
             <h2>Submit a game to be added!</h2>
             <div>
               <label>Game's name</label>
-              <input type="text" placeholder="pl. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)} />
+              <input
+                type="text"
+                placeholder="e.g. Elden Ring..."
+                value={newGameName}
+                onChange={(e) => setNewGameName(e.target.value)}
+              />
             </div>
             <button className="submit-btn" disabled={!newGameName.trim()} onClick={submitRequest}>
               Submit request
