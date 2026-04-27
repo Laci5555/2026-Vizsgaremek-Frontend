@@ -53,7 +53,7 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
     return () => observer.disconnect();
   }, []);
 
-  const isFiltering = searched && games.length > cardsPerRow;
+  const isFiltering = searched && games.length < cardsPerRow;
 
   useEffect(() => {
     async function fetchGames() {
@@ -180,7 +180,13 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
               ? games.map((x) => (
                 <div className="card" key={x.id} onClick={() => { setSelectedGame(x); setShowGame(true); }}>
                   <img src={x.img} alt={x.name} />
-                  <h3>{x.name}</h3>
+                  <div className="cardBottom">
+                    <h3>{x.name}</h3>
+                    <div className="cardRatings">
+                      <span className="cardLike"><AiFillLike />{x.likes}</span>
+                      <span className="cardDislike"><AiFillDislike />{x.dislikes}</span>
+                    </div>
+                  </div>
                 </div>
               ))
               : <div>No games found...</div>

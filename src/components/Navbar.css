@@ -87,6 +87,19 @@
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 4px 8px;
+  transition: border-color 0.2s;
+}
+
+.navbar .right:hover .profName {
+  color: #f0eeff;
+}
+
+.navbar .right:hover {
+  border-color: #6c63ff;
 }
 
 .navbar .profName {
@@ -103,13 +116,8 @@
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #46465a;
-  cursor: pointer;
   transition: border-color 0.2s, transform 0.15s;
   display: block;
-}
-.navbar .profPicture:hover {
-  border-color: #6c63ff;
-  transform: scale(1.06);
 }
 
 /* ─── Mobile ────────────────────────────────────────── */

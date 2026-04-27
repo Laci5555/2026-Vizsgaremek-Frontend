@@ -40,9 +40,9 @@ export default function Navbar() {
         <div className="page" onClick={() => navigate('/discussions')}>Discussions</div>
         <div className="page" onClick={() => navigate('/finder')}>Finder</div>
       </div>
-      <div className="right">
+      <div className="right" onClick={() => navigate('/profile')}>
         <div className="profName">{name}</div>
-        <div onClick={() => navigate('/profile')}>
+        <div>
           <img className="profPicture" src={pfp} alt="profile" />
         </div>
       </div>
