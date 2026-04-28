@@ -935,6 +935,25 @@
     border-color: #f87171;
 }
 
+.gameDiv .like,
+.gameDiv .dislike {
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, background 0.2s, border-color 0.2s;
+}
+
+.gameDiv .like:hover { opacity: 0.8; transform: scale(1.05); }
+.gameDiv .dislike:hover { opacity: 0.8; transform: scale(1.05); }
+
+.gameDiv .like.voted {
+  background: rgba(74, 222, 128, 0.22);
+  border-color: rgba(74, 222, 128, 0.55);
+}
+
+.gameDiv .dislike.voted {
+  background: rgba(248, 113, 113, 0.22);
+  border-color: rgba(248, 113, 113, 0.55);
+}
+
 
 /* ── RESPONSIVE ── */
 @media screen and (max-width: 1010px) {
@@ -1040,4 +1059,44 @@
     .editModal { padding: 24px 16px 20px; gap: 18px; }
     .editGenreGrid { grid-template-columns: repeat(2, 1fr); }
     .gameDiv .gameEditBtn { right: 50px; }
+}
+
+@media (max-width: 340px) {
+  .editModal {
+    padding: 20px 12px 16px;
+    gap: 14px;
+  }
+
+  .editGenreGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .editGenreItem {
+    padding: 6px 6px;
+    gap: 5px;
+  }
+
+  .editGenreItem span {
+    font-size: 0.75rem;
+  }
+
+  .editActions {
+    flex-direction: column;
+  }
+
+  .deleteGameButton,
+  .editGameButton {
+    width: 100%;
+  }
+
+  .pictureType .toggle-wrapper {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .editField input[type="text"],
+  .editTextarea {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
 }

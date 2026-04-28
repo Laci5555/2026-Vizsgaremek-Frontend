@@ -204,10 +204,20 @@ export default function Message() {
                       )}
                       <div className={`bubble ${isMe ? 'me' : 'them'}`}>{msg.text}</div>
                       <span className="bubble-time">
-                        {msg.time?.toDate?.()
-                          ? msg.time.toDate().toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' })
-                          : ''}
-                      </span>
+                      {msg.time?.toDate?.()
+                        ? (() => {
+                            const d = msg.time.toDate();
+                            const now = new Date();
+                            const isToday = d.toDateString() === now.toDateString();
+                            const yesterday = new Date(now);
+                            yesterday.setDate(now.getDate() - 1);
+                            const isYesterday = d.toDateString() === yesterday.toDateString();
+                            if (isToday) return d.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+                            if (isYesterday) return 'tegnap';
+                            return d.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' });
+                          })()
+                        : ''}
+                    </span>
                     </div>
                   );
                 })}

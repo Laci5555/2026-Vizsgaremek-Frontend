@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
 import Navbar from './Navbar';
 import './Finder.css';
 import { GoPlus } from 'react-icons/go';
-import { IoMdClose } from 'react-icons/io';
 import { IoArrowBack, IoExitOutline } from 'react-icons/io5';
+import { MdPersonRemove } from 'react-icons/md';
 import {
-  addDoc, collection, getDocs, getDoc, doc,
+  addDoc, collection, getDocs, doc,
   updateDoc, arrayUnion, arrayRemove, deleteDoc,
   query, where, orderBy, Timestamp,
 } from 'firebase/firestore';
@@ -15,31 +14,27 @@ import { useApp } from '../AppContext';
 
 export default function Finder() {
   const { user } = useApp();
-  const navigate = useNavigate();
 
-  // Listák
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
   const [games, setGames] = useState([]);
 
-  // Kiválasztott poszt / szoba
   const [selectedPost, setSelectedPost] = useState(null);
   const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [inRoom, setInRoom] = useState(false);
 
-  // Create modal
   const [isOpen, setIsOpen] = useState(false);
   const [newGame, setNewGame] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newLimit, setNewLimit] = useState(4);
-
   const [limitEnabled, setLimitEnabled] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const chatRef = useRef(null);
   const MAX_DESC = 300;
 
   // ── Betöltés ──
@@ -47,7 +42,7 @@ export default function Finder() {
     async function load() {
       const [usersSnap, postsSnap, gamesSnap] = await Promise.all([
         getDocs(collection(db, 'user-data')),
-        getDocs(collection(db, 'finder-posts')),
+        getDocs(collection(db, 'finder-groups')),
         getDocs(collection(db, 'games')),
       ]);
       setUsers(usersSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
@@ -60,45 +55,52 @@ export default function Finder() {
 
   // ── Üzenetek betöltése ──
   useEffect(() => {
-    if (!room) return;
+    if (!selectedPost) return;
     async function loadMessages() {
       const snap = await getDocs(
         query(
           collection(db, 'finder-messages'),
-          where('roomId', '==', room.id),
+          where('finderid', '==', selectedPost.id),
           orderBy('time', 'asc'),
         ),
       );
       setMessages(snap.docs.map((d) => ({ ...d.data(), id: d.id })));
     }
     loadMessages();
-  }, [room, refresh]);
+  }, [selectedPost, refresh]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   function getUser(email) {
     return users.find((x) => x.email === email);
   }
 
-  // ── Poszt létrehozása ──
+  function getGame(gameId) {
+    return games.find((g) => g.id === gameId || g.name === gameId);
+  }
+
+  // ── Szoba létrehozása ──
   async function createPost() {
     if (!newGame || !newDescription.trim()) return;
     try {
-      // 1. Poszt létrehozása
-      const postRef = await addDoc(collection(db, 'finder-posts'), {
-        creatorEmail: user.email,
+      await addDoc(collection(db, 'finder-groups'), {
+        creatoremail: user.email,
         game: newGame,
         description: newDescription,
-        limit: newLimit,
-        createdAt: Timestamp.now(),
-      });
-      // 2. Szoba létrehozása, creator automatikusan tag
-      await addDoc(collection(db, 'finder-rooms'), {
-        postId: postRef.id,
+        maxplayers: limitEnabled ? newLimit : 0, // 0 = korlátlan
         members: [user.email],
+        createdAt: Timestamp.now(),
       });
       setIsOpen(false);
       setNewGame('');
       setNewDescription('');
       setNewLimit(4);
+      setLimitEnabled(false);
       setRefresh((p) => !p);
     } catch (err) { console.error(err); }
   }
@@ -106,71 +108,83 @@ export default function Finder() {
   // ── Szoba megnyitása ──
   async function openPost(post) {
     setSelectedPost(post);
-    const snap = await getDocs(
-      query(collection(db, 'finder-rooms'), where('postId', '==', post.id))
-    );
-    if (!snap.empty) {
-      const roomDoc = { ...snap.docs[0].data(), id: snap.docs[0].id };
-      setRoom(roomDoc);
-      setInRoom(roomDoc.members.includes(user.email));
-    }
+    setInRoom((post.members ?? []).includes(user.email));
   }
 
   // ── Csatlakozás ──
   async function joinRoom() {
-    if (!room || room.members.length >= selectedPost.limit) return;
-    await updateDoc(doc(db, 'finder-rooms', room.id), {
+    if (!selectedPost) return;
+    const isFull = selectedPost.maxplayers > 0 &&
+      (selectedPost.members ?? []).length >= selectedPost.maxplayers;
+    if (isFull) return;
+    await updateDoc(doc(db, 'finder-groups', selectedPost.id), {
       members: arrayUnion(user.email),
     });
-    setRoom((r) => ({ ...r, members: [...r.members, user.email] }));
+    const updated = { ...selectedPost, members: [...(selectedPost.members ?? []), user.email] };
+    setSelectedPost(updated);
+    setPosts((prev) => prev.map((p) => p.id === selectedPost.id ? updated : p));
     setInRoom(true);
-    setRefresh((p) => !p);
   }
 
   // ── Kilépés ──
   async function leaveRoom() {
-    if (!room) return;
-    const newMembers = room.members.filter((m) => m !== user.email);
+    if (!selectedPost) return;
 
-    // Ha a creator lép ki, töröljük a posztot és a szobát
-    if (selectedPost.creatorEmail === user.email) {
-      await deleteDoc(doc(db, 'finder-rooms', room.id));
-      await deleteDoc(doc(db, 'finder-posts', selectedPost.id));
-      setSelectedPost(null);
-      setRoom(null);
-      setInRoom(false);
-      setRefresh((p) => !p);
+    // Creator kilép → szoba + üzenetek törlése
+    if (selectedPost.creatoremail === user.email) {
+      // Üzenetek törlése
+      const msgsSnap = await getDocs(
+        query(collection(db, 'finder-messages'), where('finderid', '==', selectedPost.id))
+      );
+      await Promise.all(msgsSnap.docs.map((d) => deleteDoc(d.ref)));
+      await deleteDoc(doc(db, 'finder-groups', selectedPost.id));
+      setPosts((prev) => prev.filter((p) => p.id !== selectedPost.id));
+      closePost();
       return;
     }
 
-    await updateDoc(doc(db, 'finder-rooms', room.id), {
+    const newMembers = (selectedPost.members ?? []).filter((m) => m !== user.email);
+    await updateDoc(doc(db, 'finder-groups', selectedPost.id), {
       members: arrayRemove(user.email),
     });
-    setRoom((r) => ({ ...r, members: newMembers }));
+    const updated = { ...selectedPost, members: newMembers };
+    setSelectedPost(updated);
+    setPosts((prev) => prev.map((p) => p.id === selectedPost.id ? updated : p));
     setInRoom(false);
-    setRefresh((p) => !p);
+  }
+
+  // ── Tag kirúgása (csak creator) ──
+  async function kickMember(email) {
+    if (!selectedPost || selectedPost.creatoremail !== user.email) return;
+    const newMembers = (selectedPost.members ?? []).filter((m) => m !== email);
+    await updateDoc(doc(db, 'finder-groups', selectedPost.id), {
+      members: arrayRemove(email),
+    });
+    const updated = { ...selectedPost, members: newMembers };
+    setSelectedPost(updated);
+    setPosts((prev) => prev.map((p) => p.id === selectedPost.id ? updated : p));
   }
 
   // ── Üzenet küldése ──
   async function sendMessage() {
-    if (message.trim() === '' || !inRoom) return;
+    if (message.trim() === '' || !inRoom || !selectedPost) return;
+    const text = message.trim();
     const optimistic = {
       id: `temp-${Date.now()}`,
-      roomId: room.id,
-      email: user.email,
-      message: message,
+      finderid: selectedPost.id,
+      sender: user.email,
+      message: text,
       time: Timestamp.now(),
     };
     setMessages((prev) => [...prev, optimistic]);
     setMessage('');
     try {
       await addDoc(collection(db, 'finder-messages'), {
-        roomId: room.id,
-        email: user.email,
-        message: optimistic.message,
+        finderid: selectedPost.id,
+        sender: user.email,
+        message: text,
         time: optimistic.time,
       });
-      setRefresh((p) => !p);
     } catch (err) {
       console.error(err);
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
@@ -184,12 +198,22 @@ export default function Finder() {
     setMessages([]);
   }
 
-  const isFull = room && selectedPost && room.members.length >= selectedPost.limit;
-  const currentUser = getUser(user?.email);
+  const members = selectedPost?.members ?? [];
+  const maxplayers = selectedPost?.maxplayers ?? 0;
+  const isFull = maxplayers > 0 && members.length >= maxplayers;
+  const isCreator = selectedPost?.creatoremail === user?.email;
+
+  const XIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
 
   return (
     <div className="finder">
       <Navbar />
+
       {/* ── Poszt lista ── */}
       {!selectedPost && (
         <div className="finder-list">
@@ -198,8 +222,10 @@ export default function Finder() {
             <div className="finder-empty">No posts yet. Be the first!</div>
           )}
           {posts.map((post) => {
-            const creator = getUser(post.creatorEmail);
-            const game = games.find((g) => g.id === post.game || g.name === post.game);
+            const creator = getUser(post.creatoremail);
+            const game = getGame(post.game);
+            const memberCount = (post.members ?? []).length;
+            const full = post.maxplayers > 0 && memberCount >= post.maxplayers;
             return (
               <div className="finder-card" key={post.id} onClick={() => openPost(post)}>
                 <div className="finder-card-top">
@@ -212,9 +238,10 @@ export default function Finder() {
                 </div>
                 <p className="finder-desc">{post.description}</p>
                 <div className="finder-card-footer">
-                  <span className="finder-limit">
-                    {/* members count unknown here, shown in detail */}
-                    Max {post.limit} players
+                  <span className={`finder-limit ${full ? 'finder-limit-full' : ''}`}>
+                    {post.maxplayers > 0
+                      ? `${memberCount} / ${post.maxplayers} players${full ? ' · FULL' : ''}`
+                      : `${memberCount} player${memberCount !== 1 ? 's' : ''}`}
                   </span>
                 </div>
               </div>
@@ -223,7 +250,7 @@ export default function Finder() {
         </div>
       )}
 
-      {/* ── Poszt részlet + chat ── */}
+      {/* ── Szoba nézet ── */}
       {selectedPost && (
         <div className="finder-room">
           <div className="finder-room-header">
@@ -231,17 +258,17 @@ export default function Finder() {
               <IoArrowBack />
             </button>
             <div className="finder-room-info">
-              <img src={getUser(selectedPost.creatorEmail)?.picture} alt="" className="finder-pfp" />
+              <img src={getUser(selectedPost.creatoremail)?.picture} alt="" className="finder-pfp" />
               <div>
-                <span className="finder-username">{getUser(selectedPost.creatorEmail)?.username}</span>
+                <span className="finder-username">{getUser(selectedPost.creatoremail)?.username}</span>
                 <span className="finder-game">
-                  {games.find((g) => g.id === selectedPost.game || g.name === selectedPost.game)?.name ?? selectedPost.game}
+                  {getGame(selectedPost.game)?.name ?? selectedPost.game}
                 </span>
               </div>
             </div>
             <div className="finder-room-meta">
               <span className={`finder-members ${isFull ? 'full' : ''}`}>
-                {room?.members.length ?? 0} / {selectedPost.limit}
+                {members.length}{maxplayers > 0 ? ` / ${maxplayers}` : ''} 
               </span>
               {inRoom && (
                 <button className="finder-leave" onClick={leaveRoom} title="Leave room">
@@ -253,17 +280,44 @@ export default function Finder() {
 
           <p className="finder-room-desc">{selectedPost.description}</p>
 
-          {/* Chat – csak tagoknak */}
+          {/* ── Tagok lista (creator látja a kick gombokat) ── */}
+          {inRoom && (
+            <div className="finder-members-list">
+              {members.map((email) => {
+                const u = getUser(email);
+                return (
+                  <div key={email} className="finder-member-item">
+                    <img src={u?.picture} alt="" className="finder-pfp-sm" />
+                    <span>{u?.username ?? email}</span>
+                    {email === selectedPost.creatoremail && (
+                      <span className="finder-owner-badge">owner</span>
+                    )}
+                    {isCreator && email !== user.email && (
+                      <button
+                        className="finder-kick-btn"
+                        onClick={() => kickMember(email)}
+                        title="Kick"
+                      >
+                        <MdPersonRemove />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ── Chat – csak tagoknak ── */}
           {inRoom ? (
             <>
-              <div className="finder-chat">
+              <div className="finder-chat" ref={chatRef}>
                 {messages.map((m) => {
-                  const msgUser = getUser(m.email);
+                  const msgUser = getUser(m.sender);
                   return (
-                    <div key={m.id} className={`finder-message ${m.email === user.email ? 'own' : ''}`}>
+                    <div key={m.id} className={`finder-message ${m.sender === user.email ? 'own' : ''}`}>
                       <div className="finder-msg-user">
                         <img src={msgUser?.picture} alt="" className="finder-pfp-sm" />
-                        <span>{msgUser?.username ?? m.email}</span>
+                        <span>{msgUser?.username ?? m.sender}</span>
                       </div>
                       <p>{m.message}</p>
                     </div>
@@ -292,10 +346,12 @@ export default function Finder() {
         </div>
       )}
 
-      {/* ── Create FAB ── */}
-      <div className="finder-fab" onClick={() => setIsOpen(true)} title="New post">
-        <GoPlus />
-      </div>
+      {/* ── FAB ── */}
+      {!selectedPost && (
+        <div className="finder-fab" onClick={() => setIsOpen(true)} title="New post">
+          <GoPlus />
+        </div>
+      )}
 
       {/* ── Create modal ── */}
       <div
@@ -303,13 +359,7 @@ export default function Finder() {
         onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setIsOpen(false); }}
       >
         <div className="finder-modal" onClick={(e) => e.stopPropagation()}>
-          <button className="close-btn" onClick={() => setIsOpen(false)}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
-
+          <button className="close-btn" onClick={() => setIsOpen(false)}><XIcon /></button>
           <h2 className="finder-modal-title">Find a teammate</h2>
 
           <div className="finder-field">
@@ -337,7 +387,7 @@ export default function Finder() {
             <div className="finder-limit-toggle">
               <label>Max players (including you)</label>
               <label className="toggle">
-                <input type="checkbox" checked={limitEnabled} onChange={() => setLimitEnabled(p => !p)} />
+                <input type="checkbox" checked={limitEnabled} onChange={() => setLimitEnabled((p) => !p)} />
                 <div className="track"><div className="thumb" /></div>
               </label>
             </div>

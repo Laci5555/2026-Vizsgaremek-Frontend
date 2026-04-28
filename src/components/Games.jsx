@@ -4,18 +4,26 @@ import './Games.css';
 import { IoSearchOutline } from 'react-icons/io5';
 import { TfiFilter } from 'react-icons/tfi';
 import { IoMdClose } from 'react-icons/io';
-import { addDoc, collection, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { GoPlus } from 'react-icons/go';
 import { db } from '../../firebaseApp';
 import Message from './Message';
 import { AiFillDislike, AiFillLike } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
+import {
+  addDoc, collection, getDocs, updateDoc, deleteDoc,
+  doc, getDoc, setDoc, increment,
+} from 'firebase/firestore';
+import { useApp } from '../AppContext';
 
 const CARD_WIDTH = 200;
 const CARD_GAP = 20;
 const MAX_DESC = 500;
 
 export default function Games({ gamesDataCollection, genreCollection, isAdmin = true }) {
+
+  const { user } = useApp();
+  const [userVote, setUserVote] = useState(null);
+
   const [game, setGame] = useState('');
   const [games, setGames] = useState([]);
   const [gamesMain, setGamesMain] = useState([]);
@@ -70,6 +78,16 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
     fetchGenres();
   }, []);
 
+  useEffect(() => {
+    if (!selectedGame || !user) { setUserVote(null); return; }
+    async function fetchVote() {
+      const voteRef = doc(db, 'user-votes', `${user.uid}_${selectedGame.id}`);
+      const snap = await getDoc(voteRef);
+      setUserVote(snap.exists() ? snap.data().vote : null);
+    }
+    fetchVote();
+  }, [selectedGame, user]);
+
   function filterGames(searchName, activeFilters) {
     let result = gamesMain;
     if (searchName) result = result.filter((x) => x.name.toLowerCase().includes(searchName.toLowerCase()));
@@ -86,6 +104,52 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
       filterGames(game, next);
       return next;
     });
+  }
+
+  async function handleVote(type) {
+    if (!user || !selectedGame) return;
+
+    const gameRef = doc(db, 'games', selectedGame.id);
+    const voteRef = doc(db, 'user-votes', `${user.uid}_${selectedGame.id}`);
+
+    let likeDelta = 0;
+    let dislikeDelta = 0;
+    let newVote = null;
+
+    if (userVote === type) {
+      // Visszavonás: ugyanazt nyomta újra
+      if (type === 'like') likeDelta = -1;
+      else dislikeDelta = -1;
+      newVote = null;
+    } else {
+      // Váltás vagy első szavazat
+      if (userVote === 'like') likeDelta = -1;
+      if (userVote === 'dislike') dislikeDelta = -1;
+      if (type === 'like') likeDelta += 1;
+      else dislikeDelta += 1;
+      newVote = type;
+    }
+
+    const updates = {};
+    if (likeDelta !== 0) updates.likes = increment(likeDelta);
+    if (dislikeDelta !== 0) updates.dislikes = increment(dislikeDelta);
+    await updateDoc(gameRef, updates);
+
+    if (newVote) {
+      await setDoc(voteRef, { vote: newVote, gameId: selectedGame.id, userId: user.uid });
+    } else {
+      await deleteDoc(voteRef);
+    }
+
+    const updated = {
+      ...selectedGame,
+      likes: (selectedGame.likes ?? 0) + likeDelta,
+      dislikes: (selectedGame.dislikes ?? 0) + dislikeDelta,
+    };
+    setSelectedGame(updated);
+    setGamesMain((prev) => prev.map((x) => x.id === selectedGame.id ? updated : x));
+    setGames((prev) => prev.map((x) => x.id === selectedGame.id ? updated : x));
+    setUserVote(newVote);
   }
 
   async function submitRequest() {
@@ -232,8 +296,18 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
                   <h3 className="title">{selectedGame?.name}</h3>
                   <div className="likeRatios">
-                    <div className="like"><AiFillLike /><span>{selectedGame?.likes}</span></div>
-                    <div className="dislike"><AiFillDislike /><span>{selectedGame?.dislikes}</span></div>
+                    <div
+                      className={`like${userVote === 'like' ? ' voted' : ''}`}
+                      onClick={() => handleVote('like')}
+                    >
+                      <AiFillLike /><span>{selectedGame?.likes}</span>
+                    </div>
+                    <div
+                      className={`dislike${userVote === 'dislike' ? ' voted' : ''}`}
+                      onClick={() => handleVote('dislike')}
+                    >
+                      <AiFillDislike /><span>{selectedGame?.dislikes}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="gameGenres">

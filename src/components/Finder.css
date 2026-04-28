@@ -573,6 +573,72 @@
 .finder-create-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 .finder-create-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
+/* ── MEMBERS LIST ── */
+.finder-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.finder-member-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.finder-member-item span:nth-child(2) {
+  flex: 1;
+}
+
+.finder-owner-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(108, 99, 255, 0.12);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+
+.finder-kick-btn {
+  width: 28px;
+  height: 28px;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 6px;
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.finder-kick-btn:hover {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: #f87171;
+}
+
+/* Tele szoba jelzés a kártyán */
+.finder-limit.finder-limit-full {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.08);
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 600px) {
   .finder-list { padding: 16px; gap: 12px; }
