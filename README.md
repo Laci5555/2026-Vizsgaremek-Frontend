@@ -1,6 +1,8 @@
-# React + Vite
+# Vizsgaremek dokumentáció
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## a) Mi az alkalmazás célja?
+
+Az alkalmazás célja az, hogy összekösse a különböző játékok közösségeit miközben egymással ki tudják beszélni és privátban csevegni ezekről a játékokról.
 
 Currently, two official plugins are available:
 
