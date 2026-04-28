@@ -4,7 +4,7 @@ import './Games.css';
 import { IoSearchOutline } from 'react-icons/io5';
 import { TfiFilter } from 'react-icons/tfi';
 import { IoMdClose } from 'react-icons/io';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { GoPlus } from 'react-icons/go';
 import { db } from '../../firebaseApp';
 import Message from './Message';
@@ -113,18 +113,38 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
   }
 
   async function saveEdit() {
-    // TODO: Firestore update hívás ide
+    if (!selectedGame?.id) return;
+    try {
+      await updateDoc(doc(db, 'games', selectedGame.id), {
+        name: editName,
+        genre: editGenres,
+        img: editPicture,
+        description: editDescription,
+      });
+      // Lokális state frissítése – nem kell újra fetchelni
+      const updated = { ...selectedGame, name: editName, genre: editGenres, img: editPicture, description: editDescription };
+      setGamesMain((prev) => prev.map((x) => x.id === selectedGame.id ? updated : x));
+      setGames((prev) => prev.map((x) => x.id === selectedGame.id ? updated : x));
+      setSelectedGame(updated);
+    } catch (err) {
+      console.error('Mentés során hiba!', err);
+    }
     setEditing(false);
   }
-
-
 
   function deleteGame() {
     setConfirmDelete(true);
   }
 
   async function confirmDeleteGame() {
-    // TODO: await deleteDoc(doc(db, 'games', selectedGame.id))
+    if (!selectedGame?.id) return;
+    try {
+      await deleteDoc(doc(db, 'games', selectedGame.id));
+      setGamesMain((prev) => prev.filter((x) => x.id !== selectedGame.id));
+      setGames((prev) => prev.filter((x) => x.id !== selectedGame.id));
+    } catch (err) {
+      console.error('Törlés során hiba!', err);
+    }
     setConfirmDelete(false);
     setEditing(false);
     setShowGame(false);

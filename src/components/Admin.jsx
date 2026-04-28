@@ -62,10 +62,8 @@ export default function Admin() {
         name: gameName, img: gamePicture, likes: 0, dislikes: 0,
         genre: gameGenres, description,
       });
-    } else {
-      await updateDoc(doc(db, 'games', existing.id), {
-        genre: gameGenres, img: gamePicture,
-      });
+    }else{
+      console.log("A játék már létezik!");
     }
 
     await resolveRequest(gameName);
