@@ -143,6 +143,20 @@
   padding: 3px 10px;
 }
 
+.finder-limit-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.finder-limit-toggle label:first-child {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
 /* ── ROOM VIEW ── */
 .finder-room {
   display: flex;

@@ -35,6 +35,8 @@ export default function Finder() {
   const [newDescription, setNewDescription] = useState('');
   const [newLimit, setNewLimit] = useState(4);
 
+  const [limitEnabled, setLimitEnabled] = useState(false);
+
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -332,15 +334,23 @@ export default function Finder() {
           </div>
 
           <div className="finder-field">
-            <label>Max players (including you)</label>
-            <div className="finder-limit-row">
-              <input
-                type="range" min={2} max={10}
-                value={newLimit}
-                onChange={(e) => setNewLimit(Number(e.target.value))}
-              />
-              <span className="finder-limit-val">{newLimit}</span>
+            <div className="finder-limit-toggle">
+              <label>Max players (including you)</label>
+              <label className="toggle">
+                <input type="checkbox" checked={limitEnabled} onChange={() => setLimitEnabled(p => !p)} />
+                <div className="track"><div className="thumb" /></div>
+              </label>
             </div>
+            {limitEnabled && (
+              <div className="finder-limit-row">
+                <input
+                  type="range" min={2} max={20}
+                  value={newLimit}
+                  onChange={(e) => setNewLimit(Number(e.target.value))}
+                />
+                <span className="finder-limit-val">{newLimit}</span>
+              </div>
+            )}
           </div>
 
           <button

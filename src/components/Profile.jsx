@@ -79,3 +79,11 @@ export default function Profile({ auth }) {
     </div>
   );
 }
+
+{/*Lesz majd egy likes tömb a felhasználó adatai között, amiben benne lesznek ezek a játékok.
+
+Legyen a leírás inline szerkeszthető. És bocsi tényleg az legyen még, hogyha admin az illető, akkor tudja törölni a discussiont.
+
+Szerintem a posztjainál és az üzeneteinél a felhasználónév helyett legyen egy "Deleted" szó inkább.
+
+A my profile-nál legyen mind a kettő toggle-vel megoldva.*/}
