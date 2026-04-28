@@ -10,7 +10,10 @@ import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Admin from './components/Admin';
-import { collection } from 'firebase/firestore';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { getDocs, query, collection, where } from 'firebase/firestore';
 import { auth, db } from '../firebaseApp';
 import { AppProvider, useApp } from './AppContext';
 
@@ -20,7 +23,24 @@ const genreCollection = collection(db, 'genres');
 // 👇 Védett útvonal komponens
 function ProtectedRoute({ children }) {
   const { user, loading } = useApp();
-  if (loading) return null; // vagy egy spinner
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user?.email) return;
+    async function checkDisabled() {
+      const snap = await getDocs(
+        query(collection(db, 'user-data'), where('email', '==', user.email))
+      );
+      const userData = snap.docs[0]?.data();
+      if (userData?.disabled) {
+        await signOut(auth);
+        navigate('/login');
+      }
+    }
+    checkDisabled();
+  }, [user]);
+
+  if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
