@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { db } from '../../firebaseApp';
-import { addDoc, collection, getDocs, or, orderBy, query, Timestamp, where } from 'firebase/firestore';
+import {
+  addDoc, collection, getDocs, setDoc, doc,
+  or, orderBy, query, Timestamp, where, onSnapshot,
+} from 'firebase/firestore';
 import { IoMdClose } from 'react-icons/io';
 import { IoArrowBack } from 'react-icons/io5';
 import './Message.css';
@@ -21,29 +24,30 @@ function UserAvatar({ src, alt, className, style }) {
   );
 }
 
+function Badge({ count }) {
+  if (!count || count === 0) return null;
+  return <span className="unread-badge">{count > 9 ? '9+' : count}</span>;
+}
+
 export default function Message() {
   const { user } = useApp();
 
-  // ── state ──────────────────────────────────────────────────────────
-  const [messages, setMessages] = useState([]);          // grouped conversations
-  const [allUsers, setAllUsers] = useState([]);          // full user-data list
-  const [friendEmails, setFriendEmails] = useState([]); // emails we already chatted with
+  const [messages, setMessages] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [friendEmails, setFriendEmails] = useState([]);
+  const [readTimestamps, setReadTimestamps] = useState({});
+
   const [showMessage, setShowMessage] = useState(false);
   const [activeTab, setActiveTab] = useState('friends');
   const [selectedConv, setSelectedConv] = useState(null);
   const [inputText, setInputText] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');    // search box value
-  const [refresh, setRefresh] = useState(false);        // toggle to re-fetch messages
+  const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
 
-  // ── helpers ─────────────────────────────────────────────────────────
   function createKey(a, b) { return [a, b].sort().join('__'); }
+  function getUserByEmail(email) { return allUsers.find((u) => u.email === email) ?? null; }
 
-  function getUserByEmail(email) {
-    return allUsers.find((u) => u.email === email) ?? null;
-  }
-
-  // ── fetch all users once ─────────────────────────────────────────────
+  // ── Fetch users ──────────────────────────────────────────────────────
   useEffect(() => {
     async function fetchUsers() {
       const snap = await getDocs(collection(db, 'user-data'));
@@ -52,20 +56,34 @@ export default function Message() {
     fetchUsers();
   }, []);
 
-  // ── fetch & group messages ───────────────────────────────────────────
+  // ── Fetch read timestamps ────────────────────────────────────────────
+  useEffect(() => {
+    if (!user?.email) return;
+    async function fetchReadTs() {
+      const snap = await getDocs(
+        query(collection(db, 'read-timestamps'), where('userEmail', '==', user.email))
+      );
+      const map = {};
+      snap.docs.forEach((d) => { map[d.data().convKey] = d.data().readAt?.toDate?.() ?? null; });
+      setReadTimestamps(map);
+    }
+    fetchReadTs();
+  }, [user]);
+
+  // ── Real-time listener ───────────────────────────────────────────────
   useEffect(() => {
     if (!user?.email) return;
 
-    async function getMessages() {
-      const q = query(
-        collection(db, 'private-messages'),
-        or(
-          where('sender', '==', user.email),
-          where('receiver', '==', user.email),
-        ),
-        orderBy('time', 'asc'),
-      );
-      const snap = await getDocs(q);
+    const q = query(
+      collection(db, 'private-messages'),
+      or(
+        where('sender', '==', user.email),
+        where('receiver', '==', user.email),
+      ),
+      orderBy('time', 'asc'),
+    );
+
+    const unsubscribe = onSnapshot(q, (snap) => {
       const adatList = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
 
       const grouped = {};
@@ -80,68 +98,122 @@ export default function Message() {
         if (msg.receiver !== user.email) friendsSet.add(msg.receiver);
       });
 
-      setMessages(Object.values(grouped));
+      const allConvs = Object.values(grouped);
+      setMessages(allConvs);
       setFriendEmails([...friendsSet]);
-    }
 
-    getMessages();
-  }, [user, refresh]);
+      // Nyitott conv üzeneteinek frissítése
+      setSelectedConv((prev) => {
+        if (!prev) return prev;
+        const key = createKey(user.email, prev.otherEmail);
+        const updated = allConvs.find(
+          (c) => createKey(c.participants[0], c.participants[1]) === key
+        );
+        if (updated) return { ...prev, messages: updated.messages };
+        return prev;
+      });
+    });
 
-  // ── scroll to bottom on new message ─────────────────────────────────
+    return () => unsubscribe();
+  }, [user]);
+
+  // ── Ha nyitva van conv és jön új üzenet → azonnal olvasottnak jelöljük ──
+  useEffect(() => {
+    if (!selectedConv) return;
+    markAsRead(selectedConv.otherEmail);
+  }, [selectedConv?.messages?.length]);
+
+  // ── Scroll to bottom ─────────────────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [selectedConv?.messages]);
+  }, [selectedConv?.messages?.length]);
 
-  // ── send message ─────────────────────────────────────────────────────
+  // ── Send message ─────────────────────────────────────────────────────
   async function sendMessage() {
     if (!inputText.trim() || !selectedConv || !user?.email) return;
-
     const newMsg = {
       sender: user.email,
       receiver: selectedConv.otherEmail,
       text: inputText.trim(),
       time: Timestamp.now(),
     };
-
-    // optimistic update
-    setSelectedConv((prev) => ({ ...prev, messages: [...prev.messages, newMsg] }));
     setInputText('');
-
     try {
       await addDoc(collection(db, 'private-messages'), newMsg);
-      setRefresh((p) => !p); // re-fetch so conversation list updates too
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   }
 
-  // ── open an existing conversation ────────────────────────────────────
+  // ── Mark as read ─────────────────────────────────────────────────────
+  async function markAsRead(otherEmail) {
+    if (!user?.email) return;
+    const key = createKey(user.email, otherEmail);
+    const now = Timestamp.now();
+    const docId = `${user.email}__${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
+    await setDoc(doc(db, 'read-timestamps', docId), {
+      userEmail: user.email,
+      convKey: key,
+      readAt: now,
+    });
+    setReadTimestamps((prev) => ({ ...prev, [key]: now.toDate() }));
+  }
+
+  // ── Open conversation ────────────────────────────────────────────────
   function openConversation(conv) {
     const other = conv.participants.find((p) => p !== user.email);
     setSelectedConv({ otherEmail: other, messages: conv.messages });
     setSearchQuery('');
+    markAsRead(other);
   }
 
-  // ── open a new (empty) conversation ─────────────────────────────────
   function openNewConversation(email) {
     if (!email) return;
-    // If a conversation already exists, open it; otherwise start fresh
     const key = createKey(user.email, email);
     const existing = messages.find(
       (c) => createKey(c.participants[0], c.participants[1]) === key,
     );
     setSelectedConv({ otherEmail: email, messages: existing?.messages ?? [] });
     setSearchQuery('');
+    markAsRead(email);
   }
 
-  // ── filtered user lists ──────────────────────────────────────────────
+  // ── Unread count ─────────────────────────────────────────────────────
+  function getUnreadCount(otherEmail) {
+    const key = createKey(user.email, otherEmail);
+    const conv = messages.find(
+      (c) => createKey(c.participants[0], c.participants[1]) === key,
+    );
+    if (!conv) return 0;
+    const readAt = readTimestamps[key];
+    return conv.messages.filter((m) => {
+      if (m.sender === user.email) return false;
+      if (!readAt) return true;
+      const msgTime = m.time?.toDate?.() ?? null;
+      return msgTime && msgTime > readAt;
+    }).length;
+  }
+
+  // ── Total unread for FAB badge ───────────────────────────────────────
+  const totalUnread = friendEmails.reduce((sum, email) => sum + getUnreadCount(email), 0);
+
+  // ── Filtered & sorted lists ──────────────────────────────────────────
   const q = searchQuery.toLowerCase().trim();
+  const activeUsers = allUsers.filter((u) => !u.disabled);
 
-  const friendUsers = allUsers.filter(
-    (u) => u.email !== user?.email && friendEmails.includes(u.email),
-  );
+  // Legutóbbi üzenet ideje egy conv-ban
+  function lastMsgTime(email) {
+    const key = createKey(user.email, email);
+    const conv = messages.find(
+      (c) => createKey(c.participants[0], c.participants[1]) === key,
+    );
+    if (!conv || conv.messages.length === 0) return 0;
+    return conv.messages[conv.messages.length - 1].time?.toDate?.()?.getTime() ?? 0;
+  }
 
-  const otherUsers = allUsers.filter(
+  const friendUsers = activeUsers
+    .filter((u) => u.email !== user?.email && friendEmails.includes(u.email))
+    .sort((a, b) => lastMsgTime(b.email) - lastMsgTime(a.email)); // legújabb felül
+
+  const otherUsers = activeUsers.filter(
     (u) => u.email !== user?.email && !friendEmails.includes(u.email),
   );
 
@@ -157,7 +229,6 @@ export default function Message() {
       )
     : otherUsers;
 
-  // ── guard ────────────────────────────────────────────────────────────
   if (!user) return null;
 
   const otherUser = selectedConv ? getUserByEmail(selectedConv.otherEmail) : null;
@@ -165,8 +236,9 @@ export default function Message() {
   return (
     <div className="message">
       {!showMessage ? (
-        <div className="showChat" onClick={() => setShowMessage(true)}>
+        <div className="showChat" onClick={() => setShowMessage(true)} style={{ position: 'relative' }}>
           <FaUserFriends />
+          <Badge count={totalUnread} />
         </div>
       ) : (
         <div className="messages">
@@ -194,7 +266,7 @@ export default function Message() {
                   const senderUser = getUserByEmail(msg.sender);
                   const isMe = msg.sender === user.email;
                   return (
-                    <div key={i} className={`bubble-wrap ${isMe ? 'me' : 'them'}`}>
+                    <div key={msg.id ?? i} className={`bubble-wrap ${isMe ? 'me' : 'them'}`}>
                       {!isMe && (
                         <UserAvatar
                           src={senderUser?.picture}
@@ -204,20 +276,20 @@ export default function Message() {
                       )}
                       <div className={`bubble ${isMe ? 'me' : 'them'}`}>{msg.text}</div>
                       <span className="bubble-time">
-                      {msg.time?.toDate?.()
-                        ? (() => {
-                            const d = msg.time.toDate();
-                            const now = new Date();
-                            const isToday = d.toDateString() === now.toDateString();
-                            const yesterday = new Date(now);
-                            yesterday.setDate(now.getDate() - 1);
-                            const isYesterday = d.toDateString() === yesterday.toDateString();
-                            if (isToday) return d.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-                            if (isYesterday) return 'tegnap';
-                            return d.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' });
-                          })()
-                        : ''}
-                    </span>
+                        {msg.time?.toDate?.()
+                          ? (() => {
+                              const d = msg.time.toDate();
+                              const now = new Date();
+                              const isToday = d.toDateString() === now.toDateString();
+                              const yesterday = new Date(now);
+                              yesterday.setDate(now.getDate() - 1);
+                              const isYesterday = d.toDateString() === yesterday.toDateString();
+                              if (isToday) return d.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+                              if (isYesterday) return 'tegnap';
+                              return d.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' });
+                            })()
+                          : ''}
+                      </span>
                     </div>
                   );
                 })}
@@ -306,12 +378,12 @@ export default function Message() {
                     </p>
                   ) : (
                     filteredFriends.map((fu) => {
-                      // find their conversation
                       const key = createKey(user.email, fu.email);
                       const conv = messages.find(
                         (c) => createKey(c.participants[0], c.participants[1]) === key,
                       );
                       const lastMsg = conv?.messages[conv.messages.length - 1];
+                      const unread = getUnreadCount(fu.email);
                       return (
                         <div
                           key={fu.email}
@@ -332,6 +404,11 @@ export default function Message() {
                               </span>
                             )}
                           </div>
+                          {unread > 0 && (
+                            <div className="conv-right">
+                              <Badge count={unread} />
+                            </div>
+                          )}
                         </div>
                       );
                     })

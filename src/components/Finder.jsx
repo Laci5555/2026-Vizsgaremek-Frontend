@@ -7,7 +7,7 @@ import { MdPersonRemove } from 'react-icons/md';
 import {
   addDoc, collection, getDocs, doc,
   updateDoc, arrayUnion, arrayRemove, deleteDoc,
-  query, where, orderBy, Timestamp,
+  query, where, orderBy, Timestamp, onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../../firebaseApp';
 import { useApp } from '../AppContext';
@@ -40,34 +40,77 @@ export default function Finder() {
   // ── Betöltés ──
   useEffect(() => {
     async function load() {
+      const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+
       const [usersSnap, postsSnap, gamesSnap] = await Promise.all([
         getDocs(collection(db, 'user-data')),
         getDocs(collection(db, 'finder-groups')),
         getDocs(collection(db, 'games')),
       ]);
-      setUsers(usersSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
-      setPosts(postsSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
+
+      const allUsers = usersSnap.docs.map((d) => ({ ...d.data(), id: d.id }));
+      const allPosts = postsSnap.docs.map((d) => ({ ...d.data(), id: d.id }));
+
+      // Disabled userek emailjei
+      const disabledEmails = new Set(
+        allUsers.filter((u) => u.disabled === true).map((u) => u.email)
+      );
+
+      // lastActivity: ha nincs, createdAt alapján számítjuk
+      const getActivityMs = (p) => {
+        if (p.lastActivity) return p.lastActivity.toMillis?.() ?? p.lastActivity;
+        if (p.createdAt) return p.createdAt.toMillis?.() ?? p.createdAt;
+        return 0;
+      };
+
+      // Törlendő: disabled creator VAGY 3 napja inaktív
+      const toDelete = allPosts.filter(
+        (p) => disabledEmails.has(p.creatoremail) || (now - getActivityMs(p)) >= THREE_DAYS_MS
+      );
+      const validPosts = allPosts.filter(
+        (p) => !disabledEmails.has(p.creatoremail) && (now - getActivityMs(p)) < THREE_DAYS_MS
+      );
+
+      // Törlés Firestore-ból (csoport + üzenetei)
+      await Promise.all(
+        toDelete.map(async (p) => {
+          const msgsSnap = await getDocs(
+            query(collection(db, 'finder-messages'), where('finderid', '==', p.id))
+          );
+          await Promise.all(msgsSnap.docs.map((d) => deleteDoc(d.ref)));
+          await deleteDoc(doc(db, 'finder-groups', p.id));
+        })
+      );
+
+      setUsers(allUsers);
+      setPosts(validPosts);
       setGames(gamesSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
       setLoading(false);
     }
     load();
   }, [refresh]);
 
-  // ── Üzenetek betöltése ──
+  // ── Üzenetek valós idejű figyelése ──
   useEffect(() => {
     if (!selectedPost) return;
-    async function loadMessages() {
-      const snap = await getDocs(
-        query(
-          collection(db, 'finder-messages'),
-          where('finderid', '==', selectedPost.id),
-          orderBy('time', 'asc'),
-        ),
-      );
-      setMessages(snap.docs.map((d) => ({ ...d.data(), id: d.id })));
-    }
-    loadMessages();
-  }, [selectedPost, refresh]);
+    const q = query(
+      collection(db, 'finder-messages'),
+      where('finderid', '==', selectedPost.id),
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      const msgs = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+      msgs.sort((a, b) => {
+        const ta = a.time?.toMillis?.() ?? a.time ?? 0;
+        const tb = b.time?.toMillis?.() ?? b.time ?? 0;
+        return ta - tb;
+      });
+      setMessages(msgs);
+    }, (err) => {
+      console.error('onSnapshot error:', err);
+    });
+    return () => unsub();
+  }, [selectedPost?.id]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -169,25 +212,24 @@ export default function Finder() {
   async function sendMessage() {
     if (message.trim() === '' || !inRoom || !selectedPost) return;
     const text = message.trim();
-    const optimistic = {
-      id: `temp-${Date.now()}`,
-      finderid: selectedPost.id,
-      sender: user.email,
-      message: text,
-      time: Timestamp.now(),
-    };
-    setMessages((prev) => [...prev, optimistic]);
+    const now = Timestamp.now();
     setMessage('');
     try {
       await addDoc(collection(db, 'finder-messages'), {
         finderid: selectedPost.id,
         sender: user.email,
         message: text,
-        time: optimistic.time,
+        time: now,
       });
+      // Frissítjük a csoport lastActivity mezőjét → inaktivitás számítás alapja
+      await updateDoc(doc(db, 'finder-groups', selectedPost.id), {
+        lastActivity: now,
+      });
+      const updatedPost = { ...selectedPost, lastActivity: now };
+      setSelectedPost(updatedPost);
+      setPosts((prev) => prev.map((p) => p.id === selectedPost.id ? updatedPost : p));
     } catch (err) {
       console.error(err);
-      setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
     }
   }
 
@@ -202,6 +244,34 @@ export default function Finder() {
   const maxplayers = selectedPost?.maxplayers ?? 0;
   const isFull = maxplayers > 0 && members.length >= maxplayers;
   const isCreator = selectedPost?.creatoremail === user?.email;
+
+  // Expiry helper – újrahasználható
+  const getExpiryInfo = (post) => {
+    if (!post) return null;
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+    const getActivityMs = (p) => {
+      if (p.lastActivity) return p.lastActivity.toMillis?.() ?? p.lastActivity;
+      if (p.createdAt) return p.createdAt.toMillis?.() ?? p.createdAt;
+      return Date.now();
+    };
+    const activityMs = getActivityMs(post);
+    const hoursLeft = (THREE_DAYS_MS - (Date.now() - activityMs)) / (1000 * 60 * 60);
+    const daysLeft = Math.ceil(hoursLeft / 24);
+    if (hoursLeft <= 0) return { label: 'Closes today', tier: 'red' };
+    if (hoursLeft <= 24) return { label: 'Closes today', tier: 'red' };
+    if (daysLeft === 2) return { label: 'Closes in 2 days', tier: 'orange' };
+    if (daysLeft === 3) return { label: 'Closes in 3 days', tier: 'gray' };
+    return null;
+  };
+  const roomExpiryInfo = getExpiryInfo(selectedPost);
+
+  const InfoIcon = () => (
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="6.5" cy="6.5" r="5.75" stroke="currentColor" strokeWidth="1.25" />
+      <rect x="6" y="5.5" width="1" height="4" rx="0.5" fill="currentColor" />
+      <rect x="6" y="3.5" width="1" height="1" rx="0.5" fill="currentColor" />
+    </svg>
+  );
 
   const XIcon = () => (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -226,6 +296,23 @@ export default function Finder() {
             const game = getGame(post.game);
             const memberCount = (post.members ?? []).length;
             const full = post.maxplayers > 0 && memberCount >= post.maxplayers;
+
+            // Expiry számítás
+            const expiryInfo = getExpiryInfo(post);
+
+            // Leírás tördelése 100 karakterenként
+            const formatDesc = (text) => {
+              if (!text) return '';
+              const chunks = [];
+              for (let i = 0; i < text.length; i += 100) {
+                chunks.push(text.slice(i, i + 100));
+              }
+              if(text.length>100){
+                return chunks[0]+"...";
+              }
+              return text;
+            };
+
             return (
               <div className="finder-card" key={post.id} onClick={() => openPost(post)}>
                 <div className="finder-card-top">
@@ -236,8 +323,9 @@ export default function Finder() {
                   </div>
                   {game?.img && <img src={game.img} alt={game.name} className="finder-game-img" />}
                 </div>
-                <p className="finder-desc">{post.description}</p>
+                <p className="finder-desc">{formatDesc(post.description)}</p>
                 <div className="finder-card-footer">
+                  <span />
                   <span className={`finder-limit ${full ? 'finder-limit-full' : ''}`}>
                     {post.maxplayers > 0
                       ? `${memberCount} / ${post.maxplayers} players${full ? ' · FULL' : ''}`
@@ -279,6 +367,15 @@ export default function Finder() {
           </div>
 
           <p className="finder-room-desc">{selectedPost.description}</p>
+          {roomExpiryInfo && (
+            <div className={`finder-room-expiry finder-room-expiry--${roomExpiryInfo.tier}`}>
+              <InfoIcon />
+              <span>{roomExpiryInfo.label}</span>
+              <span className="finder-expiry-tooltip">
+                This room closes automatically after 3 days of inactivity (no new messages).
+              </span>
+            </div>
+          )}
 
           {/* ── Tagok lista (creator látja a kick gombokat) ── */}
           {inRoom && (
