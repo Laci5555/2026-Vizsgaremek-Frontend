@@ -5,7 +5,7 @@ import { IoMdClose } from 'react-icons/io';
 import { db } from '../../firebaseApp';
 import {
   addDoc, collection, deleteDoc, doc, getDocs,
-  query, updateDoc,
+  query, Timestamp, updateDoc,
 } from 'firebase/firestore';
 
 export default function Admin() {
@@ -60,7 +60,7 @@ export default function Admin() {
     if (!existing) {
       await addDoc(collection(db, 'games'), {
         name: gameName, img: gamePicture, likes: 0, dislikes: 0,
-        genre: gameGenres, description,
+        genre: gameGenres, description, createdAt:Timestamp.now()
       });
     }else{
       console.log("A játék már létezik!");

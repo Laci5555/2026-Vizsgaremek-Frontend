@@ -39,12 +39,10 @@
     flex-direction: column;
     gap: 16px;
     padding: 20px 16px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    overflow-y: hidden;
 }
 
-.games .filter > div:first-child {
+.games .filter>div:first-child {
     display: none !important;
 }
 
@@ -99,12 +97,94 @@
     flex-shrink: 0;
 }
 
-.games .searchDiv .searchBtn:hover { opacity: 0.85; }
+.games .searchDiv .searchBtn:hover {
+    opacity: 0.85;
+}
+
+.games .sortOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.games .sortOptions>span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.games .sortOption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.games .sortOption:hover {
+    background: var(--surface2);
+    border-color: var(--border);
+}
+
+.games .sortOption.active {
+    background: rgba(108, 99, 255, 0.08);
+    border-color: rgba(108, 99, 255, 0.3);
+}
+
+.games .sortOption span {
+    font-size: 0.88rem;
+    color: var(--text);
+}
+
+.games .sortRadio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+}
+
+.games .sortOption.active .sortRadio {
+    border-color: var(--accent);
+}
+
+.games .sortRadioDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.games .filterLabel {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+}
 
 .games .checkboxs {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    flex: 1;
+    min-height: 0;
+    
 }
 
 .games .genres {
@@ -196,8 +276,13 @@
     font-weight: 500;
 }
 
-.games .cardLike { color: #4ade80; }
-.games .cardDislike { color: #f87171; }
+.games .cardLike {
+    color: #4ade80;
+}
+
+.games .cardDislike {
+    color: #f87171;
+}
 
 .games .card:hover {
     transform: translateY(-4px);
@@ -225,7 +310,7 @@
 }
 
 /* ── EMPTY / LOADING STATE ── */
-.games .cardlist > div:not(.card):not(.gameDiv):not(.requestGame):not(.backdrop) {
+.games .cardlist>div:not(.card):not(.gameDiv):not(.requestGame):not(.backdrop) {
     width: 100%;
     text-align: center;
     color: var(--text-muted);
@@ -274,6 +359,34 @@
     box-shadow: 0 6px 24px rgba(108, 99, 255, 0.5);
 }
 
+.games-toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    z-index: 200;
+    animation: toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 /* ── BACKDROP ── */
 .backdrop {
     position: fixed;
@@ -315,7 +428,9 @@
     opacity: 1;
 }
 
-.modal-top-bar { display: none; }
+.modal-top-bar {
+    display: none;
+}
 
 .close-btn {
     position: absolute;
@@ -549,7 +664,9 @@
     transition: border-color 0.2s;
 }
 
-.games .filterIcon:hover { border-color: var(--accent); }
+.games .filterIcon:hover {
+    border-color: var(--accent);
+}
 
 .games .close {
     display: none;
@@ -559,7 +676,9 @@
     transition: color 0.15s;
 }
 
-.games .close:hover { color: #f87171; }
+.games .close:hover {
+    color: #f87171;
+}
 
 
 
@@ -603,7 +722,7 @@
     gap: 8px;
 }
 
-.editField > label {
+.editField>label {
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.09em;
@@ -687,7 +806,9 @@
     transition: color 0.15s;
 }
 
-.editGenreItem .genreX:hover { color: #f87171; }
+.editGenreItem .genreX:hover {
+    color: #f87171;
+}
 
 /* ── PICTURE TOGGLE ── */
 .pictureType .toggle-wrapper {
@@ -706,7 +827,9 @@
     letter-spacing: 0;
 }
 
-.label.active { color: var(--text); }
+.label.active {
+    color: var(--text);
+}
 
 .toggle {
     position: relative;
@@ -732,7 +855,7 @@
     transition: background 0.25s, border-color 0.25s;
 }
 
-.toggle input:checked ~ .track {
+.toggle input:checked~.track {
     background: var(--accent);
     border-color: var(--accent);
 }
@@ -746,10 +869,12 @@
     background: white;
     border-radius: 50%;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-.toggle input:checked ~ .track .thumb { transform: translateX(22px); }
+.toggle input:checked~.track .thumb {
+    transform: translateX(22px);
+}
 
 /* ── FILE CHOOSER ── */
 .fileChooser {
@@ -766,7 +891,10 @@
     transition: border-color 0.2s, color 0.2s;
 }
 
-.fileChooser:hover { border-color: var(--accent); color: var(--text); }
+.fileChooser:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
 
 .fileName {
     font-size: 0.8rem;
@@ -793,7 +921,10 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.editTextarea::placeholder { color: var(--text-muted); opacity: 0.7; }
+.editTextarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
 
 .editTextarea:focus {
     border-color: var(--accent);
@@ -807,8 +938,13 @@
     letter-spacing: 0.03em;
 }
 
-.charCount.near { color: #f0a020; }
-.charCount.over { color: #e24b4a; }
+.charCount.near {
+    color: #f0a020;
+}
+
+.charCount.over {
+    color: #e24b4a;
+}
 
 /* ── EDIT GAME BUTTON ── */
 .editGameButton {
@@ -858,8 +994,16 @@
     border-color: #f87171;
 }
 
-.editGameButton:hover { opacity: 0.88; transform: translateY(-1px); }
-.editGameButton:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+.editGameButton:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+.editGameButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
 
 .confirmModal {
     background: var(--surface);
@@ -937,27 +1081,36 @@
 
 .gameDiv .like,
 .gameDiv .dislike {
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s, background 0.2s, border-color 0.2s;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, background 0.2s, border-color 0.2s;
 }
 
-.gameDiv .like:hover { opacity: 0.8; transform: scale(1.05); }
-.gameDiv .dislike:hover { opacity: 0.8; transform: scale(1.05); }
+.gameDiv .like:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.gameDiv .dislike:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
 
 .gameDiv .like.voted {
-  background: rgba(74, 222, 128, 0.22);
-  border-color: rgba(74, 222, 128, 0.55);
+    background: rgba(74, 222, 128, 0.22);
+    border-color: rgba(74, 222, 128, 0.55);
 }
 
 .gameDiv .dislike.voted {
-  background: rgba(248, 113, 113, 0.22);
-  border-color: rgba(248, 113, 113, 0.55);
+    background: rgba(248, 113, 113, 0.22);
+    border-color: rgba(248, 113, 113, 0.55);
 }
 
 
 /* ── RESPONSIVE ── */
 @media screen and (max-width: 1010px) {
-    .games .hbox { height: calc(100vh - 64px); }
+    .games .hbox {
+        height: calc(100vh - 64px);
+    }
 
     .games .filterIcon {
         display: flex;
@@ -980,20 +1133,32 @@
         transition: left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .games .filter.show { left: 0; }
+    .games .filter.show {
+        left: 0;
+    }
 
-    .games .filter > div:first-child {
+    .games .filter>div:first-child {
         display: flex !important;
         justify-content: flex-end;
     }
 
-    .games .close { display: inline; }
-    .games .requestGame { bottom: 20px; left: 20px; right: auto; }
+    .games .close {
+        display: inline;
+    }
 
-    .games .cardlist { padding-top: 64px; }
+    .games .requestGame {
+        bottom: 20px;
+        left: 20px;
+        right: auto;
+    }
+
+    .games .cardlist {
+        padding-top: 64px;
+    }
 }
 
 @media screen and (max-width: 600px) {
+
     /* gameDiv mobilon: kisebb kép, minden adat kiférjen */
     .gameDiv {
         width: 96vw;
@@ -1011,7 +1176,7 @@
         gap: 10px;
     }
 
-    .gameDiv .gameInfos > div:first-child {
+    .gameDiv .gameInfos>div:first-child {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 8px !important;
@@ -1045,58 +1210,79 @@
         height: 250px;
     }
 
-    .games .card img { height: 155px; }
+    .games .card img {
+        height: 155px;
+    }
 
-    .games .cardlist { justify-content: center; }
+    .games .cardlist {
+        justify-content: center;
+    }
 
     /* FAB gombok kicsit közelebb a sarokhoz mobilon */
-    .games .requestGame { bottom: 20px; left: 20px; right: auto; }
-    .games .message-fab { bottom: 78px; right: 20px; }
+    .games .requestGame {
+        bottom: 20px;
+        left: 20px;
+        right: auto;
+    }
+
+    .games .message-fab {
+        bottom: 78px;
+        right: 20px;
+    }
 }
 
 /* ── EDIT MODAL RESPONSIVE ── */
 @media (max-width: 600px) {
-    .editModal { padding: 24px 16px 20px; gap: 18px; }
-    .editGenreGrid { grid-template-columns: repeat(2, 1fr); }
-    .gameDiv .gameEditBtn { right: 50px; }
+    .editModal {
+        padding: 24px 16px 20px;
+        gap: 18px;
+    }
+
+    .editGenreGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gameDiv .gameEditBtn {
+        right: 50px;
+    }
 }
 
 @media (max-width: 340px) {
-  .editModal {
-    padding: 20px 12px 16px;
-    gap: 14px;
-  }
+    .editModal {
+        padding: 20px 12px 16px;
+        gap: 14px;
+    }
 
-  .editGenreGrid {
-    grid-template-columns: 1fr 1fr;
-  }
+    .editGenreGrid {
+        grid-template-columns: 1fr 1fr;
+    }
 
-  .editGenreItem {
-    padding: 6px 6px;
-    gap: 5px;
-  }
+    .editGenreItem {
+        padding: 6px 6px;
+        gap: 5px;
+    }
 
-  .editGenreItem span {
-    font-size: 0.75rem;
-  }
+    .editGenreItem span {
+        font-size: 0.75rem;
+    }
 
-  .editActions {
-    flex-direction: column;
-  }
+    .editActions {
+        flex-direction: column;
+    }
 
-  .deleteGameButton,
-  .editGameButton {
-    width: 100%;
-  }
+    .deleteGameButton,
+    .editGameButton {
+        width: 100%;
+    }
 
-  .pictureType .toggle-wrapper {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+    .pictureType .toggle-wrapper {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
 
-  .editField input[type="text"],
-  .editTextarea {
-    font-size: 0.85rem;
-    padding: 8px 10px;
-  }
+    .editField input[type="text"],
+    .editTextarea {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
 }

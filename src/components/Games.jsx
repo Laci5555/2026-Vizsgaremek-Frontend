@@ -26,11 +26,13 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
 
   const [game, setGame] = useState('');
   const [games, setGames] = useState([]);
+  const [sortBy, setSortBy] = useState('latest');
   const [gamesMain, setGamesMain] = useState([]);
   const [genres, setGenres] = useState([]);
   const [genreFilters, setGenreFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [requestSent, setRequestSent] = useState(false);
   const [newGameName, setNewGameName] = useState('');
   const [showGame, setShowGame] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +68,7 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
   useEffect(() => {
     async function fetchGames() {
       const snap = await getDocs(gamesDataCollection);
-      const lst = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      const lst = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id })).sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));;
       setGamesMain(lst);
       setGames(lst);
     }
@@ -88,14 +90,29 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
     fetchVote();
   }, [selectedGame, user]);
 
+  useEffect(() => {
+    setGames((prev) => sortGames(prev));
+  }, [sortBy]);
+
   function filterGames(searchName, activeFilters) {
     let result = gamesMain;
     if (searchName) result = result.filter((x) => x.name.toLowerCase().includes(searchName.toLowerCase()));
     if (activeFilters.length > 0) result = result.filter((x) => x.genre.some((g) => activeFilters.includes(g)));
+    result = sortGames(result);
     setGames(result);
     setSearched(true);
     setShowFilter(false);
   }
+
+  function sortGames(list) {
+    switch (sortBy) {
+      case 'az': return [...list].sort((a, b) => a.name.localeCompare(b.name));
+      case 'likes': return [...list].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0));
+      default: return [...list];
+    }
+  }
+
+  
 
   function handleFilterGenre(e, name) {
     e.stopPropagation();
@@ -158,6 +175,8 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
     try {
       await addDoc(collection(db, 'game-requests'), { name: newGameName });
       setNewGameName('');
+      setRequestSent(true);
+      setTimeout(() => setRequestSent(false), 3000);
     } catch (err) { console.error(err); }
   }
 
@@ -247,14 +266,32 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
             />
             <input className="searchBtn" type="button" value="Search" onClick={() => filterGames(game, genreFilters)} />
           </div>
-          <div className="checkboxs">
-            {genres.map((x) => (
-              <div className="genres" key={x.id} onClick={(e) => handleFilterGenre(e, x.name)}>
-                <input type="checkbox" readOnly checked={genreFilters.includes(x.name)} />
-                <label>{x.name}</label>
+          <div className="sortOptions">
+            <span>Sort by</span>
+            {[
+              { value: 'latest', label: 'Latest' },
+              { value: 'az', label: 'A–Z' },
+              { value: 'likes', label: 'Most liked' },
+            ].map((opt) => (
+              <div
+                key={opt.value}
+                className={`sortOption ${sortBy === opt.value ? 'active' : ''}`}
+                onClick={() => setSortBy(opt.value)}
+              >
+                <div className="sortRadio">{sortBy === opt.value && <div className="sortRadioDot" />}</div>
+                <span>{opt.label}</span>
               </div>
             ))}
           </div>
+          <span className="filterLabel">Categories By</span>
+            <div className="checkboxs">
+              {genres.map((x) => (
+                <div className="genres" key={x.id} onClick={(e) => handleFilterGenre(e, x.name)}>
+                  <input type="checkbox" readOnly checked={genreFilters.includes(x.name)} />
+                  <label>{x.name}</label>
+                </div>
+              ))}
+            </div>
         </div>
 
         {/* ── Card list ── */}
@@ -323,6 +360,12 @@ export default function Games({ gamesDataCollection, genreCollection, isAdmin = 
       {/* ── FAB gombok ── */}
       <Message />
       <div className="requestGame" onClick={() => setIsOpen(true)}><GoPlus /></div>
+
+      {requestSent && (
+        <div className="games-toast">
+          ✓ Game request submitted successfully!
+        </div>
+      )}
 
       {/* ── Request modal ── */}
       <div
