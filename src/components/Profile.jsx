@@ -15,17 +15,19 @@ import { GoPlus } from 'react-icons/go';
 
 const MAX_DESC = 300;
 
-// Tab definíciók
-const TABS = [
-  { id: 'favourites', label: 'Favourite Games', icon: <IoHeartOutline /> },
-  { id: 'discussions', label: 'My Discussions', icon: <IoChatbubblesOutline /> },
-  { id: 'peoples', label: 'Peoples', icon: <IoPeopleOutline />, adminOnly: true },
-  { id: 'profile', label: 'My Profile', icon: <IoPersonOutline /> },
-];
+
 
 export default function Profile({ auth, isAdmin = true }) {
   const { user } = useApp();
   const navigate = useNavigate();
+
+  // Tab definíciók
+  const TABS = [
+    { id: 'favourites', label: 'Favourite Games', icon: <IoHeartOutline /> },
+    { id: 'discussions', label: isAdmin ? 'All Discussions' : 'My Discussions', icon: <IoChatbubblesOutline /> },
+    { id: 'peoples', label: 'Peoples', icon: <IoPeopleOutline />, adminOnly: true },
+    { id: 'profile', label: 'My Profile', icon: <IoPersonOutline /> },
+  ];
 
   // ── User adatok ──
   const [username, setUsername] = useState('');
@@ -44,9 +46,12 @@ export default function Profile({ auth, isAdmin = true }) {
   const [discussions, setDiscussions] = useState([]);
   const [editingDiscId, setEditingDiscId] = useState(null);
   const [editingDesc, setEditingDesc] = useState('');
+  const [discSearch, setDiscSearch] = useState('');
 
   // ── Peoples (admin) ──
+  const [allUsers, setAllUsers] = useState([]);
   const [peoples, setPeoples] = useState([]);
+  const [peopleSearch, setPeopleSearch] = useState('');
 
   useEffect(() => {
     if (!user?.email) return;
@@ -67,36 +72,26 @@ export default function Profile({ auth, isAdmin = true }) {
       setAllGames(gamesSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
 
       // Saját discussionök
-      const discSnap = await getDocs(query(collection(db, 'discussions'), where('creatoremail', '==', user.email)));
+      let discQuery;
+      if (isAdmin) {
+        discQuery = collection(db, 'discussions'); // admin mindent lát
+      } else {
+        discQuery = query(collection(db, 'discussions'), where('creatoremail', '==', user.email));
+      }
+      const discSnap = await getDocs(discQuery);
       setDiscussions(discSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
 
       // Peoples (csak adminnak)
       if (isAdmin) {
         const peopleSnap = await getDocs(collection(db, 'user-data'));
-        setPeoples(peopleSnap.docs.map((d) => ({ ...d.data(), id: d.id })).filter((p) => p.email !== user.email));
+        setPeoples(peopleSnap.docs.map((d) => ({ ...d.data(), id: d.id })).filter((p) => p.email !== user.email && !p.disabled));
       }
+
+      const allUsersSnap = await getDocs(collection(db, 'user-data'));
+      setAllUsers(allUsersSnap.docs.map((d) => ({ ...d.data(), id: d.id })));
     }
     load();
   }, [user, isAdmin]);
-
-
-  async function deleteUser(person) {
-    try {
-      await updateDoc(doc(db, 'user-data', person.id), {
-        username: 'Deleted',
-        picture: 'https://www.shutterstock.com/image-vector/delete-account-vector-icon-user-600nw-2508332847.jpg',
-        disabled: true,
-      });
-      await disableUser({ uid: person.uid });
-      setPeoples((prev) => prev.filter((p) => p.id !== person.id));
-    } catch (err) { console.error(err); }
-  }
-
-  // ── Profile mentés ──
-  async function updateData() {
-    if (!currentid) return;
-    // TODO: Firebase setDoc
-  }
 
   // ── Logout ──
   async function logOut() {
@@ -152,6 +147,10 @@ export default function Profile({ auth, isAdmin = true }) {
     } catch (err) { console.error(err); }
   }
 
+  function getDiscussionCreator(email) {
+    return allUsers.find((p) => p.email === email);
+  }
+
   // ── Profile mentés ──
   async function updateData() {
     if (!currentid) return;
@@ -167,15 +166,15 @@ export default function Profile({ auth, isAdmin = true }) {
 
   // ── User törlés (admin) – "Deleted" pattern ──
   async function deleteUser(person) {
-  try {
-    await updateDoc(doc(db, 'user-data', person.id), {
-      username: 'Deleted',
-      picture: 'https://www.shutterstock.com/image-vector/delete-account-vector-icon-user-600nw-2508332847.jpg',
-      disabled: true,
-    });
-    setPeoples((prev) => prev.filter((p) => p.id !== person.id));
-  } catch (err) { console.error(err); }
-}
+    try {
+      await updateDoc(doc(db, 'user-data', person.id), {
+        username: 'Deleted',
+        picture: 'https://www.shutterstock.com/image-vector/delete-account-vector-icon-user-600nw-2508332847.jpg',
+        disabled: true,
+      });
+      setPeoples((prev) => prev.filter((p) => p.id !== person.id));
+    } catch (err) { console.error(err); }
+  }
 
   const visibleTabs = TABS.filter((t) => !t.adminOnly || isAdmin);
   const filteredGames = allGames.filter(
@@ -283,51 +282,83 @@ export default function Profile({ auth, isAdmin = true }) {
           {activeTab === 'discussions' && (
             <div className="profile-section">
               <div className="profile-section-header">
-                <h2>My Discussions</h2>
+                {isAdmin ? <h2>All Discussions</h2> : <h2>My Discussions</h2>}
               </div>
+              <input
+                type="text"
+                className="profile-picker-search"
+                placeholder="Search discussions..."
+                value={discSearch}
+                onChange={(e) => setDiscSearch(e.target.value)}
+              />
               <div className="profile-disc-list">
-                {discussions.length === 0 && <p className="profile-empty">No discussions yet.</p>}
-                {discussions.map((disc) => (
-                  <div key={disc.id} className="profile-disc-card">
-                    <div className="profile-disc-header">
-                      <h3>{disc.title}</h3>
-                      <div className="profile-disc-actions">
-                        {(isAdmin || disc.creatoremail === user?.email) && (
-                          <button className="profile-disc-delete" onClick={() => deleteDiscussion(disc.id)}>
-                            <IoTrashOutline />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    {editingDiscId === disc.id ? (
-                      <div className="profile-disc-edit">
-                        <textarea
-                          value={editingDesc}
-                          onChange={(e) => setEditingDesc(e.target.value)}
-                          maxLength={MAX_DESC}
-                          rows={4}
-                        />
-                        <div className="profile-disc-edit-actions">
-                          <span className="profile-charcount">{editingDesc.length} / {MAX_DESC}</span>
-                          <button className="profile-disc-cancel" onClick={() => setEditingDiscId(null)}>
-                            <IoCloseOutline /> Cancel
-                          </button>
-                          <button className="profile-disc-save" onClick={() => saveDiscussion(disc.id)}>
-                            <IoCheckmark /> Save
-                          </button>
+                {discussions
+                  .filter((d) => {
+                    const creator = getDiscussionCreator(d.creatoremail);
+                    return (
+                      d.title?.toLowerCase().includes(discSearch.toLowerCase()) ||
+                      d.description?.toLowerCase().includes(discSearch.toLowerCase()) ||
+                      creator?.username?.toLowerCase().includes(discSearch.toLowerCase())
+                    );
+                  }).map((disc) => (
+                    <div key={disc.id} className="profile-disc-card">
+                      <div className="profile-disc-header">
+                        <h3>{disc.title}</h3>
+                        {/* Admin látja ki írta, ha nem saját */}
+                        {isAdmin && disc.creatoremail !== user?.email && (() => {
+                          const creator = getDiscussionCreator(disc.creatoremail);
+                          return (
+                            <div className="profile-disc-creator">
+                              <img src={creator?.picture} alt="" className="profile-disc-creator-pfp" />
+                              <span>{creator?.username ?? disc.creatoremail}</span>
+                            </div>
+                          );
+                        })()}
+                        <div className="profile-disc-actions">
+                          {(isAdmin || disc.creatoremail === user?.email) && (
+                            <button className="profile-disc-delete" onClick={() => deleteDiscussion(disc.id)}>
+                              <IoTrashOutline />
+                            </button>
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      <p
-                        className="profile-disc-desc"
-                        onClick={() => { setEditingDiscId(disc.id); setEditingDesc(disc.description); }}
-                        title="Click to edit"
-                      >
-                        {disc.description || <span className="profile-empty-inline">No description. Click to add.</span>}
-                      </p>
-                    )}
-                  </div>
-                ))}
+                      {/* Szerkesztés csak saját discussionnél */}
+                      {disc.creatoremail === user?.email ? (
+                        editingDiscId === disc.id ? (
+                          <div className="profile-disc-edit">
+                            <textarea
+                              value={editingDesc}
+                              onChange={(e) => setEditingDesc(e.target.value)}
+                              maxLength={MAX_DESC}
+                              rows={4}
+                            />
+                            <div className="profile-disc-edit-actions">
+                              <span className="profile-charcount">{editingDesc.length} / {MAX_DESC}</span>
+                              <button className="profile-disc-cancel" onClick={() => setEditingDiscId(null)}>
+                                <IoCloseOutline /> Cancel
+                              </button>
+                              <button className="profile-disc-save" onClick={() => saveDiscussion(disc.id)}>
+                                <IoCheckmark /> Save
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p
+                            className="profile-disc-desc"
+                            onClick={() => { setEditingDiscId(disc.id); setEditingDesc(disc.description); }}
+                            title="Click to edit"
+                          >
+                            {disc.description || <span className="profile-empty-inline">No description. Click to add.</span>}
+                          </p>
+                        )
+                      ) : (
+                        // Admin látja mások leírását, de nem szerkesztheti
+                        <p className="profile-disc-desc" style={{ cursor: 'default' }}>
+                          {disc.description || <span className="profile-empty-inline">No description.</span>}
+                        </p>
+                      )}
+                    </div>
+                  ))}
               </div>
             </div>
           )}
@@ -338,9 +369,10 @@ export default function Profile({ auth, isAdmin = true }) {
               <div className="profile-section-header">
                 <h2>Peoples</h2>
               </div>
+              <input type="text" className="profile-picker-search" placeholder="Search users..." value={peopleSearch} onChange={(e) => setPeopleSearch(e.target.value)} />
               <div className="profile-peoples-list">
                 {peoples.length === 0 && <p className="profile-empty">No users found.</p>}
-                {peoples.map((person) => (
+                {peoples.filter((p) => p.username.toLowerCase().includes(peopleSearch.toLowerCase()) || p.email.toLowerCase().includes(peopleSearch.toLowerCase())).map((person) => (
                   <div key={person.id} className="profile-people-card">
                     <img src={person.picture} alt="" className="profile-people-pfp" />
                     <div className="profile-people-info">

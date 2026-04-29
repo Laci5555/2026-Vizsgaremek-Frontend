@@ -387,6 +387,40 @@
     gap: 12px;
 }
 
+.profile .profile-disc-creator {
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-left: auto;
+    margin-right: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.profile .profile-disc-creator span {
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.profile .profile-disc-creator-pfp {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
 .profile .profile-disc-header h3 {
     font-family: 'Syne', sans-serif;
     font-size: 0.95rem;
