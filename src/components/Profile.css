@@ -832,9 +832,10 @@
     .profile .profile-content { padding: 20px 16px 80px; }
     .profile .profile-fav-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
     .profile .profile-edit-card { max-width: 100%; }
-    .profile .profile-people-card {
-        flex-wrap: wrap;
-    }
+}
+
+@media (max-width: 430px) {
+    .profile .profile-people-card { flex-wrap: wrap; }
     .profile .profile-people-delete {
         width: 100%;
         justify-content: center;
