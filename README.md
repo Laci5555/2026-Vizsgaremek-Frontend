@@ -1,296 +1,457 @@
-🎮 Gamminity – Gaming Community Platform
+<div align="center">
 
-Your best platform for communication about gaming!
+# 🎮 Gamminity
+### Gaming Community Platform
 
+*Your best platform for communication about gaming!*
 
-a) Az alkalmazás célja
-A Gamminity egy játékosok számára tervezett közösségi webalkalmazás, amelynek célja, hogy egyetlen helyen biztosítson platformot a videojátékokkal kapcsolatos kommunikációra, felfedezésre és közösségi élményre.
-A felhasználók képesek:
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router_v6-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 
-böngészni és értékelni a játékok adatbázisát,
-fórumszerű témákat (discussion-öket) indítani és kommentelni,
-csapatokat keresni és csatlakozni más játékosokhoz valós idejű csevegéssel,
-személyre szabni a profiljukat és nyomon követni kedvenc játékaikat.
+</div>
 
-Az alkalmazás React alapú frontend-del és Firebase (Authentication + Firestore) backend-del működik, és teljes mértékben reszponzív – mobilon és asztali gépen egyaránt használható.
+---
 
-b) Funkciók (menüpontok)
-A navigációs sávban az alábbi fő oldalak érhetők el:
-🔐 Login / Signup
-Bejelentkezés e-mail + jelszó kombinációval vagy Google-fiókkal. Regisztrációkor a felhasználónak felhasználónevet és jelszót kell megadnia.
+## 📋 Tartalomjegyzék
 
-📸 [Képernyőkép: a bejelentkezési oldal, az e-mail + jelszó mezőkkel és a Google-gombbal]
+- [a) Az alkalmazás célja](#a-az-alkalmazás-célja)
+- [b) Funkciók – menüpontok](#b-funkciók--menüpontok)
+- [c) Reszponzív megjelenés mobilon](#c-reszponzív-megjelenés-mobilon)
+- [d) Adattárolás](#d-adattárolás)
+- [e) Backend végpontok](#e-fontosabb-backend-végpontok)
+- [f) Tesztelés](#f-tesztelés)
 
+---
 
-📸 [Képernyőkép: a regisztrációs oldal a négy mezővel (név, e-mail, jelszó, jelszó ismét)]
+## a) Az alkalmazás célja
 
+A **Gamminity** egy játékosok számára tervezett közösségi webalkalmazás, amelynek célja, hogy egyetlen helyen biztosítson platformot a videojátékokkal kapcsolatos kommunikációra, felfedezésre és közösségi élményre.
 
-🏠 Home
-A főoldal az alkalmazás belépőpontja bejelentkezett felhasználók számára. Innen elérhető az összes többi funkció a navigációs sávon keresztül.
+A felhasználók az alkalmazásban:
 
-📸 [Képernyőkép: a főoldal a navbarral együtt, bejelentkezve]
+- 🎮 böngészhetik és értékelhetik a játékok adatbázisát
+- 💬 fórumszerű témákat (discussion-öket) indíthatnak és kommentelhetnek
+- 🔍 csapatokat kereshetnek és csatlakozhatnak más játékosokhoz valós idejű csevegéssel
+- 👤 személyre szabhatják profiljukat és nyomon követhetik kedvenc játékaikat
 
+Az alkalmazás **React** alapú frontenddel és **Firebase** (Authentication + Firestore) backenddel működik, és teljes mértékben reszponzív – mobilon és asztali gépen egyaránt használható.
 
-🎮 Games
+---
+
+## b) Funkciók – menüpontok
+
+### 🔐 Login / Signup
+
+Bejelentkezés e-mail + jelszó kombinációval, vagy Google-fiókkal. Regisztrációkor felhasználónév és jelszó megadása szükséges.
+
+| | Bejelentkezés | Regisztráció |
+|---|:---:|:---:|
+| **E-mail + jelszó** | ✅ | ✅ |
+| **Google-fiók** | ✅ | ✅ |
+
+> **📸 Képernyőkép helye:** *A bejelentkezési oldalt fotózd le – látszódjon az e-mail + jelszó mező és a Google-gomb*
+
+> **📸 Képernyőkép helye:** *A regisztrációs oldalt fotózd le – látszódjon a négy mező (név, e-mail, jelszó, jelszó ismét)*
+
+---
+
+### 🏠 Home
+
+A főoldal bejelentkezett felhasználók belépőpontja. Innen érhető el az összes funkció a navigációs sávon keresztül.
+
+> **📸 Képernyőkép helye:** *A főoldalt fotózd le a navbarral együtt, bejelentkezve*
+
+---
+
+### 🎮 Games
+
 A játékok böngészésének és értékelésének oldala.
-Funkciók:
 
-Játékok listázása kártyás nézetben, névvel, képpel, műfajokkal
-Szűrés műfaj szerint (filter panel)
-Keresés játéknév alapján
-Rendezés: legújabb, A–Z, legtöbb like
-Játékkártya megnyitásakor részletes leírás, like/dislike szavazás
-Nem létező játék esetén „kérelem" küldése az adminnak
-Admin számára: játék szerkesztése (név, kép, leírás, műfajok), törlése
+| Funkció | Leírás |
+|---|---|
+| 🃏 Kártyás lista | Játékok névvel, képpel, műfajokkal |
+| 🔎 Keresés | Játéknév alapján szűrés |
+| 🏷️ Műfajszűrő | Egy vagy több genre kijelölése |
+| 📊 Rendezés | Legújabb / A–Z / Legtöbb like |
+| 👍 Like / Dislike | Szavazás, váltás és visszavonás |
+| 📋 Részletek | Leírás, kép, szavazatok megnyitható panelben |
+| 📨 Kérelem | Nem létező játék esetén admin-kérelem küldése |
+| ✏️ Szerkesztés | Admin: név, kép, leírás, műfajok módosítása, törlés |
 
+> **📸 Képernyőkép helye:** *A Games oldalt fotózd le – látszódjon a kártyás játéklista és a szűrő/kereső sor*
 
-📸 [Képernyőkép: a Games oldal a kártyás játéklistával és a szűrő/kereső sorral]
+> **📸 Képernyőkép helye:** *Nyiss meg egy játékkártyát – látszódjon a részletes nézet a like/dislike gombokkal*
 
+---
 
-📸 [Képernyőkép: egy megnyitott játékkártya részletes nézettel, like/dislike gombokkal]
+### 💬 Discussions
 
-
-💬 Discussions
 Fórum jellegű témák (discussion-ok) oldala.
-Funkciók:
 
-Az összes téma listázása (létrehozó avatárjával, nevével, témacímmel, leírással)
-Új téma létrehozása (cím + leírás, max. 80/300 karakter)
-Témára kattintva a hozzászólások megtekintése és új komment írása
-Profiloldalon saját témák szerkesztése és törlése
+- Az összes téma listázása (létrehozó avatárjával, nevével, témacímmel, leírással)
+- Új téma létrehozása (cím max. 80, leírás max. 300 karakter)
+- Témára kattintva a hozzászólások megtekintése és új komment írása
+- Profiloldalon saját témák szerkesztése és törlése
 
+> **📸 Képernyőkép helye:** *A Discussions listát fotózd le a téma-kártyákkal és a „+" gombbal*
 
-📸 [Képernyőkép: a Discussions lista oldala a téma-kártyákkal és a „+" gombbal]
+> **📸 Képernyőkép helye:** *Nyiss meg egy discussion-t – látszódjon a kommentlista és az új komment mező*
 
+---
 
-📸 [Képernyőkép: egy megnyitott discussion belseje a kommentekkel és az új komment mezővel]
+### 🔍 Finder
 
-
-🔍 Finder
 Csapatkeresési oldal – segít más játékosokkal összekapcsolódni.
-Funkciók:
 
-Elérhető csoportok (posztok) listája: játéknév, leírás, létszámlimit, tagok száma
-Csatlakozás csoporthoz; belépve valós idejű csevegőszoba nyílik meg (Firebase onSnapshot)
-Kilépés a csoportból; csoportgazda eltávolíthatja a tagokat
-Új csoport létrehozása (játék kiválasztása legördülőből, leírás, opcionális létszámlimit)
-Inaktív (3 napnál régebbi) vagy letiltott felhasználó által létrehozott csoportok automatikusan törlődnek
+- Elérhető csoportok listája: játéknév, leírás, létszámlimit, tagok száma
+- Csatlakozás csoporthoz → valós idejű csevegőszoba nyílik meg (`onSnapshot`)
+- Kilépés a csoportból; csoportgazda eltávolíthatja a tagokat
+- Új csoport létrehozása (játék, leírás, opcionális létszámlimit)
+- Inaktív (3+ napos) vagy letiltott felhasználó csoportjai automatikusan törlődnek
 
+> **📸 Képernyőkép helye:** *A Finder oldalt fotózd le a csoport-kártyákkal és a „+" gombbal*
 
-📸 [Képernyőkép: a Finder oldal a csoport-kártyákkal és a „+" gombbal]
+> **📸 Képernyőkép helye:** *Lépj be egy csoportba – fotózd le a megnyílt csevegőszobát üzenetekkel*
 
+---
 
-📸 [Képernyőkép: egy megnyitott csevegőszoba a Finder-ben, üzenetekkel]
+### 👤 Profile
 
-
-👤 Profile
 A felhasználói profil kezelésének oldala, négy fülre osztva:
-FülTartalomFavourite GamesKedvenc játékok listája; játék hozzáadása/eltávolítása keresésselMy DiscussionsSaját témák megtekintése, leírás szerkesztése, téma törlésePeoples (csak admin)Az összes felhasználó listája; felhasználó letiltása/engedélyezéseMy ProfileFelhasználónév és profilkép (URL vagy fájl feltöltés) módosítása; kijelentkezés
 
-📸 [Képernyőkép: a Profile oldal „My Profile" füle a szerkesztő mezőkkel]
+| Fül | Elérhető kinek | Tartalom |
+|---|:---:|---|
+| **Favourite Games** | Mindenki | Kedvenc játékok listája; keresés, hozzáadás, eltávolítás |
+| **My Discussions** | Mindenki | Saját témák megtekintése, leírás szerkesztése, törlés |
+| **Peoples** | Csak admin | Az összes felhasználó; letiltás / engedélyezés |
+| **My Profile** | Mindenki | Felhasználónév, profilkép (URL vagy fájl) módosítása; kijelentkezés |
 
+> **📸 Képernyőkép helye:** *A Profile oldal „My Profile" fülét fotózd le a szerkesztő mezőkkel*
 
-📸 [Képernyőkép: a Profile oldal „Favourite Games" füle a kedvenc játékok listájával]
+> **📸 Képernyőkép helye:** *A „Favourite Games" fület fotózd le a kedvenc játékok listájával*
 
+---
 
-🛠️ Admin
-Csak adminisztrátori jogosultságú felhasználóknak elérhető oldal.
-Funkciók:
+### 🛠️ Admin
 
-Új játék felvitele (név, kép URL vagy feltöltés, műfajok, leírás)
-Új műfaj (genre) hozzáadása és törlése
-Felhasználóktól érkező játékkérelmek (game requests) megtekintése és jóváhagyása/elutasítása
+Kizárólag adminisztrátori jogosultságú felhasználóknak elérhető oldal.
 
+- Új játék felvitele (név, kép URL vagy feltöltés, műfajok, leírás)
+- Új műfaj (genre) hozzáadása és törlése
+- Felhasználóktól érkező játékkérelmek megtekintése, jóváhagyása / elutasítása
 
-📸 [Képernyőkép: az Admin oldal az „Add Game" űrlappal és a kérelmek listájával]
+> **📸 Képernyőkép helye:** *Az Admin oldalt fotózd le az „Add Game" űrlappal és a kérelmek listájával*
 
+---
 
-c) Reszponzív megjelenés mobilon
-Az alkalmazás teljes mértékben reszponzív, minden komponensnek van mobil (max-width: 600px) és tablet (max-width: 768–900px) nézete.
-Navigációs sáv
+## c) Reszponzív megjelenés mobilon
 
-Asztali: vízszintes menüsor linkekkel bal oldalon, profil névvel és képpel jobb oldalon
-Mobil (≤600px): a menüpontok rejtve vannak; egy hamburger ikon (☰) megnyomásával előcsúszik egy oldalsó drawer panel balról; a profilnév elrejtve, csak a kép látható
+Az alkalmazás teljes mértékben reszponzív. Minden komponensnek van dedikált mobil- és tablet-nézete.
 
+| Törésipont | Érintett komponensek |
+|---|---|
+| `≤ 600px` | Navbar, Games, Finder, Discussion |
+| `≤ 768px` | Profile |
+| `601px – 900px` | Navbar (tablet) |
 
-📸 [Képernyőkép: a hamburger menü ikont mutasd mobilon (Chrome DevTools → 390px szélesség)]
+---
 
+### 📱 Navigációs sáv
 
-📸 [Képernyőkép: a kinyílt drawer/oldalsó menü mobilon a navigációs linkekkel]
+| | Asztali nézet | Mobil nézet (≤ 600px) |
+|---|---|---|
+| Menü | Vízszintes linksor bal oldalon | ☰ Hamburger ikon → bal oldali drawer panel |
+| Profil | Profilnév + profilkép | Csak profilkép (név rejtve) |
 
-Games oldal
+> **📸 Képernyőkép helye:** *Chrome DevTools → 390px szélesség → fotózd le a hamburgert a navbaron*
 
-Asztali: több kártyás rács, oldalsó részletpanel
-Mobil: a kártyák teljes szélességre nőnek (96vw), a részletpanel modálként nyílik meg, az edit modal mérete csökken
+> **📸 Képernyőkép helye:** *Nyomd meg a hamburgert → fotózd le a kinyílt oldalsó drawer menüt*
 
+---
 
-📸 [Képernyőkép: a Games oldal mobilon (kártyák egymás alatt, teljes szélességben)]
+### 📱 Games oldal
 
-Finder oldal
+| | Asztali nézet | Mobil nézet |
+|---|---|---|
+| Elrendezés | Többoszlopos kártyarács, oldalsó részletpanel | Kártyák teljes szélességen (`96vw`), részletpanel modálként |
 
-Asztali: kártyás lista + csevegőablak egymás mellett
-Mobil: a lista és a csevegőablak egymás alatt jelenik meg, az üzenetmező és a beviteli sor az aljára kerül
+> **📸 Képernyőkép helye:** *Games oldal mobilon – kártyák egymás alatt, teljes szélességben*
 
+---
 
-📸 [Képernyőkép: a Finder oldal mobilon, a csevegőszobával]
+### 📱 Finder oldal
 
-Profile oldal
+| | Asztali nézet | Mobil nézet |
+|---|---|---|
+| Elrendezés | Kártyás lista + csevegőablak egymás mellett | Lista és chat egymás alatt, beviteli sor az aljára kerül |
 
-Asztali: széles kártyás elrendezés, fülek vízszintesen
-Mobil (≤768px): a fülek és tartalmak egymás alá rendeződnek, kisebb betűméretek
+> **📸 Képernyőkép helye:** *Finder oldal mobilon, a csevegőszobával*
 
+---
 
-📸 [Képernyőkép: a Profile oldal mobilon]
+### 📱 Profile oldal
 
-Discussion oldal
+| | Asztali nézet | Mobil nézet (≤ 768px) |
+|---|---|---|
+| Elrendezés | Széles kártyás nézet, vízszintes fülek | Fülek és tartalmak egymás alá rendeződnek |
 
-Mobil (≤600px): a komment kártyák és az űrlap teljes szélességre nőnek, kisebb padding
+> **📸 Képernyőkép helye:** *Profile oldal mobilon – látszódjon a fülváltó és a tartalom*
 
+---
 
-📸 [Képernyőkép: egy discussion mobilon, kommentekkel]
+### 📱 Discussion oldal
 
+| | Asztali nézet | Mobil nézet (≤ 600px) |
+|---|---|---|
+| Elrendezés | Kártyák normál szélességgel | Komment kártyák és írómező teljes szélességre nőnek |
 
-d) Adattárolás
-Az alkalmazás Firebase Firestore NoSQL adatbázist használ. Az adatok kollekciókba (táblákba) szervezve tárolódnak.
-Firestore kollekciók és kapcsolataik
-┌─────────────────────────────────────────────────────────────────┐
-│                        FIRESTORE                                │
-│                                                                 │
-│  ┌──────────────┐        ┌──────────────┐                       │
-│  │  user-data   │        │    games     │                       │
-│  ├──────────────┤        ├──────────────┤                       │
-│  │ email (PK)   │        │ name         │                       │
-│  │ username     │        │ img          │                       │
-│  │ picture      │        │ likes        │                       │
-│  │ favourites[] │──────▶ │ dislikes     │                       │
-│  │ disabled     │        │ genre[]      │                       │
-│  └──────┬───────┘        │ description  │                       │
-│         │                │ createdAt    │                       │
-│         │                └──────┬───────┘                       │
-│         │                       │                               │
-│         │              ┌────────┴────────┐                      │
-│         │              │   user-votes    │                      │
-│         │              ├─────────────────┤                      │
-│         │              │ id: uid_gameId  │                      │
-│         │              │ vote (like/dis) │                      │
-│         │              └─────────────────┘                      │
-│         │                                                       │
-│         │   ┌──────────────┐    ┌──────────────────┐           │
-│         └──▶│ discussions  │    │  discussion-msgs  │           │
-│             ├──────────────┤    ├──────────────────┤           │
-│             │ creatoremail │    │ discussionId (FK) │           │
-│             │ title        │───▶│ senderemail       │           │
-│             │ description  │    │ text              │           │
-│             └──────────────┘    │ createdAt         │           │
-│                                 └──────────────────┘           │
-│                                                                 │
-│  ┌──────────────────┐   ┌──────────────────────┐               │
-│  │  finder-groups   │   │  finder-messages      │               │
-│  ├──────────────────┤   ├──────────────────────┤               │
-│  │ creatoremail     │   │ finderid (FK)         │               │
-│  │ game             │──▶│ senderemail           │               │
-│  │ description      │   │ text                  │               │
-│  │ members[]        │   │ createdAt             │               │
-│  │ limit            │   └──────────────────────┘               │
-│  │ limitEnabled     │                                           │
-│  │ createdAt        │                                           │
-│  │ lastActivity     │                                           │
-│  └──────────────────┘                                           │
-│                                                                 │
-│  ┌──────────────┐    ┌──────────────────┐                       │
-│  │   genres     │    │  game-requests   │                       │
-│  ├──────────────┤    ├──────────────────┤                       │
-│  │ name         │    │ name             │                       │
-│  └──────────────┘    │ requesteremail   │                       │
-│                       └──────────────────┘                      │
-└─────────────────────────────────────────────────────────────────┘
-Kollekciók leírása
-KollekcióLeírásuser-dataFelhasználói profiladatok (email, felhasználónév, profilkép, kedvenc játékok, letiltás státusz)gamesJátékok adatbázisa (név, kép, leírás, műfajok, like/dislike számláló, létrehozás dátuma)genresElérhető játékműfajok listájauser-votesFelhasználói szavazatok játékokra (uid_gameId összetett kulccsal, dupla szavazás megelőzéséhez)discussionsFórum témák (létrehozó e-mail, cím, leírás)discussion-msgsEgy-egy discussion alá tartozó hozzászólásokfinder-groupsCsoportkereső posztok (játék, leírás, tagok tömbje, limit)finder-messagesEgy-egy finder csoporthoz tartozó valós idejű chat üzenetekgame-requestsFelhasználók által kért, de még nem felvett játékok
-Firebase Authentication kezeli a bejelentkezést; az auth UID és az e-mail-cím köti össze az user-data kollekció rekordjait.
+> **📸 Képernyőkép helye:** *Egy megnyitott discussion mobilon, kommentekkel*
 
-e) Fontosabb backend végpontok
+---
 
-ℹ️ Az alkalmazás Firebase Firestore SDK-n keresztül kommunikál közvetlenül az adatbázissal – nincs hagyományos REST API szerver. Az alábbi „végpontok" a Firestore-hívások logikai egységeit képviselik.
+## d) Adattárolás
 
+Az alkalmazás **Firebase Firestore** NoSQL felhőadatbázist használ. A hitelesítést a **Firebase Authentication** végzi; a felhasználók azonosítása e-mail-cím alapján történik.
 
-🔗 Backend repository: [IDE ILLESZD BE A BACKEND / FIREBASE FUNCTIONS REPO LINKJÉT]
+### Kollekciók és kapcsolataik
 
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                          FIRESTORE                                   │
+│                                                                      │
+│   ┌─────────────┐              ┌─────────────┐                       │
+│   │  user-data  │              │    games    │                       │
+│   ├─────────────┤              ├─────────────┤                       │
+│   │ email  (PK) │              │ name        │                       │
+│   │ username    │  favourites  │ img         │                       │
+│   │ picture     │─────────────▶│ likes       │                       │
+│   │ favourites[]│              │ dislikes    │                       │
+│   │ disabled    │              │ genre[]     │                       │
+│   └──────┬──────┘              │ description │                       │
+│          │                     │ createdAt   │                       │
+│          │                     └──────┬──────┘                       │
+│          │                            │ 1:N                          │
+│          │                     ┌──────┴──────┐                       │
+│          │                     │ user-votes  │                       │
+│          │                     ├─────────────┤                       │
+│          │                     │ uid_gameId  │  (összetett kulcs)    │
+│          │                     │ vote        │  like | dislike       │
+│          │                     └─────────────┘                       │
+│          │                                                           │
+│          │  1:N   ┌─────────────┐   1:N   ┌──────────────────┐      │
+│          └───────▶│ discussions │────────▶│ discussion-msgs  │      │
+│                   ├─────────────┤         ├──────────────────┤      │
+│                   │ creatoremail│         │ discussionId (FK)│      │
+│                   │ title       │         │ senderemail      │      │
+│                   │ description │         │ text             │      │
+│                   └─────────────┘         │ createdAt        │      │
+│                                           └──────────────────┘      │
+│                                                                      │
+│   ┌─────────────────┐  1:N  ┌──────────────────┐                    │
+│   │  finder-groups  │──────▶│ finder-messages  │                    │
+│   ├─────────────────┤       ├──────────────────┤                    │
+│   │ creatoremail    │       │ finderid (FK)    │                    │
+│   │ game            │       │ senderemail      │                    │
+│   │ description     │       │ text             │                    │
+│   │ members[]       │       │ createdAt        │                    │
+│   │ limit           │       └──────────────────┘                    │
+│   │ limitEnabled    │                                                │
+│   │ createdAt       │                                                │
+│   │ lastActivity    │                                                │
+│   └─────────────────┘                                                │
+│                                                                      │
+│   ┌──────────┐        ┌──────────────────┐                           │
+│   │  genres  │        │  game-requests   │                           │
+│   ├──────────┤        ├──────────────────┤                           │
+│   │ name     │        │ name             │                           │
+│   └──────────┘        │ requesteremail   │                           │
+│                        └──────────────────┘                          │
+└──────────────────────────────────────────────────────────────────────┘
+```
 
-1. Felhasználó regisztrálása / Google-login
-Hívás helye: Login.jsx, Signup.jsx
-MetóduscreateUserWithEmailAndPassword / signInWithPopup (Firebase Auth)Paraméterekemail: string, password: string (email+pass esetén); Google popup (Google esetén)MűködésLétrehozza az auth-felhasználót, majd ellenőrzi, hogy létezik-e már user-data rekord az e-mailhez. Ha nem, létrehozza az alapértelmezett profiladatokkal.Visszatérési értékSikeres bejelentkezés esetén navigálás a főoldalraHibakezelésFirebase auth hibakód jelenik meg a UI-ban (err.message)
+### Kollekciók összefoglalója
 
-2. Játék hozzáadása (admin)
-Hívás helye: Admin.jsx → addGame()
-MetódusaddDoc(collection(db, 'games'), {...})Paraméterekname: string, img: string (URL), likes: 0, dislikes: 0, genre: string[], description: string, createdAt: TimestampMűködésNormalizált névvel ellenőrzi, hogy a játék már létezik-e. Ha igen, nem veszi fel. Ha érkezett hozzá game-request, azt törli.Visszatérési érték— (UI frissül)HibakezelésDuplikátum esetén csak konzol-figyelmeztetés
+| Kollekció | Leírás |
+|---|---|
+| `user-data` | Felhasználói profiladatok: email, felhasználónév, profilkép URL, kedvenc játékok (tömb), letiltás státusz |
+| `games` | Játékok adatbázisa: név, kép, leírás, műfajok, like/dislike számláló, létrehozás időbélyege |
+| `genres` | Elérhető játékműfajok listája |
+| `user-votes` | Szavazatok: `uid_gameId` összetett kulcs → dupla szavazás megelőzésére |
+| `discussions` | Fórum témák: létrehozó e-mail, cím, leírás |
+| `discussion-msgs` | Egy-egy discussion alá tartozó hozzászólások |
+| `finder-groups` | Csoportkereső posztok: játék, leírás, tagok tömbje, limit |
+| `finder-messages` | Finder csoportokhoz tartozó valós idejű chat üzenetek |
+| `game-requests` | Felhasználók által kért, még fel nem vett játékok |
 
-3. Játék szavazás (like / dislike)
-Hívás helye: Games.jsx → handleVote(type)
-MetódusupdateDoc a games kollekción + setDoc a user-votes kollekciónParaméterek`type: 'like'MűködésAz user-votes/{uid}_{gameId} dokumentumban tárolja az aktuális szavazatot. Ha ugyanarra szavaz újra, visszavonja. Ha másikra vált, a régi értéket csökkenti és az újat növeli. increment() atomikus növeléssel.Visszatérési értékFrissített like/dislike számok a UI-banHibakezelésNincs bejelentkezett user esetén a függvény nem fut le (`if (!user
+> **Firebase Authentication** kezeli a bejelentkezést. Az auth `uid` és az e-mail-cím köti össze az `user-data` rekordokat.
 
-4. Discussion létrehozása
-Hívás helye: Discussions.jsx → createDiscussion()
-MetódusaddDoc(collection(db, 'discussions'), {...})Paraméterekcreatoremail: string, title: string (min 3, max 80 kar.), description: string (max 300 kar.)Visszatérési értékModal bezárása, lista frissítéseHibakezelésÜres/rövid cím esetén hibaüzenet a UI-ban; Firebase-hiba esetén általános hibaüzenet
+---
 
-5. Finder csoport létrehozása és csatlakozás
-Hívás helye: Finder.jsx
-LétrehozásaddDoc(collection(db, 'finder-groups'), {...}) – game, description, limit, limitEnabled, members[], creatoremail, createdAtCsatlakozásupdateDoc(groupRef, { members: arrayUnion(user.email) })KilépésupdateDoc(groupRef, { members: arrayRemove(user.email) })Tag eltávolításaupdateDoc(groupRef, { members: arrayRemove(targetEmail) }) (csak a csoportgazdának)Valós idejű chatonSnapshot(query(...finder-messages...)) – élő frissítésVisszatérési értékUI frissítés, csevegőszoba megnyitásaHibakezelésTeli csoport esetén a „Join" gomb nem jelenik meg; letiltott felhasználók csoportjai automatikusan törlődnek betöltéskor
+## e) Fontosabb backend végpontok
 
-6. Felhasználó letiltása (admin)
-Hívás helye: Profile.jsx (Peoples fül)
-MetódusupdateDoc(doc(db, 'user-data', id), { disabled: true/false })ParaméterekFelhasználó Firestore dokumentum ID-jaMűködésA disabled: true mező beállítása után a ProtectedRoute komponens a következő oldalletöltésnél automatikusan kijelentkezteti az érintett felhasználót és átirányítja a login oldalraHibakezelés—
+> [!NOTE]
+> Az alkalmazás **Firebase Firestore SDK**-n keresztül kommunikál közvetlenül az adatbázissal – nincs hagyományos REST API szerver. Az alábbi „végpontok" a Firestore-hívások logikai egységeit képviselik.
 
-f) Tesztelés
-Frontend tesztek
+> 🔗 **Backend repository:** `[IDE ILLESZD BE A REPO LINKJÉT]`
+
+---
+
+### 1. 🔐 Felhasználó regisztrálása / Google-login
+
+**Hívás helye:** `Login.jsx`, `Signup.jsx`
+
+| Mező | Érték |
+|---|---|
+| **Metódus** | `createUserWithEmailAndPassword` / `signInWithPopup` (Firebase Auth) |
+| **Paraméterek** | `email: string`, `password: string` — e-mail+jelszó esetén; Google popup — Google esetén |
+| **Működés** | Létrehozza az auth-felhasználót, majd ellenőrzi, hogy létezik-e már `user-data` rekord az e-mailhez. Ha nem, létrehozza alapértelmezett profiladatokkal. |
+| **Visszatérési érték** | Sikeres belépés → navigálás a főoldalra (`/`) |
+| **Hibakezelés** | Firebase auth hibakód jelenik meg a UI-ban (`err.message`) |
+
+---
+
+### 2. 🎮 Játék hozzáadása *(admin)*
+
+**Hívás helye:** `Admin.jsx` → `addGame()`
+
+| Mező | Érték |
+|---|---|
+| **Metódus** | `addDoc(collection(db, 'games'), {...})` |
+| **Paraméterek** | `name: string`, `img: string`, `likes: 0`, `dislikes: 0`, `genre: string[]`, `description: string`, `createdAt: Timestamp` |
+| **Működés** | Normalizált névvel ellenőrzi, hogy a játék már létezik-e. Ha igen, nem veszi fel újra. Ha érkezett hozzá game-request, azt törli. |
+| **Visszatérési érték** | — *(UI frissül, form ürül)* |
+| **Hibakezelés** | Duplikátum esetén konzol-figyelmeztetés; üres név esetén a függvény nem fut le |
+
+---
+
+### 3. 👍 Játék szavazás (like / dislike)
+
+**Hívás helye:** `Games.jsx` → `handleVote(type)`
+
+| Mező | Érték |
+|---|---|
+| **Metódus** | `updateDoc` → `games` + `setDoc` → `user-votes` |
+| **Paraméterek** | `type: 'like' \| 'dislike'`, `user.uid`, `selectedGame.id` |
+| **Működés** | Az `user-votes/{uid}_{gameId}` dokumentumban tárolja a szavazatot. Visszavonás: ha ugyanarra kattint újra. Váltás: régi érték csökkentése + új növelése atomikus `increment()`-tel. |
+| **Visszatérési érték** | Frissített like/dislike számok a UI-ban |
+| **Hibakezelés** | Bejelentkezés nélkül a függvény kilép: `if (!user \|\| !selectedGame) return` |
+
+---
+
+### 4. 💬 Discussion létrehozása
+
+**Hívás helye:** `Discussions.jsx` → `createDiscussion()`
+
+| Mező | Érték |
+|---|---|
+| **Metódus** | `addDoc(collection(db, 'discussions'), {...})` |
+| **Paraméterek** | `creatoremail: string`, `title: string` *(min. 3, max. 80 kar.)*, `description: string` *(max. 300 kar.)* |
+| **Visszatérési érték** | Modal bezárása, lista automatikus frissítése |
+| **Hibakezelés** | Üres / rövid cím → hibaüzenet a UI-ban; Firebase-hiba → általános hibaüzenet |
+
+---
+
+### 5. 🔍 Finder csoport – létrehozás és csatlakozás
+
+**Hívás helye:** `Finder.jsx`
+
+| Művelet | Firestore-hívás |
+|---|---|
+| **Létrehozás** | `addDoc(collection(db, 'finder-groups'), { game, description, limit, limitEnabled, members: [], creatoremail, createdAt })` |
+| **Csatlakozás** | `updateDoc(groupRef, { members: arrayUnion(user.email) })` |
+| **Kilépés** | `updateDoc(groupRef, { members: arrayRemove(user.email) })` |
+| **Tag eltávolítása** | `updateDoc(groupRef, { members: arrayRemove(targetEmail) })` *(csak csoportgazda)* |
+| **Valós idejű chat** | `onSnapshot(query(finder-messages, ...))` – élő frissítés |
+
+| Mező | Érték |
+|---|---|
+| **Visszatérési érték** | UI frissítés, csevegőszoba megnyitása |
+| **Hibakezelés** | Teli csoport → Join gomb nem jelenik meg; letiltott felhasználók csoportjai betöltéskor automatikusan törlődnek (üzeneteikkel együtt) |
+
+---
+
+### 6. 🚫 Felhasználó letiltása *(admin)*
+
+**Hívás helye:** `Profile.jsx` → Peoples fül
+
+| Mező | Érték |
+|---|---|
+| **Metódus** | `updateDoc(doc(db, 'user-data', id), { disabled: true \| false })` |
+| **Paraméterek** | Felhasználó Firestore dokumentum ID-ja |
+| **Működés** | `disabled: true` beállítása után a `ProtectedRoute` automatikusan kijelentkezteti az érintett felhasználót és a `/login` oldalra irányítja |
+| **Hibakezelés** | — |
+
+---
+
+## f) Tesztelés
+
+### 🖥️ Frontend tesztek
+
 A frontend komponensek manuális tesztelése Chrome DevTools segítségével történt, különösen a reszponzív nézetek ellenőrzésekor.
-Tesztelt esetek:
 
-Bejelentkezés helyes és helytelen adatokkal
-Google-bejelentkezés
-Játék kereső és szűrő működése
-Like/dislike szavazás (váltás, visszavonás)
-Discussion létrehozása validációval (üres cím, rövid cím)
-Finder csoport létrehozása, csatlakozás, kilépés
-Profil adatok szerkesztése
-Admin: játék és műfaj hozzáadása, kérelem kezelése
-Letiltott felhasználó automatikus kijelentkezése
-404 oldal ismeretlen URL-en
+**Tesztelt esetek:**
 
+- [x] Bejelentkezés helyes adatokkal
+- [x] Bejelentkezés helytelen adatokkal (hibaüzenet megjelenése)
+- [x] Google-bejelentkezés
+- [x] Játék keresés és műfajszűrő működése
+- [x] Like/dislike szavazás (első szavazat, váltás, visszavonás)
+- [x] Discussion létrehozása validációval (üres cím, rövid cím)
+- [x] Finder csoport létrehozása, csatlakozás, kilépés, tag eltávolítás
+- [x] Profil adatok szerkesztése (felhasználónév, profilkép)
+- [x] Admin: játék és műfaj hozzáadása, kérelem jóváhagyása
+- [x] Letiltott felhasználó automatikus kijelentkezése
+- [x] 404 oldal ismeretlen URL-en
 
-📸 [Képernyőkép: a bejelentkezési hibát mutató állapot (pl. rossz jelszó hiba)]
+> **📸 Képernyőkép helye:** *Fotózd le a bejelentkezési hibát – pl. rossz jelszó esetén megjelenő hibaüzenet*
 
+> **📸 Képernyőkép helye:** *Fotózd le a Discussion form validációs hibaüzenetét (üres cím esetén)*
 
-📸 [Képernyőkép: a Discussion form validációs hibaüzenettel (üres cím)]
+> **📸 Képernyőkép helye:** *Fotózd le a like/dislike gombokat aktív (kattintott) állapotban egy játéknál*
 
+> **📸 Képernyőkép helye:** *Chrome DevTools mobilnézet (390px szélesség) a Games oldalon*
 
-📸 [Képernyőkép: a like/dislike gombok aktív állapotban egy játéknál]
+---
 
+### 🔧 Backend tesztek
 
-📸 [Képernyőkép: Chrome DevTools mobilnézet (390px) a Games oldalon]
+A Firestore adatbázis-műveletek tesztelése a **Firebase Console** segítségével történt, ahol közvetlenül ellenőrizhetők a kollekciókban lévő dokumentumok.
 
+**Tesztelt esetek:**
 
-Backend tesztek
-A Firebase Firestore adatbázis-műveletek tesztelése a Firebase Console segítségével történt, ahol közvetlenül ellenőrizhetők a kollekciókban lévő dokumentumok.
-Tesztelt esetek:
+- [x] `user-data` rekord automatikus létrehozása Google-login után
+- [x] `games` kollekció frissítése admin által (hozzáadás, törlés)
+- [x] `user-votes` dokumentum helyessége: egy user + egy játék = egy rekord
+- [x] `finder-groups` `members` tömbjének frissülése join/leave műveletnél
+- [x] 3 napnál régebbi finder csoportok automatikus törlése betöltéskor
+- [x] `disabled: true` mező hatása a `ProtectedRoute`-ra
 
-user-data rekord automatikus létrehozása Google-login után
-games kollekció frissítése admin által (hozzáadás, törlés)
-user-votes dokumentum helyessége (egy user, egy játék = egy rekord)
-finder-groups members tömbjének frissülése join/leave műveletnél
-3 napnál régebbi finder csoportok automatikus törlése betöltéskor
-disabled mező hatása a ProtectedRoute-ra
+> **📸 Képernyőkép helye:** *Firebase Console → Firestore → `games` kollekció, egy játék dokumentuma kinyitva*
 
+> **📸 Képernyőkép helye:** *Firebase Console → Firestore → `user-votes` kollekció, egy szavazat-dokumentum*
 
-📸 [Képernyőkép: Firebase Console → Firestore → games kollekció egy játék dokumentumával]
+> **📸 Képernyőkép helye:** *Firebase Console → Authentication → Users lista*
 
+---
 
-📸 [Képernyőkép: Firebase Console → Firestore → user-votes kollekció egy szavazat dokumentummal]
+## 🛠️ Technológiai stack
 
+| Réteg | Technológia |
+|---|---|
+| Frontend framework | React 18 + Vite |
+| Routing | React Router v6 |
+| Adatbázis | Firebase Firestore (NoSQL) |
+| Hitelesítés | Firebase Authentication |
+| Ikonok | react-icons |
+| Stílus | Plain CSS (komponensenként) |
 
-📸 [Képernyőkép: Firebase Console → Authentication → felhasználók listája]
+---
 
+<div align="center">
 
-Technológiai stack
-RétegTechnológiaFrontend frameworkReact 18 + ViteRoutingReact Router v6Backend / DBFirebase Firestore (NoSQL)HitelesítésFirebase AuthenticationIkonokreact-iconsStílusPlain CSS (komponensenként)
+*README összeállítva a forráskód alapján.*  
+*A* `📸 Képernyőkép helye` *jelzéseknél saját képernyőfelvételeket illessz be.*
 
-README összeállítva a forráskód alapján. A képernyőképek helyett a jelzett helyeken saját képernyőfelvételeket illessz be.
+</div>
