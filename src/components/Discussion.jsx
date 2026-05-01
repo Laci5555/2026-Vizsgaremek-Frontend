@@ -99,7 +99,7 @@ export default function Discussion() {
             <span>{creator?.username}</span>
           </div>
           <div className="discussion-text">
-            <p>{discussion.title}</p>
+            <p data-testid="discussion-title">{discussion.title}</p>
             <p>{discussion.description}</p>
           </div>
         </div>
@@ -128,8 +128,9 @@ export default function Discussion() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            data-testid="discussion-input"
           />
-          <input type="button" value="Send" onClick={sendMessage} />
+          <input type="button" value="Send" onClick={sendMessage} data-testid="discussion-send-btn" />
         </div>
 
       </div>

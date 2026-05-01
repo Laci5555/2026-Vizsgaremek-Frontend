@@ -37,17 +37,17 @@ export default function Navbar() {
     <div className="navbar">
       <IoMdMenu className="menuIkon" onClick={() => setShowMenu((p) => !p)} />
       <div className={`left ${showMenu ? 'show' : ''}`}>
-        <div className={`page ${path === '/' ? 'active' : ''}`} onClick={() => navigate('/')}>Home</div>
-        <div className={`page ${path === '/games' ? 'active' : ''}`} onClick={() => navigate('/games')}>Games</div>
-        <div className={`page ${path.startsWith('/discussion') ? 'active' : ''}`} onClick={() => navigate('/discussions')}>Discussions</div>
-        <div className={`page ${path === '/finder' ? 'active' : ''}`} onClick={() => navigate('/finder')}>Finder</div>
-        <div className={`page ${path === '/faq' ? 'active' : ''}`} onClick={() => navigate('/faq')}>FAQ</div>
+        <div className={`page ${path === '/' ? 'active' : ''}`} onClick={() => navigate('/')} data-testid="nav-home">Home</div>
+        <div className={`page ${path === '/games' ? 'active' : ''}`} onClick={() => navigate('/games')} data-testid="nav-games">Games</div>
+        <div className={`page ${path.startsWith('/discussion') ? 'active' : ''}`} onClick={() => navigate('/discussions')} data-testid="nav-discussions">Discussions</div>
+        <div className={`page ${path === '/finder' ? 'active' : ''}`} onClick={() => navigate('/finder')} data-testid="nav-finder">Finder</div>
+        <div className={`page ${path === '/faq' ? 'active' : ''}`} onClick={() => navigate('/faq')} data-testid="nav-faq">FAQ</div>
         {isAdmin && <div className={`page ${path === '/admin' ? 'active' : ''}`} onClick={() => navigate('/admin')}>Admin</div>}
       </div>
       <div className="right" onClick={() => navigate('/profile')}>
-        <div className="profName">{name}</div>
+        <div className="profName" data-testid="nav-username">{name}</div>
         <div>
-          <img className="profPicture" src={pfp} alt="profile" />
+          <img className="profPicture" src={pfp} alt="profile" data-testid="nav-profile-pic" />
         </div>
       </div>
     </div>

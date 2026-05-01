@@ -122,6 +122,7 @@ export default function Admin() {
             <input
               id="gameName" type="text" value={gameName}
               onChange={(e) => setGameName(e.target.value)}
+              data-testid="admin-game-name"
             />
           </div>
           <div>
@@ -162,6 +163,7 @@ export default function Admin() {
                 <input
                   id="gamePicture" type="text" value={gamePicture}
                   onChange={(e) => setGamePicture(e.target.value)}
+                  data-testid="admin-game-picture"
                 />
               </div>
             ) : (
@@ -187,6 +189,7 @@ export default function Admin() {
               id="gameDescription" className="description" rows={5} maxLength={MAX_DESC}
               placeholder="Write a short description of the game..."
               value={description} onChange={(e) => setDescription(e.target.value)}
+              data-testid="admin-game-description"
             />
             <span className={`charCount${description.length > 450 ? description.length >= MAX_DESC ? ' over' : ' near' : ''}`}>
               {description.length} / {MAX_DESC}
@@ -197,14 +200,14 @@ export default function Admin() {
             className="addGameButton" style={{ width: '200px' }}
             type="button" value="Add new game"
             onClick={addGame} disabled={!canAddGame}
+            data-testid="admin-add-game-btn"
           />
         </div>
 
         <div className="oldalso">
           <div className="addGenre">
-            <label htmlFor="genre">Genre:</label>
-            <input id="genre" type="text" value={genre} onChange={(e) => setGenre(e.target.value)} />
-            <input className="addGenreButton" type="button" value="Add genre" onClick={addGenre} />
+            <input id="genre" type="text" value={genre} onChange={(e) => setGenre(e.target.value)} data-testid="admin-genre-input" />
+            <input className="addGenreButton" type="button" value="Add genre" onClick={addGenre} data-testid="admin-add-genre-btn" />
           </div>
           <div className="gameRequests">
             <span>Game requests:</span>
