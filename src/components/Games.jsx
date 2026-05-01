@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
 import './Games.css';
 import { IoSearchOutline } from 'react-icons/io5';
@@ -18,6 +18,13 @@ import { useApp } from '../AppContext';
 const CARD_WIDTH = 200;
 const CARD_GAP = 20;
 const MAX_DESC = 500;
+
+const XIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+    <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
 
 export default function Games({ gamesDataCollection, genreCollection }) {
 
@@ -90,11 +97,11 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     fetchGames();
     fetchGenres();
     fetchUsers();
-  }, []);
+  }, [gamesDataCollection, genreCollection]);
 
   useEffect(() => {
-    if (!selectedGame || !user) { setUserVote(null); return; }
     async function fetchVoteAndReviews() {
+      if (!selectedGame || !user) { setUserVote(null); return; }
       // 1. Fetch user vote
       const voteRef = doc(db, 'user-votes', `${user.uid}_${selectedGame.id}`);
       const voteSnap = await getDoc(voteRef);
@@ -127,18 +134,29 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     fetchVoteAndReviews();
   }, [selectedGame, user]);
 
-  useEffect(() => {
-    setGames((prev) => sortGames(prev));
+  const sortGames = useCallback((list) => {
+    switch (sortBy) {
+      case 'az': return [...list].sort((a, b) => a.name.localeCompare(b.name));
+      case 'likes': return [...list].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0));
+      default: return [...list];
+    }
   }, [sortBy]);
 
-  function filterGames(searchName, activeFilters) {
+  const filterGames = useCallback((searchName, activeFilters) => {
     let result = gamesMain;
     if (searchName) result = result.filter((x) => x.name.toLowerCase().includes(searchName.toLowerCase()));
     if (activeFilters.length > 0) result = result.filter((x) => x.genre.some((g) => activeFilters.includes(g)));
     result = sortGames(result);
     setGames(result);
     setSearched(searchName.trim() !== '' || activeFilters.length > 0);
-  }
+  }, [gamesMain, sortGames]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setGames((prev) => sortGames(prev));
+    }, 0);
+    return () => clearTimeout(t);
+  }, [sortGames]);
 
   // Real-time search with small debounce (150ms – runs on local data, no Firebase)
   useEffect(() => {
@@ -146,15 +164,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
       filterGames(game, genreFilters);
     }, 150);
     return () => clearTimeout(timer);
-  }, [game, gamesMain]);
-
-  function sortGames(list) {
-    switch (sortBy) {
-      case 'az': return [...list].sort((a, b) => a.name.localeCompare(b.name));
-      case 'likes': return [...list].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0));
-      default: return [...list];
-    }
-  }
+  }, [game, gamesMain, genreFilters, filterGames]);
 
 
 
@@ -328,13 +338,6 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     }
     setConfirmDeleteReview(false);
   }
-
-  const XIcon = () => (
-    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-      <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
 
   return (
     <div className="games">

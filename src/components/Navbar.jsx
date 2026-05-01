@@ -17,12 +17,12 @@ export default function Navbar() {
   const path = location.pathname;
 
   useEffect(() => {
-    if (!user?.email) {
-      setName('');
-      setPfp(null);
-      return;
-    }
     async function getUserData() {
+      if (!user?.email) {
+        setName('');
+        setPfp(null);
+        return;
+      }
       const snap = await getDocs(
         query(collection(db, 'user-data'), where('email', '==', user.email))
       );

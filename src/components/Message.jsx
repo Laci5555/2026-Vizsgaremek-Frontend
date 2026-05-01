@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { db } from '../../firebaseApp';
 import {
   addDoc, collection, getDocs, setDoc, doc,
@@ -117,11 +117,28 @@ export default function Message() {
     return () => unsubscribe();
   }, [user]);
 
+  // ── Mark as read ─────────────────────────────────────────────────────
+  const markAsRead = useCallback(async (otherEmail) => {
+    if (!user?.email) return;
+    const key = createKey(user.email, otherEmail);
+    const now = Timestamp.now();
+    const docId = `${user.email}__${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
+    await setDoc(doc(db, 'read-timestamps', docId), {
+      userEmail: user.email,
+      convKey: key,
+      readAt: now,
+    });
+    setReadTimestamps((prev) => ({ ...prev, [key]: now.toDate() }));
+  }, [user]);
+
   // ── Ha nyitva van conv és jön új üzenet → azonnal olvasottnak jelöljük ──
   useEffect(() => {
     if (!selectedConv) return;
-    markAsRead(selectedConv.otherEmail);
-  }, [selectedConv?.messages?.length]);
+    const t = setTimeout(() => {
+      markAsRead(selectedConv.otherEmail);
+    }, 0);
+    return () => clearTimeout(t);
+  }, [selectedConv, selectedConv?.messages?.length, markAsRead]);
 
   // ── Scroll to bottom ─────────────────────────────────────────────────
   useEffect(() => {
@@ -143,19 +160,6 @@ export default function Message() {
     } catch (err) { console.error(err); }
   }
 
-  // ── Mark as read ─────────────────────────────────────────────────────
-  async function markAsRead(otherEmail) {
-    if (!user?.email) return;
-    const key = createKey(user.email, otherEmail);
-    const now = Timestamp.now();
-    const docId = `${user.email}__${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
-    await setDoc(doc(db, 'read-timestamps', docId), {
-      userEmail: user.email,
-      convKey: key,
-      readAt: now,
-    });
-    setReadTimestamps((prev) => ({ ...prev, [key]: now.toDate() }));
-  }
 
   // ── Open conversation ────────────────────────────────────────────────
   function openConversation(conv) {

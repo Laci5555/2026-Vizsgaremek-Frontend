@@ -15,7 +15,12 @@ import { GoPlus } from 'react-icons/go';
 
 const MAX_DESC = 300;
 
-
+const XIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+    <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
 
 export default function Profile({ auth }) {
   const { user, isAdmin } = useApp();
@@ -179,13 +184,6 @@ export default function Profile({ auth }) {
   const visibleTabs = TABS.filter((t) => !t.adminOnly || isAdmin);
   const filteredGames = allGames.filter(
     (g) => !favourites.includes(g.id) && g.name.toLowerCase().includes(gameSearch.toLowerCase())
-  );
-
-  const XIcon = () => (
-    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-      <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
   );
 
   return (

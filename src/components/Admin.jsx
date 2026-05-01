@@ -5,7 +5,7 @@ import { IoMdClose } from 'react-icons/io';
 import { db } from '../../firebaseApp';
 import {
   addDoc, collection, deleteDoc, doc, getDocs,
-  query, Timestamp, updateDoc,
+  query, Timestamp,
 } from 'firebase/firestore';
 
 export default function Admin() {

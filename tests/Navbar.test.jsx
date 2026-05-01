@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Navbar from "../src/components/Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useApp } from "../src/AppContext";
 
 vi.unmock("../src/components/Navbar");
 

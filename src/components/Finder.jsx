@@ -8,10 +8,24 @@ import { MdPersonRemove } from 'react-icons/md';
 import {
   addDoc, collection, getDocs, doc,
   updateDoc, arrayUnion, arrayRemove, deleteDoc,
-  query, where, orderBy, Timestamp, onSnapshot,
+  query, where, Timestamp, onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../../firebaseApp';
 import { useApp } from '../AppContext';
+const InfoIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0 }}>
+    <circle cx="6.5" cy="6.5" r="5.75" stroke="currentColor" strokeWidth="1.25" />
+    <rect x="6" y="5.5" width="1" height="4" rx="0.5" fill="currentColor" />
+    <rect x="6" y="3.5" width="1" height="1" rx="0.5" fill="currentColor" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
 
 export default function Finder() {
   const { user } = useApp();
@@ -21,7 +35,6 @@ export default function Finder() {
   const [games, setGames] = useState([]);
 
   const [selectedPost, setSelectedPost] = useState(null);
-  const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [inRoom, setInRoom] = useState(false);
@@ -125,7 +138,7 @@ export default function Finder() {
       console.error('onSnapshot error:', err);
     });
     return () => unsub();
-  }, [selectedPost?.id]);
+  }, [selectedPost]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -250,7 +263,6 @@ export default function Finder() {
 
   function closePost() {
     setSelectedPost(null);
-    setRoom(null);
     setInRoom(false);
     setMessages([]);
   }
@@ -280,21 +292,6 @@ export default function Finder() {
   };
   const roomExpiryInfo = getExpiryInfo(selectedPost);
 
-  const InfoIcon = () => (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="6.5" cy="6.5" r="5.75" stroke="currentColor" strokeWidth="1.25" />
-      <rect x="6" y="5.5" width="1" height="4" rx="0.5" fill="currentColor" />
-      <rect x="6" y="3.5" width="1" height="1" rx="0.5" fill="currentColor" />
-    </svg>
-  );
-
-  const XIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-
   return (
     <div className="finder">
       <Navbar />
@@ -311,9 +308,6 @@ export default function Finder() {
             const game = getGame(post.game);
             const memberCount = (post.members ?? []).length;
             const full = post.maxplayers > 0 && memberCount >= post.maxplayers;
-
-            // Expiry számítás
-            const expiryInfo = getExpiryInfo(post);
 
             // Leírás tördelése 100 karakterenként
             const formatDesc = (text) => {

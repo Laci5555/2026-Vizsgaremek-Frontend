@@ -26,13 +26,13 @@ console.warn = (...args) => {
 };
 
 // Browser API Mocks
-global.ResizeObserver = class ResizeObserver {
+globalThis.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-global.IntersectionObserver = class IntersectionObserver {
+globalThis.IntersectionObserver = class IntersectionObserver {
   constructor(callback) { this.callback = callback; }
   observe() {}
   unobserve() {}

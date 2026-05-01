@@ -39,7 +39,7 @@ function ProtectedRoute({ children }) {
       }
     }
     checkDisabled();
-  }, [user]);
+  }, [user, navigate]);
 
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
