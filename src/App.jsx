@@ -10,6 +10,7 @@ import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Admin from './components/Admin';
+import Faq from './components/Faq';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
   {
     path: '/profile',
     element: <ProtectedRoute><Profile auth={auth} /></ProtectedRoute>,
+  },
+  {
+    path: '/faq',
+    element: <ProtectedRoute><Faq /></ProtectedRoute>,
   },
   { path: '*', element: <NotFound /> },
 ]);

@@ -39,6 +39,7 @@ export default function Navbar() {
         <div className="page" onClick={() => navigate('/games')}>Games</div>
         <div className="page" onClick={() => navigate('/discussions')}>Discussions</div>
         <div className="page" onClick={() => navigate('/finder')}>Finder</div>
+        <div className="page" onClick={() => navigate('/faq')}>FAQ</div>
         {isAdmin && <div className="page" onClick={() => navigate('/admin')}>Admin</div>}
       </div>
       <div className="right" onClick={() => navigate('/profile')}>
