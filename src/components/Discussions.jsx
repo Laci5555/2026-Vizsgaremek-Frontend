@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
+import Message from './Message';
 import './Discussions.css';
 import {
   addDoc,
@@ -216,6 +217,8 @@ export default function Discussions() {
           </div>
         </div>
       </div>
+
+      <Message />
     </div>
   );
 }

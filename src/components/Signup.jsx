@@ -55,8 +55,10 @@ export default function Signup({ auth }) {
 
   return (
     <div className="signup">
-      <h1 className="title">Welcome to Gamminity!</h1>
-      <div className="motto">Your best platform for communication about gaming!</div>
+      <div className="brand">
+        <h1 className="brand-name">Gamminity</h1>
+        <p className="brand-motto">Your best platform for communication about gaming!</p>
+      </div>
       <div className="signupForm">
         <h1>Sign up</h1>
         <input type="text" placeholder="Username" value={name} onChange={(e) => setName(e.target.value)} required />

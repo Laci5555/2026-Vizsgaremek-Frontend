@@ -42,8 +42,10 @@ export default function Login({ auth }) {
 
   return (
     <div className="login">
-      <h1 className="title">Welcome to Gamminity!</h1>
-      <div className="motto">Your best platform for communication about gaming!</div>
+      <div className="brand">
+        <h1 className="brand-name">Gamminity</h1>
+        <p className="brand-motto">Your best platform for communication about gaming!</p>
+      </div>
       <div className="loginForm">
         <h1>Login</h1>
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />

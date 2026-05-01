@@ -1,12 +1,4 @@
-:root {
-  --bg:           #0f0f0f;
-  --surface:      #1a1a1a;
-  --border:       #2e2e2e;
-  --border-focus: #555;
-  --text:         #ececec;
-  --muted:        #6b6b6b;
-  --danger:       #ef4444;
-}
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Inter:wght@400;500;600&display=swap');
 
 /* ── Page ── */
 .signup {
@@ -16,48 +8,111 @@
   width: 100vw;
   height: 100vh;
   flex-direction: column;
-  background: var(--bg);
+  background: #13131a;
   font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
 }
 
-.signup .title{
-  font-size: 60pt;
+/* ── Background orbs ── */
+.signup::before,
+.signup::after {
+  content: '';
   position: absolute;
-  top: 5px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  pointer-events: none;
 }
 
-.signup .motto{
-  font-size: 20pt;
-  position: absolute;
-  top: 110px;
+.signup::before {
+  width: 450px; height: 450px;
+  background: rgba(108,99,255,0.25);
+  bottom: -100px; right: -80px;
+  animation: signupOrb1 10s ease-in-out infinite;
+}
+
+.signup::after {
+  width: 350px; height: 350px;
+  background: rgba(165,180,252,0.15);
+  top: -80px; left: -60px;
+  animation: signupOrb2 12s ease-in-out infinite;
+}
+
+@keyframes signupOrb1 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-30px,-25px) scale(1.1); }
+}
+@keyframes signupOrb2 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(25px,20px) scale(1.08); }
+}
+
+/* ── Brand ── */
+.signup .brand {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 36px;
+  animation: signupFadeIn 0.6s ease-out;
+}
+
+.signup .brand-name {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 7vw, 3.8rem);
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #f0eeff 0%, #a5b4fc 50%, #6c63ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.signup .brand-motto {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: #8888aa;
+  margin: 8px 0 0;
+  letter-spacing: 0.02em;
+}
+
+@keyframes signupFadeIn {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Card ── */
 .signupForm {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
   align-items: stretch;
   width: 400px;
-  padding: 48px 44px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  max-width: 90vw;
+  padding: 36px 36px 32px;
+  background: rgba(28,28,38,0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid #32323f;
   border-radius: 16px;
-  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  animation: signupCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
+@keyframes signupCardIn {
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Title ── */
 .signupForm h1 {
-  font-size: 26px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 8px;
-  letter-spacing: -0.4px;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f0eeff;
+  margin: 0 0 6px;
 }
 
 /* ── Inputs ── */
@@ -67,24 +122,34 @@
   width: 100%;
   height: 46px;
   padding: 0 14px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
+  background: rgba(19,19,26,0.6);
+  border: 1px solid #32323f;
+  border-radius: 10px;
+  color: #f0eeff;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 0.88rem;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
 .signupForm input[type="text"]:focus,
 .signupForm input[type="email"]:focus,
 .signupForm input[type="password"]:focus {
-  border-color: var(--border-focus);
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
 }
 
 .signupForm input::placeholder {
-  color: #6b6b6b;
+  color: #8888aa;
+}
+
+/* ── Error ── */
+.signupForm .error {
+  font-size: 0.78rem;
+  color: #f87171;
+  margin: 0;
+  padding: 0 2px;
 }
 
 /* ── Signup button ── */
@@ -92,41 +157,48 @@
   width: 100%;
   height: 46px;
   margin-top: 4px;
-  background: var(--text);
+  background: #6c63ff;
   border: none;
-  border-radius: 8px;
-  color: #0f0f0f;
+  border-radius: 10px;
+  color: white;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.3);
 }
 
-.signupEmail:hover  { opacity: 0.85; }
-.signupEmail:active { opacity: 1; }
+.signupEmail:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(108,99,255,0.45);
+}
+
+.signupEmail:active { transform: translateY(0); }
 
 /* ── Login text ── */
 .signup span > p {
-  font-size: 13px;
-  color: var(--muted);
+  font-size: 0.8rem;
+  color: #8888aa;
   margin: 0;
+  text-align: center;
 }
 
 .signup .logB {
-  color: var(--text);
+  color: #a5b4fc;
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
   transition: color 0.15s;
+  font-weight: 500;
 }
 
-.signup .logB:hover { color: var(--danger); }
+.signup .logB:hover { color: #6c63ff; }
 
 /* ── Divider ── */
-.separator {
+.signup .separator {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #32323f;
   margin: 4px 0;
   width: 100%;
 }
@@ -140,60 +212,28 @@
   height: 46px;
   width: 100%;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
+  border: 1px solid #32323f;
+  border-radius: 10px;
+  color: #a0a0c0;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
   padding: 0;
 }
 
 .signupGoogle p { margin: 0; }
 
 .signupGoogle:hover {
-  border-color: var(--border-focus);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-@media (min-width:501px) and (max-width:850px) {
-  .signup .title{
-    font-size: 35pt;
-    top: 20px;
-  }
-  .signup .motto{
-    font-size: 16pt;
-    top: 90px;
-  }
-}
-
-@media (min-width:400px) and (max-width:500px) {
-  .signup .title{
-    font-size: 29pt;
-    top: 20px;
-  }
-  .signup .motto{
-    font-size: 13pt;
-    top: 80px;
-  }
+  border-color: #6c63ff;
+  background: rgba(108,99,255,0.06);
+  color: #f0eeff;
 }
 
 /* ── Responsive ── */
-@media (max-width: 400px) {
-  .signupForm {
-    width: 100%;
-    padding: 48px 28px;
-    justify-content: center;
-  }
-  .signup .title{
-    font-size: 30px;
-    top: 35px;
-  }
-  .signup .motto{
-    font-size: 15px;
-    top: 80px;
-    text-align: center;
-  }
+@media (max-width: 500px) {
+  .signup .brand-name { font-size: 2rem; }
+  .signup .brand-motto { font-size: 0.82rem; }
+  .signupForm { padding: 28px 22px 24px; }
 }
