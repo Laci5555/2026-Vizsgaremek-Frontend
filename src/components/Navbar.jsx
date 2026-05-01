@@ -9,7 +9,7 @@ import { useApp } from '../AppContext';
 export default function Navbar() {
   const { user, isAdmin } = useApp();
   const [name, setName] = useState('');
-  const [pfp, setPfp] = useState('');
+  const [pfp, setPfp] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
 
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!user?.email) {
       setName('');
-      setPfp('');
+      setPfp(null);
       return;
     }
     async function getUserData() {
@@ -28,7 +28,7 @@ export default function Navbar() {
       );
       const lst = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
       setName(lst[0]?.username ?? '');
-      setPfp(lst[0]?.picture ?? '');
+      setPfp(lst[0]?.picture ?? null);
     }
     getUserData();
   }, [user]);

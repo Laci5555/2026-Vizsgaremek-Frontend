@@ -9,7 +9,7 @@ vi.unmock("../src/components/Navbar");
 
 vi.mock("../src/AppContext", () => ({
   useApp: vi.fn(() => ({
-    user: { email: "test@test.com", username: "Test User", picture: "test.png" },
+    user: { email: "test@test.com", username: "Test User", picture: "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg" },
     isAdmin: true
   }))
 }));

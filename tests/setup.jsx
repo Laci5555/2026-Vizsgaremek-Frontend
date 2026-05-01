@@ -1,10 +1,31 @@
 import React from "react";
 import "@testing-library/jest-dom/vitest";
 import * as matchers from "@testing-library/jest-dom/matchers";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 
 expect.extend(matchers);
 
+// Silence common console noise during tests
+const originalError = console.error;
+const originalWarn = console.warn;
+console.error = (...args) => {
+  const msg = args.map(a => a?.toString() || "").join(" ");
+  if (msg.includes("act(...)") || 
+      msg.includes("An update to %s inside a test") || 
+      msg.includes("src attribute") ||
+      msg.includes("empty string") ||
+      msg.includes("download the whole page again")) {
+    return;
+  }
+  originalError(...args);
+};
+console.warn = (...args) => {
+  const msg = args[0]?.toString() || "";
+  if (msg.includes("act(...)")) return;
+  originalWarn(...args);
+};
+
+// Browser API Mocks
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -12,22 +33,16 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 global.IntersectionObserver = class IntersectionObserver {
-  constructor(callback) {
-    this.callback = callback;
-  }
+  constructor(callback) { this.callback = callback; }
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-// Global Mocks for Vitest
-import { vi } from "vitest";
+const PLACEHOLDER_IMG = "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg";
 
 // Mock Firebase Modules
-vi.mock("firebase/app", () => ({
-  initializeApp: vi.fn(),
-}));
-
+vi.mock("firebase/app", () => ({ initializeApp: vi.fn() }));
 vi.mock("firebase/auth", () => ({
   getAuth: vi.fn(),
   signInWithEmailAndPassword: vi.fn(),
@@ -41,7 +56,9 @@ vi.mock("firebase/firestore", () => ({
   getFirestore: vi.fn(),
   collection: vi.fn((db, path) => ({ _path: path })),
   doc: vi.fn(),
-  getDocs: vi.fn(() => Promise.resolve({ docs: [] })),
+  getDocs: vi.fn(() => Promise.resolve({ 
+    docs: [{ data: () => ({ name: "Test Item", username: "Tester", picture: PLACEHOLDER_IMG, img: PLACEHOLDER_IMG, email: "test@test.com" }), id: "test-id" }] 
+  })),
   query: vi.fn(),
   where: vi.fn(),
   orderBy: vi.fn(),
@@ -56,13 +73,13 @@ vi.mock("firebase/firestore", () => ({
   or: vi.fn(),
 }));
 
-// Mock the local firebaseApp file globally
+// Mock local files
 vi.mock("../src/firebaseApp", () => ({
   db: {},
-  auth: {},
+  auth: { currentUser: { email: "test@test.com", photoURL: PLACEHOLDER_IMG } },
 }));
 
-// Mock React Router globally
+// Mock React Router
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
@@ -76,8 +93,8 @@ vi.mock("react-router-dom", async () => {
     Navigate: ({ to }) => <div data-testid="navigate-mock" data-to={to} />,
   };
 });
-// Mock Navbar globally
+
+// Mock Navbar globally to speed up other tests
 vi.mock("../src/components/Navbar", () => ({
   default: () => <div data-testid="navbar-mock">Navbar</div>
 }));
-
