@@ -438,6 +438,54 @@
   letter-spacing: 0.08em;
 }
 
+/* ─── FAQ CTA ───────────────────────────────────────── */
+.home .home-faq-cta {
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(165, 180, 252, 0.05));
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  margin: 40px auto;
+  max-width: 800px;
+}
+
+.home .home-faq-content h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  color: var(--text, #f0eeff);
+  margin: 0 0 16px;
+}
+
+.home .home-faq-content p {
+  color: #8888aa;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0 auto 24px;
+  max-width: 600px;
+}
+
+.home .home-faq-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.home .home-faq-btn:hover {
+  background: #5b54e5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
+}
+
 /* ─── FOOTER ──────────────────────────────────────────── */
 .home .home-footer {
   background: #16161f;

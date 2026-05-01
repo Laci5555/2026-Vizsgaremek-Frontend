@@ -11,7 +11,7 @@ import { AiFillDislike, AiFillLike } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 import {
   addDoc, collection, getDocs, updateDoc, deleteDoc,
-  doc, getDoc, setDoc, increment,
+  doc, getDoc, setDoc, increment, query, where, Timestamp
 } from 'firebase/firestore';
 import { useApp } from '../AppContext';
 
@@ -37,6 +37,12 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   const [showGame, setShowGame] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [searched, setSearched] = useState(false);
+
+  // Reviews & Users state
+  const [users, setUsers] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [myReviewText, setMyReviewText] = useState('');
+  const [isEditingReview, setIsEditingReview] = useState(false);
 
   // Edit modal state
   const [editing, setEditing] = useState(false);
@@ -76,18 +82,48 @@ export default function Games({ gamesDataCollection, genreCollection }) {
       const snap = await getDocs(genreCollection);
       setGenres(snap.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     }
+    async function fetchUsers() {
+      const snap = await getDocs(collection(db, 'user-data'));
+      setUsers(snap.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+    }
     fetchGames();
     fetchGenres();
+    fetchUsers();
   }, []);
 
   useEffect(() => {
     if (!selectedGame || !user) { setUserVote(null); return; }
-    async function fetchVote() {
+    async function fetchVoteAndReviews() {
+      // 1. Fetch user vote
       const voteRef = doc(db, 'user-votes', `${user.uid}_${selectedGame.id}`);
-      const snap = await getDoc(voteRef);
-      setUserVote(snap.exists() ? snap.data().vote : null);
+      const voteSnap = await getDoc(voteRef);
+      setUserVote(voteSnap.exists() ? voteSnap.data().vote : null);
+
+      // 2. Fetch all reviews for this game
+      const reviewsSnap = await getDocs(
+        query(collection(db, 'game-reviews'), where('gameId', '==', selectedGame.id))
+      );
+      const revs = reviewsSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+
+      // Sort reviews: my review first, then by time desc
+      revs.sort((a, b) => {
+        if (a.userId === user.uid) return -1;
+        if (b.userId === user.uid) return 1;
+        return (b.time?.seconds ?? 0) - (a.time?.seconds ?? 0);
+      });
+      setReviews(revs);
+
+      // Set my review text if exists
+      const myRev = revs.find(r => r.userId === user.uid);
+      if (myRev) {
+        setMyReviewText(myRev.text);
+        setIsEditingReview(false);
+      } else {
+        setMyReviewText('');
+        setIsEditingReview(true);
+      }
     }
-    fetchVote();
+    fetchVoteAndReviews();
   }, [selectedGame, user]);
 
   useEffect(() => {
@@ -165,6 +201,13 @@ export default function Games({ gamesDataCollection, genreCollection }) {
       await deleteDoc(voteRef);
     }
 
+    // Sync vote with review if user has one
+    const myRev = reviews.find(r => r.userId === user.uid);
+    if (myRev) {
+      await updateDoc(doc(db, 'game-reviews', myRev.id), { vote: newVote });
+      setReviews(prev => prev.map(r => r.id === myRev.id ? { ...r, vote: newVote } : r));
+    }
+
     const updated = {
       ...selectedGame,
       likes: (selectedGame.likes ?? 0) + likeDelta,
@@ -238,6 +281,37 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     setConfirmDelete(false);
     setEditing(false);
     setShowGame(false);
+  }
+
+  async function submitReview() {
+    if (!myReviewText.trim()) return;
+    const reviewId = `${user.uid}_${selectedGame.id}`;
+    const reviewRef = doc(db, 'game-reviews', reviewId);
+
+    const myRev = reviews.find(r => r.id === reviewId);
+
+    const reviewData = {
+      gameId: selectedGame.id,
+      userId: user.uid,
+      email: user.email,
+      text: myReviewText.trim(),
+      vote: userVote,
+      time: myRev ? myRev.time : Timestamp.now(),
+      edited: !!myRev,
+    };
+
+    try {
+      await setDoc(reviewRef, reviewData);
+      setIsEditingReview(false);
+
+      const newRev = { ...reviewData, id: reviewId };
+      setReviews(prev => {
+        const filtered = prev.filter(r => r.id !== reviewId);
+        return [newRev, ...filtered];
+      });
+    } catch (err) {
+      console.error("Error submitting review:", err);
+    }
   }
 
   const XIcon = () => (
@@ -354,6 +428,65 @@ export default function Games({ gamesDataCollection, genreCollection }) {
                   {selectedGame?.genre.map((x, i) => <div className="gameGenre" key={i}>{x}</div>)}
                 </div>
                 <div className="gameDescription">{selectedGame?.description}</div>
+
+                {/* ── Reviews Section ── */}
+                <div className="gameReviews">
+                  <h4>Reviews</h4>
+
+                  {/* Review Input */}
+                  <div className="reviewInputSection">
+                    {isEditingReview ? (
+                      <div className="reviewForm">
+                        <textarea
+                          placeholder="Write your review here..."
+                          value={myReviewText}
+                          onChange={(e) => setMyReviewText(e.target.value)}
+                          maxLength={500}
+                        />
+                        <div className="reviewFormActions">
+                          <button onClick={submitReview} disabled={!myReviewText.trim()}>
+                            {reviews.some(r => r.userId === user.uid) ? 'Update Review' : 'Submit Review'}
+                          </button>
+                          {reviews.some(r => r.userId === user.uid) && (
+                            <button className="cancelEditBtn" onClick={() => {
+                              setMyReviewText(reviews.find(r => r.userId === user.uid)?.text ?? '');
+                              setIsEditingReview(false);
+                            }}>Cancel</button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="myReviewDisplay">
+                        <button className="editMyReviewBtn" onClick={() => setIsEditingReview(true)}>
+                          Edit my review
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reviews List */}
+                  <div className="reviewsList">
+                    {reviews.length > 0 ? reviews.map(r => {
+                      const reviewer = users.find(u => u.email === r.email) || { username: r.email, picture: '' };
+                      return (
+                        <div className="reviewItem" key={r.id}>
+                          <img src={reviewer.picture || 'https://via.placeholder.com/40'} alt="" className="reviewAvatar" style={{ width: 28, height: 28 }} />
+                          <div className="reviewContent">
+                            <div className="reviewHeader">
+                              <span className="reviewUsername">{reviewer.username}</span>
+                              {r.vote === 'like' && <span className="reviewVote like"><AiFillLike /></span>}
+                              {r.vote === 'dislike' && <span className="reviewVote dislike"><AiFillDislike /></span>}
+                              {r.edited && <span className="reviewEdited">(edited)</span>}
+                            </div>
+                            <p className="reviewText">{r.text}</p>
+                          </div>
+                        </div>
+                      );
+                    }) : (
+                      <p className="noReviews">No reviews yet. Be the first!</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

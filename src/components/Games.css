@@ -553,7 +553,7 @@
     opacity: 1;
 }
 
-.gameDiv img {
+.gameDiv>img {
     width: 100%;
     min-height: 300px;
     max-height: 340px;
@@ -1165,7 +1165,7 @@
         border-radius: 14px;
     }
 
-    .gameDiv img {
+    .gameDiv>img {
         min-height: 180px;
         max-height: 220px;
         border-radius: 14px 14px 0 0;
@@ -1284,5 +1284,208 @@
     .editTextarea {
         font-size: 0.85rem;
         padding: 8px 10px;
+    }
+}
+
+/* ── REVIEWS ── */
+.gameReviews {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+}
+
+.gameReviews h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    color: var(--text);
+    margin: 0 0 16px;
+}
+
+.reviewInputSection {
+    margin-bottom: 24px;
+}
+
+.reviewForm textarea {
+    width: 100%;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    resize: vertical;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.reviewForm textarea:focus {
+    border-color: var(--accent);
+}
+
+.reviewFormActions {
+    display: flex;
+    gap: 12px;
+}
+
+.reviewFormActions button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.reviewFormActions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.reviewFormActions button:not(:disabled):hover {
+    background: var(--accent-hover);
+}
+
+.cancelEditBtn {
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+.cancelEditBtn:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text) !important;
+}
+
+.myReviewDisplay {
+    text-align: right;
+}
+
+.editMyReviewBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editMyReviewBtn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.reviewsList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.reviewsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.reviewsList::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.reviewItem {
+    display: flex;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.reviewItem:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.reviewAvatar {
+    width: 28px;
+    height: 28px;
+    align-self: flex-start;
+    /* ← ez megakadályozza a stretch-et */
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reviewContent {
+    flex: 1;
+}
+
+.reviewHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.reviewUsername {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.reviewVote {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.reviewVote.like {
+    color: #4ade80;
+}
+
+.reviewVote.dislike {
+    color: #f87171;
+}
+
+.reviewEdited {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-left: auto;
+}
+
+.reviewText {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.noReviews {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+@media (max-width: 500px) {
+    .reviewItem {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .reviewAvatar {
+        max-width: 24px;
+        max-height: 24px;
     }
 }

@@ -268,6 +268,17 @@ export default function Home() {
         <StatCounter icon={<FaUsers />} value={activeUsers.length} label="Members" />
       </section>
 
+      {/* ── FAQ CTA ── */}
+      <section className="home-section home-faq-cta">
+        <div className="home-faq-content">
+          <h2>Have questions?</h2>
+          <p>Whether you're new to Gamminity or looking to learn more about our features, our FAQ section has the answers to the most common questions.</p>
+          <button className="home-faq-btn" onClick={() => navigate('/faq')}>
+            Visit FAQ <HiArrowRight />
+          </button>
+        </div>
+      </section>
+
       {/* ── Footer ── */}
       <footer className="home-footer">
         <div className="home-footer-grid">
