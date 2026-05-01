@@ -28,6 +28,9 @@ export default function Finder() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [newGame, setNewGame] = useState('');
+  const [gameSearch, setGameSearch] = useState('');
+  const [showGameDropdown, setShowGameDropdown] = useState(false);
+  const dropdownRef = useRef(null);
   const [newDescription, setNewDescription] = useState('');
   const [newLimit, setNewLimit] = useState(4);
   const [limitEnabled, setLimitEnabled] = useState(false);
@@ -37,6 +40,17 @@ export default function Finder() {
 
   const chatRef = useRef(null);
   const MAX_DESC = 300;
+
+  // ── Klikkelés a legördülőn kívül ──
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowGameDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // ── Betöltés ──
   useEffect(() => {
@@ -462,12 +476,41 @@ export default function Finder() {
 
           <div className="finder-field">
             <label>Game</label>
-            <select value={newGame} onChange={(e) => setNewGame(e.target.value)}>
-              <option value="">Select a game...</option>
-              {games.map((g) => (
-                <option key={g.id} value={g.id}>{g.name}</option>
-              ))}
-            </select>
+            <div className="finder-custom-select" ref={dropdownRef}>
+              <input
+                type="text"
+                placeholder="Search a game..."
+                value={gameSearch}
+                onFocus={() => setShowGameDropdown(true)}
+                onChange={(e) => {
+                  setGameSearch(e.target.value);
+                  setNewGame('');
+                  setShowGameDropdown(true);
+                }}
+              />
+              {showGameDropdown && (
+                <div className="finder-dropdown-list">
+                  {games
+                    .filter(g => g.name.toLowerCase().includes(gameSearch.toLowerCase()))
+                    .map(g => (
+                      <div
+                        key={g.id}
+                        className="finder-dropdown-item"
+                        onClick={() => {
+                          setNewGame(g.id);
+                          setGameSearch(g.name);
+                          setShowGameDropdown(false);
+                        }}
+                      >
+                        {g.name}
+                      </div>
+                    ))}
+                  {games.filter(g => g.name.toLowerCase().includes(gameSearch.toLowerCase())).length === 0 && (
+                    <div className="finder-dropdown-item empty">No games found</div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="finder-field">
