@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 import { IoMdMenu } from 'react-icons/io';
 import { getDocs, query, collection, where } from 'firebase/firestore';
@@ -13,6 +13,8 @@ export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const path = location.pathname;
 
   useEffect(() => {
     if (!user?.email) {
@@ -35,12 +37,12 @@ export default function Navbar() {
     <div className="navbar">
       <IoMdMenu className="menuIkon" onClick={() => setShowMenu((p) => !p)} />
       <div className={`left ${showMenu ? 'show' : ''}`}>
-        <div className="page" onClick={() => navigate('/')}>Home</div>
-        <div className="page" onClick={() => navigate('/games')}>Games</div>
-        <div className="page" onClick={() => navigate('/discussions')}>Discussions</div>
-        <div className="page" onClick={() => navigate('/finder')}>Finder</div>
-        <div className="page" onClick={() => navigate('/faq')}>FAQ</div>
-        {isAdmin && <div className="page" onClick={() => navigate('/admin')}>Admin</div>}
+        <div className={`page ${path === '/' ? 'active' : ''}`} onClick={() => navigate('/')}>Home</div>
+        <div className={`page ${path === '/games' ? 'active' : ''}`} onClick={() => navigate('/games')}>Games</div>
+        <div className={`page ${path.startsWith('/discussion') ? 'active' : ''}`} onClick={() => navigate('/discussions')}>Discussions</div>
+        <div className={`page ${path === '/finder' ? 'active' : ''}`} onClick={() => navigate('/finder')}>Finder</div>
+        <div className={`page ${path === '/faq' ? 'active' : ''}`} onClick={() => navigate('/faq')}>FAQ</div>
+        {isAdmin && <div className={`page ${path === '/admin' ? 'active' : ''}`} onClick={() => navigate('/admin')}>Admin</div>}
       </div>
       <div className="right" onClick={() => navigate('/profile')}>
         <div className="profName">{name}</div>

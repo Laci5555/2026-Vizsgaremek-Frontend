@@ -292,10 +292,10 @@ export default function Home() {
           <div className="home-footer-col">
             <h4>Quick Links</h4>
             <ul>
-              <li onClick={() => navigate('/')}>Home</li>
               <li onClick={() => navigate('/games')}>Games</li>
               <li onClick={() => navigate('/discussions')}>Discussions</li>
               <li onClick={() => navigate('/finder')}>Finder</li>
+              <li onClick={() => navigate('/faq')}>Faq</li>
             </ul>
           </div>
           <div className="home-footer-col">

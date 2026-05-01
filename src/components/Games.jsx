@@ -56,6 +56,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   const [cardsPerRow, setCardsPerRow] = useState(Infinity);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDeleteReview, setConfirmDeleteReview] = useState(false);
 
   useEffect(() => {
     const el = cardlistRef.current;
@@ -314,6 +315,20 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     }
   }
 
+  async function confirmDeleteMyReview() {
+    if (!user || !selectedGame) return;
+    const reviewId = `${user.uid}_${selectedGame.id}`;
+    try {
+      await deleteDoc(doc(db, 'game-reviews', reviewId));
+      setReviews(prev => prev.filter(r => r.id !== reviewId));
+      setMyReviewText('');
+      setIsEditingReview(true);
+    } catch (err) {
+      console.error("Error deleting review:", err);
+    }
+    setConfirmDeleteReview(false);
+  }
+
   const XIcon = () => (
     <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
       <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -443,20 +458,28 @@ export default function Games({ gamesDataCollection, genreCollection }) {
                           onChange={(e) => setMyReviewText(e.target.value)}
                           maxLength={500}
                         />
-                        <div className="reviewFormActions">
-                          <button onClick={submitReview} disabled={!myReviewText.trim()}>
-                            {reviews.some(r => r.userId === user.uid) ? 'Update Review' : 'Submit Review'}
-                          </button>
-                          {reviews.some(r => r.userId === user.uid) && (
-                            <button className="cancelEditBtn" onClick={() => {
-                              setMyReviewText(reviews.find(r => r.userId === user.uid)?.text ?? '');
-                              setIsEditingReview(false);
-                            }}>Cancel</button>
-                          )}
+                        <div className="reviewFormFooter">
+                          <span className={`reviewCharCount${myReviewText.length >= 500 ? ' over' : myReviewText.length > 450 ? ' near' : ''}`}>
+                            {myReviewText.length} / 500
+                          </span>
+                          <div className="reviewFormActions">
+                            <button onClick={submitReview} disabled={!myReviewText.trim()}>
+                              {reviews.some(r => r.userId === user.uid) ? 'Update Review' : 'Submit Review'}
+                            </button>
+                            {reviews.some(r => r.userId === user.uid) && (
+                              <button className="cancelEditBtn" onClick={() => {
+                                setMyReviewText(reviews.find(r => r.userId === user.uid)?.text ?? '');
+                                setIsEditingReview(false);
+                              }}>Cancel</button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ) : (
                       <div className="myReviewDisplay">
+                        <button className="deleteMyReviewBtn" onClick={() => setConfirmDeleteReview(true)}>
+                          Delete review
+                        </button>
                         <button className="editMyReviewBtn" onClick={() => setIsEditingReview(true)}>
                           Edit my review
                         </button>
@@ -515,7 +538,17 @@ export default function Games({ gamesDataCollection, genreCollection }) {
             <h2>Submit a game to be added!</h2>
             <div>
               <label>Game's name</label>
-              <input type="text" placeholder="e.g. Elden Ring..." value={newGameName} onChange={(e) => setNewGameName(e.target.value)} />
+              <input
+                type="text"
+                placeholder="e.g. Elden Ring..."
+                value={newGameName}
+                onChange={(e) => setNewGameName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newGameName.trim()) {
+                    submitRequest();
+                  }
+                }}
+              />
             </div>
             <button className="submit-btn" disabled={!newGameName.trim()} onClick={submitRequest}>Submit request</button>
           </div>
@@ -598,19 +631,35 @@ export default function Games({ gamesDataCollection, genreCollection }) {
             <button className="deleteGameButton" onClick={deleteGame}>Delete game</button>
             <button className="editGameButton" onClick={saveEdit} disabled={!editName.trim()}>Edit game</button>
           </div>
-          {/* ── Confirm delete modal ── */}
-          <div
-            className={`backdrop ${confirmDelete ? 'visible' : ''}`}
-            onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setConfirmDelete(false); }}
-          >
-            <div className="confirmModal" onClick={(e) => e.stopPropagation()}>
-              <p className="confirmTitle">Are you sure you want to delete this game?</p>
-              <p className="confirmSub">This action cannot be undone.</p>
-              <div className="confirmActions">
-                <button className="confirmCancel" onClick={() => setConfirmDelete(false)}>Cancel</button>
-                <button className="confirmDelete" onClick={confirmDeleteGame}>Delete</button>
-              </div>
-            </div>
+        </div>
+      </div>
+
+      {/* ── Confirm delete modal ── */}
+      <div
+        className={`backdrop ${confirmDelete ? 'visible' : ''}`}
+        onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setConfirmDelete(false); }}
+      >
+        <div className="confirmModal" onClick={(e) => e.stopPropagation()}>
+          <p className="confirmTitle">Are you sure you want to delete this game?</p>
+          <p className="confirmSub">This action cannot be undone.</p>
+          <div className="confirmActions">
+            <button className="confirmCancel" onClick={() => setConfirmDelete(false)}>Cancel</button>
+            <button className="confirmDelete" onClick={confirmDeleteGame}>Delete</button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Confirm delete review modal ── */}
+      <div
+        className={`backdrop ${confirmDeleteReview ? 'visible' : ''}`}
+        onMouseDownCapture={(e) => { if (e.target === e.currentTarget) setConfirmDeleteReview(false); }}
+      >
+        <div className="confirmModal" onClick={(e) => e.stopPropagation()}>
+          <p className="confirmTitle">Are you sure you want to delete your review?</p>
+          <p className="confirmSub">This action cannot be undone. (Your vote will remain)</p>
+          <div className="confirmActions">
+            <button className="confirmCancel" onClick={() => setConfirmDeleteReview(false)}>Cancel</button>
+            <button className="confirmDelete" onClick={confirmDeleteMyReview}>Delete</button>
           </div>
         </div>
       </div>
