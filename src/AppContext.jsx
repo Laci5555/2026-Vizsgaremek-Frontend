@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebaseApp';
 
+const ADMIN_EMAIL = 'admin@gmail.com';
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
@@ -16,8 +17,10 @@ export function AppProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  const isAdmin = user?.email === ADMIN_EMAIL;
+
   return (
-    <AppContext.Provider value={{ user, loading }}> {/* 👈 */}
+    <AppContext.Provider value={{ user, loading, isAdmin }}> {/* 👈 */}
       {children}
     </AppContext.Provider>
   );

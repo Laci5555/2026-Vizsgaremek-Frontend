@@ -19,9 +19,9 @@ const CARD_WIDTH = 200;
 const CARD_GAP = 20;
 const MAX_DESC = 500;
 
-export default function Games({ gamesDataCollection, genreCollection, isAdmin = true }) {
+export default function Games({ gamesDataCollection, genreCollection }) {
 
-  const { user } = useApp();
+  const { user, isAdmin } = useApp();
   const [userVote, setUserVote] = useState(null);
 
   const [game, setGame] = useState('');

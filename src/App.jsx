@@ -45,6 +45,16 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+// 👇 Admin-only útvonal – nem admin -> redirect home-ra
+function AdminRoute({ children }) {
+  const { user, loading, isAdmin } = useApp();
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return children;
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -74,7 +84,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <ProtectedRoute><Admin /></ProtectedRoute>,
+    element: <AdminRoute><Admin /></AdminRoute>,
   },
   {
     path: '/profile',

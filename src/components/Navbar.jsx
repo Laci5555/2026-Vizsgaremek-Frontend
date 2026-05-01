@@ -7,7 +7,7 @@ import { db } from '../../firebaseApp';
 import { useApp } from '../AppContext';
 
 export default function Navbar() {
-  const { user } = useApp();
+  const { user, isAdmin } = useApp();
   const [name, setName] = useState('');
   const [pfp, setPfp] = useState('');
   const [showMenu, setShowMenu] = useState(false);
@@ -39,6 +39,7 @@ export default function Navbar() {
         <div className="page" onClick={() => navigate('/games')}>Games</div>
         <div className="page" onClick={() => navigate('/discussions')}>Discussions</div>
         <div className="page" onClick={() => navigate('/finder')}>Finder</div>
+        {isAdmin && <div className="page" onClick={() => navigate('/admin')}>Admin</div>}
       </div>
       <div className="right" onClick={() => navigate('/profile')}>
         <div className="profName">{name}</div>

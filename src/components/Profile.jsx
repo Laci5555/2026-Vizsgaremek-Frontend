@@ -17,8 +17,8 @@ const MAX_DESC = 300;
 
 
 
-export default function Profile({ auth, isAdmin = true }) {
-  const { user } = useApp();
+export default function Profile({ auth }) {
+  const { user, isAdmin } = useApp();
   const navigate = useNavigate();
 
   // Tab definíciók
