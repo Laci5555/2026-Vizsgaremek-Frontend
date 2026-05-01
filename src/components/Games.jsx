@@ -100,9 +100,16 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     if (activeFilters.length > 0) result = result.filter((x) => x.genre.some((g) => activeFilters.includes(g)));
     result = sortGames(result);
     setGames(result);
-    setSearched(true);
-    setShowFilter(false);
+    setSearched(searchName.trim() !== '' || activeFilters.length > 0);
   }
+
+  // Real-time search with small debounce (150ms – runs on local data, no Firebase)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      filterGames(game, genreFilters);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [game, gamesMain]);
 
   function sortGames(list) {
     switch (sortBy) {
@@ -112,7 +119,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     }
   }
 
-  
+
 
   function handleFilterGenre(e, name) {
     e.stopPropagation();
@@ -258,13 +265,9 @@ export default function Games({ gamesDataCollection, genreCollection }) {
             <IoSearchOutline style={{ color: 'grey' }} />
             <input
               type="text" className="searchBar" value={game}
-              onChange={(e) => {
-                setGame(e.target.value);
-                if (e.target.value.trim() === '') { setGames(gamesMain); setSearched(false); }
-              }}
-              onKeyDown={(e) => e.key === 'Enter' && filterGames(game, genreFilters)}
+              placeholder="Search games..."
+              onChange={(e) => setGame(e.target.value)}
             />
-            <input className="searchBtn" type="button" value="Search" onClick={() => filterGames(game, genreFilters)} />
           </div>
           <div className="sortOptions">
             <span>Sort by</span>
@@ -284,14 +287,14 @@ export default function Games({ gamesDataCollection, genreCollection }) {
             ))}
           </div>
           <span className="filterLabel">Categories By</span>
-            <div className="checkboxs">
-              {genres.map((x) => (
-                <div className="genres" key={x.id} onClick={(e) => handleFilterGenre(e, x.name)}>
-                  <input type="checkbox" readOnly checked={genreFilters.includes(x.name)} />
-                  <label>{x.name}</label>
-                </div>
-              ))}
-            </div>
+          <div className="checkboxs">
+            {genres.map((x) => (
+              <div className="genres" key={x.id} onClick={(e) => handleFilterGenre(e, x.name)}>
+                <input type="checkbox" readOnly checked={genreFilters.includes(x.name)} />
+                <label>{x.name}</label>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ── Card list ── */}
