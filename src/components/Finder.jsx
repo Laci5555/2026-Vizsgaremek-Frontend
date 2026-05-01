@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import Navbar from './Navbar';
+import Message from './Message';
 import './Finder.css';
 import { GoPlus } from 'react-icons/go';
 import { IoArrowBack, IoExitOutline } from 'react-icons/io5';
@@ -509,6 +510,8 @@ export default function Finder() {
           </button>
         </div>
       </div>
+
+      <Message />
     </div>
   );
 }

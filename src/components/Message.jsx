@@ -234,7 +234,17 @@ export default function Message() {
   const otherUser = selectedConv ? getUserByEmail(selectedConv.otherEmail) : null;
 
   return (
-    <div className="message">
+    <>
+      {showMessage && (
+        <div
+          className="message-backdrop"
+          style={{ position: 'fixed', inset: 0, zIndex: 98 }}
+          onMouseDownCapture={(e) => {
+            if (e.target === e.currentTarget) setShowMessage(false);
+          }}
+        />
+      )}
+      <div className="message">
       {!showMessage ? (
         <div className="showChat" onClick={() => setShowMessage(true)} style={{ position: 'relative' }}>
           <FaUserFriends />
@@ -452,6 +462,7 @@ export default function Message() {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
