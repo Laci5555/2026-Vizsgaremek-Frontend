@@ -56,6 +56,14 @@ export default function Signup({ auth }) {
         username: name,
         picture: 'https://res.cloudinary.com/drhhiqyci/image/upload/v1777718656/default-avatar-profile-icon-social-600nw-1906669723_jnpajd.jpg',
       });
+
+      // 3. Welcome email küldése a backendnek (háttérben, nem blokkoljuk a navigációt)
+      fetch(`${API_BASE_URL}/welcome-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, username: name })
+      }).catch(err => console.error("Email error:", err));
+
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -72,6 +80,13 @@ export default function Signup({ auth }) {
       const snap = await getDocs(query(userDataCollection, where('email', '==', gEmail)));
       if (snap.docs.length === 0) {
         await addDoc(userDataCollection, { email: gEmail, username: displayName, picture: photoURL });
+
+        // Welcome email küldése az új Google usernek
+        fetch(`${API_BASE_URL}/welcome-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: gEmail, username: displayName })
+        }).catch(err => console.error("Email error:", err));
       }
       navigate('/');
     } catch (err) {

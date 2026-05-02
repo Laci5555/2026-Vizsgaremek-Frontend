@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseApp';
+import { useApp } from '../AppContext';
 
 const userDataCollection = collection(db, 'user-data');
 
@@ -12,6 +13,7 @@ export default function Login({ auth }) {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [error, setError] = useState('');
+  const { API_BASE_URL } = useApp();
 
   const navigate = useNavigate();
 
@@ -32,6 +34,13 @@ export default function Login({ auth }) {
       const snap = await getDocs(query(userDataCollection, where('email', '==', gEmail)));
       if (snap.docs.length === 0) {
         await addDoc(userDataCollection, { email: gEmail, username: displayName, picture: photoURL });
+
+        // Welcome email küldése az új Google usernek (Login oldalról is)
+        fetch(`${API_BASE_URL}/welcome-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: gEmail, username: displayName })
+        }).catch(err => console.error("Email error:", err));
       }
       navigate('/');
     } catch (err) {
