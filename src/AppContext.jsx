@@ -4,6 +4,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebaseApp';
 
 const ADMIN_EMAIL = 'admin@gmail.com';
+// 👇 Backend API URL – publikálásnál csak ezt az egy sort kell átírni
+const API_BASE_URL = 'http://localhost:88';
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
@@ -21,7 +23,7 @@ export function AppProvider({ children }) {
   const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
-    <AppContext.Provider value={{ user, loading, isAdmin }}> {/* 👈 */}
+    <AppContext.Provider value={{ user, loading, isAdmin, API_BASE_URL }}>  {/* 👈 */}
       {children}
     </AppContext.Provider>
   );

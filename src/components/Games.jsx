@@ -28,7 +28,7 @@ const XIcon = () => (
 
 export default function Games({ gamesDataCollection, genreCollection }) {
 
-  const { user, isAdmin } = useApp();
+  const { user, isAdmin, API_BASE_URL } = useApp();
   const [userVote, setUserVote] = useState(null);
 
   const [game, setGame] = useState('');
@@ -56,8 +56,11 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   const [editName, setEditName] = useState('');
   const [editGenres, setEditGenres] = useState([]);
   const [editPicture, setEditPicture] = useState('');
+  const [editPicturePublicId, setEditPicturePublicId] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [useUrl, setUseUrl] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
 
   const cardlistRef = useRef(null);
   const [cardsPerRow, setCardsPerRow] = useState(Infinity);
@@ -245,8 +248,10 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     setEditName(selectedGame?.name ?? '');
     setEditGenres(selectedGame?.genre ?? []);
     setEditPicture(selectedGame?.img ?? '');
+    setEditPicturePublicId(selectedGame?.imgPublicId ?? '');
     setEditDescription(selectedGame?.description ?? '');
     setUseUrl(true);
+    setSelectedFileName('');
     setEditing(true);
   }
 
@@ -256,17 +261,62 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     );
   }
 
+  // ── Játékkép feltöltés Cloudinary-ra (szerkesztéskor) ──
+  async function uploadEditImage(file) {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE_URL}/uploadFile`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const data = await response.json();
+      setEditPicture(data.url);
+      setEditPicturePublicId(data.public_id);
+    } catch (err) {
+      console.error('Game image upload error:', err);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  // ── Régi kép törlése Cloudinary-ról ──
+  async function deleteOldImage(publicId) {
+    if (!publicId) return;
+    try {
+      await fetch(`${API_BASE_URL}/deleteImage`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: publicId }),
+      });
+    } catch (err) {
+      console.error('Delete old image error:', err);
+    }
+  }
+
   async function saveEdit() {
     if (!selectedGame?.id) return;
     try {
+      // Ha a kép megváltozott és volt régi Cloudinary kép, töröljük
+      const oldPublicId = selectedGame?.imgPublicId;
+      if (oldPublicId && oldPublicId !== editPicturePublicId) {
+        await deleteOldImage(oldPublicId);
+      }
+
       await updateDoc(doc(db, 'games', selectedGame.id), {
         name: editName,
         genre: editGenres,
         img: editPicture,
+        imgPublicId: editPicturePublicId,
         description: editDescription,
       });
       // Lokális state frissítése – nem kell újra fetchelni
-      const updated = { ...selectedGame, name: editName, genre: editGenres, img: editPicture, description: editDescription };
+      const updated = { ...selectedGame, name: editName, genre: editGenres, img: editPicture, imgPublicId: editPicturePublicId, description: editDescription };
       setGamesMain((prev) => prev.map((x) => x.id === selectedGame.id ? updated : x));
       setGames((prev) => prev.map((x) => x.id === selectedGame.id ? updated : x));
       setSelectedGame(updated);
@@ -283,6 +333,10 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   async function confirmDeleteGame() {
     if (!selectedGame?.id) return;
     try {
+      // Töröljük a Cloudinary képet is, ha van
+      if (selectedGame?.imgPublicId) {
+        await deleteOldImage(selectedGame.imgPublicId);
+      }
       await deleteDoc(doc(db, 'games', selectedGame.id));
       setGamesMain((prev) => prev.filter((x) => x.id !== selectedGame.id));
       setGames((prev) => prev.filter((x) => x.id !== selectedGame.id));
@@ -607,12 +661,23 @@ export default function Games({ gamesDataCollection, genreCollection }) {
           <div className="editField">
             <label>Game picture:</label>
             {useUrl ? (
-              <input type="text" value={editPicture} onChange={(e) => setEditPicture(e.target.value)} placeholder="https://..." />
+              <input type="text" value={editPicture} onChange={(e) => {
+                setEditPicture(e.target.value);
+                setEditPicturePublicId('');
+              }} placeholder="https://..." />
             ) : (
               <div>
-                <input style={{ display: 'none' }} type="file" id="editFile" onChange={(e) => setEditPicture(e.target.value)} />
-                <label className="fileChooser" htmlFor="editFile">Choose file</label>
-                {editPicture && <span className="fileName">{editPicture.split('fakepath\\')[1]}</span>}
+                <input style={{ display: 'none' }} type="file" id="editFile" accept="image/*" onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setSelectedFileName(file.name);
+                    uploadEditImage(file);
+                  }
+                }} />
+                <label className="fileChooser" htmlFor="editFile">
+                  {uploading ? 'Uploading...' : 'Choose file'}
+                </label>
+                {selectedFileName && <span className="fileName">{selectedFileName}</span>}
               </div>
             )}
           </div>
@@ -632,7 +697,9 @@ export default function Games({ gamesDataCollection, genreCollection }) {
 
           <div className="editActions">
             <button className="deleteGameButton" onClick={deleteGame}>Delete game</button>
-            <button className="editGameButton" onClick={saveEdit} disabled={!editName.trim()}>Edit game</button>
+            <button className="editGameButton" onClick={saveEdit} disabled={!editName.trim() || uploading}>
+              {uploading ? 'Uploading...' : 'Edit game'}
+            </button>
           </div>
         </div>
       </div>

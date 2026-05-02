@@ -7,17 +7,23 @@ import {
   addDoc, collection, deleteDoc, doc, getDocs,
   query, Timestamp,
 } from 'firebase/firestore';
+import { useApp } from '../AppContext';
 
 export default function Admin() {
+  const { API_BASE_URL } = useApp();
+
   const [gameName, setGameName] = useState('');
   const [genres, setGenres] = useState([]);
   const [gameGenres, setGameGenres] = useState([]);
   const [genre, setGenre] = useState('');
   const [gamePicture, setGamePicture] = useState('');
+  const [gamePicturePublicId, setGamePicturePublicId] = useState('');
   const [url, setUrl] = useState(true);
   const [requests, setRequests] = useState([]);
   const [description, setDescription] = useState('');
   const [r, refresh] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
 
   const MAX_DESC = 500;
 
@@ -49,6 +55,30 @@ export default function Admin() {
     if (match) await delGameRequest(match.id);
   }
 
+  // ── Játékkép feltöltés Cloudinary-ra ──
+  async function uploadGameImage(file) {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE_URL}/uploadFile`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const data = await response.json();
+      setGamePicture(data.url);
+      setGamePicturePublicId(data.public_id);
+    } catch (err) {
+      console.error('Game image upload error:', err);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function addGame() {
     if (gameName.trim().length === 0) return;
     const normalize = (s) => s.toLocaleLowerCase().trim().replace(/\s+/g, '');
@@ -59,7 +89,8 @@ export default function Admin() {
 
     if (!existing) {
       await addDoc(collection(db, 'games'), {
-        name: gameName, img: gamePicture, likes: 0, dislikes: 0,
+        name: gameName, img: gamePicture, imgPublicId: gamePicturePublicId,
+        likes: 0, dislikes: 0,
         genre: gameGenres, description, createdAt:Timestamp.now()
       });
     }else{
@@ -71,6 +102,8 @@ export default function Admin() {
     setGameGenres([]);
     setDescription('');
     setGamePicture('');
+    setGamePicturePublicId('');
+    setSelectedFileName('');
   }
 
   async function addGenre() {
@@ -110,7 +143,8 @@ export default function Admin() {
   const canAddGame =
     gameName.trim().length > 0 &&
     gameGenres.length > 0 &&
-    gamePicture.trim().length > 0;
+    gamePicture.trim().length > 0 &&
+    !uploading;
 
   return (
     <div className="admin">
@@ -162,7 +196,10 @@ export default function Admin() {
                 <label htmlFor="gamePicture">Game picture: </label>
                 <input
                   id="gamePicture" type="text" value={gamePicture}
-                  onChange={(e) => setGamePicture(e.target.value)}
+                  onChange={(e) => {
+                    setGamePicture(e.target.value);
+                    setGamePicturePublicId('');
+                  }}
                   data-testid="admin-game-picture"
                 />
               </div>
@@ -171,12 +208,21 @@ export default function Admin() {
                 <label htmlFor="myfile">Select files: </label>
                 <input
                   style={{ display: 'none' }} type="file" id="myfile" name="myfile"
-                  onChange={(e) => setGamePicture(e.target.value)}
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setSelectedFileName(file.name);
+                      uploadGameImage(file);
+                    }
+                  }}
                 />
-                <label className="fileChooser" htmlFor="myfile">File choosing</label>
-                {gamePicture.length > 0 && (
+                <label className="fileChooser" htmlFor="myfile">
+                  {uploading ? 'Uploading...' : 'File choosing'}
+                </label>
+                {selectedFileName && (
                   <div className="fileNames">
-                    <span>{gamePicture.split('fakepath\\')[1]}</span>
+                    <span>{selectedFileName}</span>
                   </div>
                 )}
               </div>
@@ -198,7 +244,7 @@ export default function Admin() {
 
           <input
             className="addGameButton" style={{ width: '200px' }}
-            type="button" value="Add new game"
+            type="button" value={uploading ? 'Uploading...' : 'Add new game'}
             onClick={addGame} disabled={!canAddGame}
             data-testid="admin-add-game-btn"
           />

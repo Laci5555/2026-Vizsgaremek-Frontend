@@ -23,7 +23,7 @@ const XIcon = () => (
 );
 
 export default function Profile({ auth }) {
-  const { user, isAdmin } = useApp();
+  const { user, isAdmin, API_BASE_URL } = useApp();
   const navigate = useNavigate();
 
   // Tab definíciók
@@ -37,9 +37,12 @@ export default function Profile({ auth }) {
   // ── User adatok ──
   const [username, setUsername] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
+  const [profilePicturePublicId, setProfilePicturePublicId] = useState('');
   const [currentid, setCurrentid] = useState(null);
   const [useUrl, setUseUrl] = useState(true);
   const [activeTab, setActiveTab] = useState('favourites');
+  const [uploading, setUploading] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
 
   // ── Favourite games ──
   const [favourites, setFavourites] = useState([]);
@@ -68,6 +71,7 @@ export default function Profile({ auth }) {
         const d = userData.data();
         setUsername(d.username ?? '');
         setProfilePicture(d.picture ?? '');
+        setProfilePicturePublicId(d.picturePublicId ?? '');
         setCurrentid(userData.id);
         setFavourites(d.favourites ?? []);
       }
@@ -156,14 +160,62 @@ export default function Profile({ auth }) {
     return allUsers.find((p) => p.email === email);
   }
 
+  // ── Profilkép feltöltés Cloudinary-ra ──
+  async function uploadProfilePicture(file) {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE_URL}/uploadPfp`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const data = await response.json();
+      setProfilePicture(data.url);
+      setProfilePicturePublicId(data.public_id);
+    } catch (err) {
+      console.error('Profile picture upload error:', err);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  // ── Régi kép törlése Cloudinary-ról ──
+  async function deleteOldImage(publicId) {
+    if (!publicId) return;
+    try {
+      await fetch(`${API_BASE_URL}/deleteImage`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: publicId }),
+      });
+    } catch (err) {
+      console.error('Delete old image error:', err);
+    }
+  }
+
   // ── Profile mentés ──
   async function updateData() {
     if (!currentid) return;
     try {
+      // Ha volt régi kép és az új kép más public_id-val rendelkezik, töröljük a régit
+      const userSnap = await getDocs(query(collection(db, 'user-data'), where('email', '==', user.email)));
+      const oldData = userSnap.docs[0]?.data();
+      const oldPublicId = oldData?.picturePublicId;
+
+      if (oldPublicId && oldPublicId !== profilePicturePublicId) {
+        await deleteOldImage(oldPublicId);
+      }
+
       await setDoc(doc(db, 'user-data', currentid), {
         email: user.email,
         username,
         picture: profilePicture,
+        picturePublicId: profilePicturePublicId,
         favourites,
       });
     } catch (err) { console.error(err); }
@@ -172,9 +224,15 @@ export default function Profile({ auth }) {
   // ── User törlés (admin) – "Deleted" pattern ──
   async function deleteUser(person) {
     try {
+      // Régi profilkép törlése Cloudinary-ról
+      if (person.picturePublicId) {
+        await deleteOldImage(person.picturePublicId);
+      }
+
       await updateDoc(doc(db, 'user-data', person.id), {
         username: 'Deleted',
         picture: 'https://www.shutterstock.com/image-vector/delete-account-vector-icon-user-600nw-2508332847.jpg',
+        picturePublicId: '',
         disabled: true,
       });
       setPeoples((prev) => prev.filter((p) => p.id !== person.id));
@@ -423,21 +481,34 @@ export default function Profile({ auth }) {
                     <input
                       type="text" placeholder="Image URL..."
                       value={profilePicture}
-                      onChange={(e) => setProfilePicture(e.target.value)}
+                      onChange={(e) => {
+                        setProfilePicture(e.target.value);
+                        setProfilePicturePublicId('');
+                      }}
                     />
                   ) : (
                     <div className="profile-file-row">
                       <input
                         style={{ display: 'none' }} type="file" id="profileFile" accept="image/*"
-                        onChange={(e) => setProfilePicture(e.target.value)}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setSelectedFileName(file.name);
+                            uploadProfilePicture(file);
+                          }
+                        }}
                       />
-                      <label className="fileChooser" htmlFor="profileFile">Choose file</label>
-                      {profilePicture && <span className="fileName">{profilePicture.split('fakepath\\')[1]}</span>}
+                      <label className="fileChooser" htmlFor="profileFile">
+                        {uploading ? 'Uploading...' : 'Choose file'}
+                      </label>
+                      {selectedFileName && <span className="fileName">{selectedFileName}</span>}
                     </div>
                   )}
                 </div>
 
-                <button className="profile-save-btn" onClick={updateData}>Save changes</button>
+                <button className="profile-save-btn" onClick={updateData} disabled={uploading}>
+                  {uploading ? 'Uploading...' : 'Save changes'}
+                </button>
               </div>
             </div>
           )}

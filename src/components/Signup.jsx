@@ -29,7 +29,7 @@ export default function Signup({ auth }) {
       await addDoc(userDataCollection, {
         email,
         username: name,
-        picture: 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
+        picture: 'https://res.cloudinary.com/drhhiqyci/image/upload/v1777718656/default-avatar-profile-icon-social-600nw-1906669723_jnpajd.jpg',
       });
       navigate('/');
     } catch (err) {
