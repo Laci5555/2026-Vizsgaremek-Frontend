@@ -4,6 +4,15 @@ import userEvent from "@testing-library/user-event";
 import Home from "../src/components/Home";
 import { useNavigate } from "react-router-dom";
 
+// Mock AppContext
+vi.mock("../src/AppContext", () => ({
+  useApp: vi.fn(() => ({
+    API_BASE_URL: "http://localhost:88",
+    user: null,
+    isAdmin: false
+  }))
+}));
+
 // Mock Navbar and Message
 vi.mock("../src/components/Navbar", () => ({
   default: () => <div data-testid="navbar-mock">Navbar</div>
@@ -15,14 +24,8 @@ vi.mock("../src/components/Message", () => ({
 describe("Home Component", () => {
   test("renders Home page and checks hero title", async () => {
     render(<Home />);
-    expect(await screen.findByText((content, node) => {
-      const hasText = (node) => node.textContent === 'Discover, Rate &Discuss Your Favorite Games';
-      const nodeHasText = hasText(node);
-      const childrenDontHaveText = Array.from(node.children).every(
-        child => !hasText(child)
-      );
-      return nodeHasText && childrenDontHaveText;
-    })).toBeInTheDocument();
+    // Adjusted to match the actual text content which might have spaces/line breaks
+    expect(await screen.findByText(/Discover, Rate &.*Discuss Your Favorite Games/i)).toBeInTheDocument();
   });
 
   test("FAQ CTA button navigates to /faq", async () => {

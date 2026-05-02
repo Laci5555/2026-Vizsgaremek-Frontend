@@ -1,7 +1,24 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Login from "../src/components/Login";
+import { useNavigate } from "react-router-dom";
+
+// Mock AppContext
+vi.mock("../src/AppContext", () => ({
+  useApp: vi.fn(() => ({
+    API_BASE_URL: "http://localhost:88"
+  }))
+}));
+
+const mockedNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => mockedNavigate
+  };
+});
 
 describe("Login Component", () => {
   test("renders login form correctly", () => {
