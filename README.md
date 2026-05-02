@@ -19,7 +19,6 @@
 - [d) Adattárolás](#d-adattárolás)
 - [e) Backend végpontok](#e-backend-végpontok)
 - [f) Tesztelés](#f-tesztelés)
-- [Telepítés és futtatás](#-telepítés-és-futtatás)
 
 ---
 
@@ -412,6 +411,8 @@ cd 2026-Vizsgaremek-Frontend
 pnpm test
 ```
 
+> 💡 **Tipp:** A `tests/run_tests.bat` fájl dupla kattintással is futtatható — automatikusan lefuttatja az összes tesztet, nincs szükség parancssori ismeretekre.
+
 <!-- 📸 KÉPERNYŐKÉP: A frontend tesztek sikeres futtatása a terminálban (pnpm test) -->
 > ![Frontend tesztek](screenshots/frontend_tests.png)
 
@@ -439,34 +440,10 @@ cd 2026-Vizsgaremek-Backend
 pnpm test
 ```
 
+> 💡 **Tipp:** A `tests/run_tests.bat` fájl dupla kattintással is futtatható — automatikusan lefuttatja az összes tesztet, nincs szükség parancssori ismeretekre.
+
 <!-- 📸 KÉPERNYŐKÉP: A backend tesztek sikeres futtatása a terminálban (pnpm test) -->
 > ![Backend tesztek](screenshots/backend_tests.png)
-
----
-
-## 🚀 Telepítés és futtatás
-
-### Előfeltételek
-- [Node.js](https://nodejs.org/) (v18+)
-- [pnpm](https://pnpm.io/) csomagkezelő
-
-### Frontend
-```bash
-cd 2026-Vizsgaremek-Frontend
-pnpm install
-pnpm dev
-```
-Az alkalmazás a `http://localhost:5173` címen lesz elérhető.
-
-### Backend
-```bash
-cd 2026-Vizsgaremek-Backend
-pnpm install
-node index.js
-```
-A szerver a `http://localhost:88` címen indul el.
-
-> **Megjegyzés:** A backend működéséhez szükséges egy `.env` fájl a Cloudinary és Gmail hitelesítő adatokkal.
 
 ---
 
