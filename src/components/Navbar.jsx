@@ -11,6 +11,7 @@ export default function Navbar() {
   const [name, setName] = useState('');
   const [pfp, setPfp] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const { API_BASE_URL } = useApp();
 
   const navigate = useNavigate();
   const location = useLocation();

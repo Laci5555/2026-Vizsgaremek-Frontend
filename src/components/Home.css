@@ -14,6 +14,62 @@
   scroll-behavior: smooth;
 }
 
+/* ─── SERVER STATUS BADGE (In-flow) ─────────────────── */
+.home-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(19, 19, 26, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+
+.home-status-badge .dot {
+  width: 8px; /* Picit nagyobb pötty */
+  height: 8px;
+  border-radius: 50%;
+}
+
+.home-status-badge.online {
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.home-status-badge.online .dot {
+  background: #4ade80;
+  box-shadow: 0 0 12px #4ade80;
+  animation: statusPulse 2s infinite;
+}
+
+.home-status-badge.offline {
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.home-status-badge.offline .dot {
+  background: #f87171;
+  box-shadow: 0 0 12px #f87171;
+}
+
+.home-status-badge .text {
+  font-size: 0.7rem; /* Nagyobb betűméret */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #f0eeff; /* Világosabb szöveg a jobb olvashatóságért */
+}
+
+@keyframes statusPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .home-status-badge { top: 80px; left: 16px; }
+}
+
 .home::-webkit-scrollbar { width: 6px; }
 .home::-webkit-scrollbar-track { background: transparent; }
 .home::-webkit-scrollbar-thumb { background: #32323f; border-radius: 3px; }

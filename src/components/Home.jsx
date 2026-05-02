@@ -5,6 +5,7 @@ import Message from './Message';
 import './Home.css';
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebaseApp';
+import { useApp } from '../AppContext';
 import { AiFillLike } from 'react-icons/ai';
 import { FaUsers, FaComments, FaGamepad, FaDiscord, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
@@ -64,6 +65,8 @@ export default function Home() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isOnline, setIsOnline] = useState(false); // Alapértelmezetten false, amíg nem válaszol
+  const { API_BASE_URL } = useApp();
 
   // Track scroll position for scroll-to-top button
   useEffect(() => {
@@ -79,6 +82,22 @@ export default function Home() {
   function scrollToTop() {
     homeRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Backend Status Polling (Render Keep-Alive)
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/health`);
+        setIsOnline(res.ok);
+      } catch (err) {
+        setIsOnline(false);
+      }
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 30000);
+    return () => clearInterval(interval);
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     async function fetchData() {
@@ -151,6 +170,14 @@ export default function Home() {
             <button className="home-btn-outline" onClick={() => navigate('/discussions')}>
               Join Discussions
             </button>
+          </div>
+
+          {/* ── Server Status Badge (Inside Hero, below buttons) ── */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '124px' }}>
+            <div className={`home-status-badge ${isOnline ? 'online' : 'offline'}`}>
+              <span className="dot"></span>
+              <span className="text">{isOnline ? "All Systems Operational" : "Service Currently Unavailable"}</span>
+            </div>
           </div>
         </div>
       </section>
