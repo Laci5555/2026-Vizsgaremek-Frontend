@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebaseApp';
+import { useApp } from '../AppContext';
 
 const userDataCollection = collection(db, 'user-data');
 
@@ -16,6 +17,8 @@ export default function Signup({ auth }) {
   const [pass, setPass] = useState('');
   const [spass, setSpass] = useState('');
   const [error, setError] = useState('');
+  const [validating, setValidating] = useState(false);
+  const { API_BASE_URL } = useApp();
 
   const navigate = useNavigate();
 
@@ -24,7 +27,29 @@ export default function Signup({ auth }) {
       setError('A két jelszó nem egyezik meg!');
       return;
     }
+    if (!name || !email || !pass) {
+      setError('Minden mezőt ki kell tölteni!');
+      return;
+    }
+
+    setValidating(true);
+    setError('');
+
     try {
+      // Backend email format check
+      const res = await fetch(`${API_BASE_URL}/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const validationData = await res.json();
+
+      if (!res.ok || !validationData.valid) {
+        setError(validationData.message || 'Invalid email address.');
+        setValidating(false);
+        return;
+      }
+
       await createUserWithEmailAndPassword(auth, email, pass);
       await addDoc(userDataCollection, {
         email,
@@ -35,6 +60,8 @@ export default function Signup({ auth }) {
     } catch (err) {
       setError(err.message);
       console.error(err);
+    } finally {
+      setValidating(false);
     }
   }
 
@@ -65,8 +92,8 @@ export default function Signup({ auth }) {
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Password" value={pass} onChange={(e) => setPass(e.target.value)} required />
         <input type="password" placeholder="Password again" value={spass} onChange={(e) => setSpass(e.target.value)} required />
-        {error && <p className="error">{error}</p>}
-        <input type="button" value="Sign up" className="signupEmail" onClick={signUpWithEmailAndPass} />
+        {error && <p className="error" style={{ color: '#ff4d4f', fontSize: '0.9rem', marginBottom: '10px' }}>{error}</p>}
+        <input type="button" value={validating ? "Checking..." : "Sign up"} disabled={validating} className="signupEmail" onClick={signUpWithEmailAndPass} />
         <span style={{ display: 'flex', justifyContent: 'center', gap: '5px' }}>
           <p>Already have an account? <span className="logB" onClick={() => navigate('/login')}>Login</span></p>
         </span>
