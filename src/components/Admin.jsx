@@ -24,6 +24,7 @@ export default function Admin() {
   const [r, refresh] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   const MAX_DESC = 500;
 
@@ -58,6 +59,7 @@ export default function Admin() {
   // ── Játékkép feltöltés Cloudinary-ra ──
   async function uploadGameImage(file) {
     setUploading(true);
+    setUploadError('');
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -74,6 +76,7 @@ export default function Admin() {
       setGamePicturePublicId(data.public_id);
     } catch (err) {
       console.error('Game image upload error:', err);
+      setUploadError('Upload failed. Please try again later.');
     } finally {
       setUploading(false);
     }
@@ -225,6 +228,7 @@ export default function Admin() {
                     <span>{selectedFileName}</span>
                   </div>
                 )}
+                {uploadError && <p className="upload-error">{uploadError}</p>}
               </div>
             )}
           </div>

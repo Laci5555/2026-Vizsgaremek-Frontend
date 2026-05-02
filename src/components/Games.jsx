@@ -61,6 +61,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   const [useUrl, setUseUrl] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   const cardlistRef = useRef(null);
   const [cardsPerRow, setCardsPerRow] = useState(Infinity);
@@ -252,6 +253,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
     setEditDescription(selectedGame?.description ?? '');
     setUseUrl(true);
     setSelectedFileName('');
+    setUploadError('');
     setEditing(true);
   }
 
@@ -264,6 +266,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
   // ── Játékkép feltöltés Cloudinary-ra (szerkesztéskor) ──
   async function uploadEditImage(file) {
     setUploading(true);
+    setUploadError('');
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -280,6 +283,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
       setEditPicturePublicId(data.public_id);
     } catch (err) {
       console.error('Game image upload error:', err);
+      setUploadError('Upload failed. Please try again later.');
     } finally {
       setUploading(false);
     }
@@ -677,6 +681,7 @@ export default function Games({ gamesDataCollection, genreCollection }) {
                 <label className="fileChooser" htmlFor="editFile">
                   {uploading ? 'Uploading...' : 'Choose file'}
                 </label>
+                {uploadError && <p className="upload-error">{uploadError}</p>}
                 {selectedFileName && <span className="fileName">{selectedFileName}</span>}
               </div>
             )}

@@ -43,6 +43,7 @@ export default function Profile({ auth }) {
   const [activeTab, setActiveTab] = useState('favourites');
   const [uploading, setUploading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   // ── Favourite games ──
   const [favourites, setFavourites] = useState([]);
@@ -163,6 +164,7 @@ export default function Profile({ auth }) {
   // ── Profilkép feltöltés Cloudinary-ra ──
   async function uploadProfilePicture(file) {
     setUploading(true);
+    setUploadError('');
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -179,6 +181,7 @@ export default function Profile({ auth }) {
       setProfilePicturePublicId(data.public_id);
     } catch (err) {
       console.error('Profile picture upload error:', err);
+      setUploadError('Upload failed. Please try again later.');
     } finally {
       setUploading(false);
     }
@@ -502,6 +505,7 @@ export default function Profile({ auth }) {
                         {uploading ? 'Uploading...' : 'Choose file'}
                       </label>
                       {selectedFileName && <span className="fileName">{selectedFileName}</span>}
+                      {uploadError && <p className="upload-error">{uploadError}</p>}
                     </div>
                   )}
                 </div>
