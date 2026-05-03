@@ -223,14 +223,14 @@ export default function Message() {
 
   const filteredFriends = q
     ? friendUsers.filter(
-        (u) => (u.username ?? '').toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
-      )
+      (u) => (u.username ?? '').toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+    )
     : friendUsers;
 
   const filteredOthers = q
     ? otherUsers.filter(
-        (u) => (u.username ?? '').toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
-      )
+      (u) => (u.username ?? '').toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+    )
     : otherUsers;
 
   if (!user) return null;
@@ -249,49 +249,49 @@ export default function Message() {
         />
       )}
       <div className="message">
-      {!showMessage ? (
-        <div className="showChat" onClick={() => setShowMessage(true)} style={{ position: 'relative' }}>
-          <FaUserFriends />
-          <Badge count={totalUnread} />
-        </div>
-      ) : (
-        <div className="messages">
+        {!showMessage ? (
+          <div className="showChat" onClick={() => setShowMessage(true)} style={{ position: 'relative' }}>
+            <FaUserFriends />
+            <Badge count={totalUnread} />
+          </div>
+        ) : (
+          <div className="messages">
 
-          {/* ── CHAT VIEW ── */}
-          {selectedConv ? (
-            <>
-              <div className="messages-header">
-                <div className="header-left">
-                  <IoArrowBack className="backBtn" onClick={() => setSelectedConv(null)} />
-                  <UserAvatar
-                    src={otherUser?.picture}
-                    alt={otherUser?.username}
-                    style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0 }}
-                  />
-                  <span className="header-email">
-                    {otherUser?.username ?? selectedConv.otherEmail}
-                  </span>
+            {/* ── CHAT VIEW ── */}
+            {selectedConv ? (
+              <>
+                <div className="messages-header">
+                  <div className="header-left">
+                    <IoArrowBack className="backBtn" onClick={() => setSelectedConv(null)} />
+                    <UserAvatar
+                      src={otherUser?.picture}
+                      alt={otherUser?.username}
+                      style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0 }}
+                    />
+                    <span className="header-email">
+                      {otherUser?.username ?? selectedConv.otherEmail}
+                    </span>
+                  </div>
+                  <IoMdClose className="closeChat" onClick={() => setShowMessage(false)} />
                 </div>
-                <IoMdClose className="closeChat" onClick={() => setShowMessage(false)} />
-              </div>
 
-              <div className="chat-messages">
-                {selectedConv.messages.map((msg, i) => {
-                  const senderUser = getUserByEmail(msg.sender);
-                  const isMe = msg.sender === user.email;
-                  return (
-                    <div key={msg.id ?? i} className={`bubble-wrap ${isMe ? 'me' : 'them'}`}>
-                      {!isMe && (
-                        <UserAvatar
-                          src={senderUser?.picture}
-                          alt={senderUser?.username}
-                          style={{ width: 22, height: 22, borderRadius: '50%', marginBottom: 2 }}
-                        />
-                      )}
-                      <div className={`bubble ${isMe ? 'me' : 'them'}`}>{msg.text}</div>
-                      <span className="bubble-time">
-                        {msg.time?.toDate?.()
-                          ? (() => {
+                <div className="chat-messages">
+                  {selectedConv.messages.map((msg, i) => {
+                    const senderUser = getUserByEmail(msg.sender);
+                    const isMe = msg.sender === user.email;
+                    return (
+                      <div key={msg.id ?? i} className={`bubble-wrap ${isMe ? 'me' : 'them'}`}>
+                        {!isMe && (
+                          <UserAvatar
+                            src={senderUser?.picture}
+                            alt={senderUser?.username}
+                            style={{ width: 22, height: 22, borderRadius: '50%', marginBottom: 2 }}
+                          />
+                        )}
+                        <div className={`bubble ${isMe ? 'me' : 'them'}`}>{msg.text}</div>
+                        <span className="bubble-time">
+                          {msg.time?.toDate?.()
+                            ? (() => {
                               const d = msg.time.toDate();
                               const now = new Date();
                               const isToday = d.toDateString() === now.toDateString();
@@ -302,170 +302,174 @@ export default function Message() {
                               if (isYesterday) return 'tegnap';
                               return d.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' });
                             })()
-                          : ''}
-                      </span>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className="chat-input-wrap">
-                <input
-                  className="chat-input"
-                  type="text"
-                  placeholder="Üzenet..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                />
-                <button className="send-btn" onClick={sendMessage}>
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2">
-                    <line x1="22" y1="2" x2="11" y2="13" />
-                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                </button>
-              </div>
-            </>
-          ) : (
-
-          /* ── LIST VIEW ── */
-            <>
-              <div className="messages-header">
-                <span>Messages</span>
-                <IoMdClose className="closeChat" onClick={() => setShowMessage(false)} />
-              </div>
-
-              <div className="messages-tabs">
-                <button
-                  className={`tab-btn ${activeTab === 'friends' ? 'active' : ''}`}
-                  onClick={() => { setActiveTab('friends'); setSearchQuery(''); }}
-                >
-                  Direct-Messages
-                </button>
-                <button
-                  className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-                  onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
-                >
-                  Others
-                </button>
-              </div>
-
-              {/* Search box */}
-              <div className="new-chat" style={{ paddingBottom: 10 }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  background: 'rgba(255,255,255,0.04)',
-                  borderBottom: '1px solid rgba(255,255,255,0.12)',
-                  padding: '6px 4px',
-                }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="rgba(255,255,255,0.35)" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder={activeTab === 'friends' ? 'Search friends...' : 'Search users...'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{
-                      flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                      fontSize: 13, color: 'rgba(255,255,255,0.7)', fontFamily: 'inherit',
-                    }}
-                  />
-                  {searchQuery && (
-                    <IoMdClose
-                      style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}
-                      onClick={() => setSearchQuery('')}
-                    />
-                  )}
+                            : ''}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
                 </div>
-              </div>
 
-              {/* Friends tab */}
-              {activeTab === 'friends' && (
-                <div className="conversations-list">
-                  <p className="section-label">Most recent</p>
-                  {filteredFriends.length === 0 ? (
-                    <p className="no-messages">
-                      {q ? 'No results.' : 'No conversations yet.'}
-                    </p>
-                  ) : (
-                    filteredFriends.map((fu) => {
-                      const key = createKey(user.email, fu.email);
-                      const conv = messages.find(
-                        (c) => createKey(c.participants[0], c.participants[1]) === key,
-                      );
-                      const lastMsg = conv?.messages[conv.messages.length - 1];
-                      const unread = getUnreadCount(fu.email);
-                      return (
-                        <div
-                          key={fu.email}
-                          className="conversation-item"
-                          onClick={() => conv ? openConversation(conv) : openNewConversation(fu.email)}
-                        >
-                          <UserAvatar
-                            src={fu.picture}
-                            alt={fu.username}
-                            style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-                              border: '1px solid rgba(255,255,255,0.08)' }}
-                          />
-                          <div className="conv-info">
-                            <span className="conv-email">{fu.username ?? fu.email}</span>
-                            {lastMsg && (
-                              <span className="conv-last-msg">
-                                {lastMsg.sender === user.email ? 'You: ' : ''}{lastMsg.text}
-                              </span>
+                <div className="chat-input-wrap">
+                  <input
+                    className="chat-input"
+                    type="text"
+                    placeholder="Üzenet..."
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                  />
+                  <button className="send-btn" onClick={sendMessage}>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg>
+                  </button>
+                </div>
+              </>
+            ) : (
+
+              /* ── LIST VIEW ── */
+              <>
+                <div className="messages-header">
+                  <span>Messages</span>
+                  <IoMdClose className="closeChat" onClick={() => setShowMessage(false)} />
+                </div>
+
+                <div className="messages-tabs">
+                  <button
+                    className={`tab-btn ${activeTab === 'friends' ? 'active' : ''}`}
+                    onClick={() => { setActiveTab('friends'); setSearchQuery(''); }}
+                  >
+                    Direct-Messages
+                  </button>
+                  <button
+                    className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+                    onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
+                  >
+                    Others
+                  </button>
+                </div>
+
+                {/* Search box */}
+                <div className="new-chat" style={{ paddingBottom: 10 }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    background: 'rgba(255,255,255,0.04)',
+                    borderBottom: '1px solid rgba(255,255,255,0.12)',
+                    padding: '6px 4px',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="rgba(255,255,255,0.35)" strokeWidth="2" strokeLinecap="round">
+                      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder={activeTab === 'friends' ? 'Search chats...' : 'Search users...'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{
+                        flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                        fontSize: 13, color: 'rgba(255,255,255,0.7)', fontFamily: 'inherit',
+                      }}
+                    />
+                    {searchQuery && (
+                      <IoMdClose
+                        style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}
+                        onClick={() => setSearchQuery('')}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Friends tab */}
+                {activeTab === 'friends' && (
+                  <div className="conversations-list">
+                    <p className="section-label">Most recent</p>
+                    {filteredFriends.length === 0 ? (
+                      <p className="no-messages">
+                        {q ? 'No results.' : 'No conversations yet.'}
+                      </p>
+                    ) : (
+                      filteredFriends.map((fu) => {
+                        const key = createKey(user.email, fu.email);
+                        const conv = messages.find(
+                          (c) => createKey(c.participants[0], c.participants[1]) === key,
+                        );
+                        const lastMsg = conv?.messages[conv.messages.length - 1];
+                        const unread = getUnreadCount(fu.email);
+                        return (
+                          <div
+                            key={fu.email}
+                            className="conversation-item"
+                            onClick={() => conv ? openConversation(conv) : openNewConversation(fu.email)}
+                          >
+                            <UserAvatar
+                              src={fu.picture}
+                              alt={fu.username}
+                              style={{
+                                width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                                border: '1px solid rgba(255,255,255,0.08)'
+                              }}
+                            />
+                            <div className="conv-info">
+                              <span className="conv-email">{fu.username ?? fu.email}</span>
+                              {lastMsg && (
+                                <span className="conv-last-msg">
+                                  {lastMsg.sender === user.email ? 'You: ' : ''}{lastMsg.text}
+                                </span>
+                              )}
+                            </div>
+                            {unread > 0 && (
+                              <div className="conv-right">
+                                <Badge count={unread} />
+                              </div>
                             )}
                           </div>
-                          {unread > 0 && (
-                            <div className="conv-right">
-                              <Badge count={unread} />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              )}
+                        );
+                      })
+                    )}
+                  </div>
+                )}
 
-              {/* Others tab */}
-              {activeTab === 'all' && (
-                <div className="conversations-list">
-                  <p className="section-label">Others</p>
-                  {filteredOthers.length === 0 ? (
-                    <p className="no-messages">
-                      {q ? 'No results.' : "Everyone's friends now!"}
-                    </p>
-                  ) : (
-                    filteredOthers.map((ou) => (
-                      <div
-                        key={ou.email}
-                        className="conversation-item"
-                        onClick={() => openNewConversation(ou.email)}
-                      >
-                        <UserAvatar
-                          src={ou.picture}
-                          alt={ou.username}
-                          style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-                            border: '1px solid rgba(255,255,255,0.08)' }}
-                        />
-                        <div className="conv-info">
-                          <span className="conv-email">{ou.username ?? ou.email}</span>
-                          <span className="conv-last-msg" style={{ fontStyle: 'italic' }}>
-                            No messages yet
-                          </span>
+                {/* Others tab */}
+                {activeTab === 'all' && (
+                  <div className="conversations-list">
+                    <p className="section-label">Others</p>
+                    {filteredOthers.length === 0 ? (
+                      <p className="no-messages">
+                        {q ? 'No results.' : "Everyone's friends now!"}
+                      </p>
+                    ) : (
+                      filteredOthers.map((ou) => (
+                        <div
+                          key={ou.email}
+                          className="conversation-item"
+                          onClick={() => openNewConversation(ou.email)}
+                        >
+                          <UserAvatar
+                            src={ou.picture}
+                            alt={ou.username}
+                            style={{
+                              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                              border: '1px solid rgba(255,255,255,0.08)'
+                            }}
+                          />
+                          <div className="conv-info">
+                            <span className="conv-email">{ou.username ?? ou.email}</span>
+                            <span className="conv-last-msg" style={{ fontStyle: 'italic' }}>
+                              No messages yet
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
+                      ))
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
